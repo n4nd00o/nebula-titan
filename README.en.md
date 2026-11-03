@@ -183,7 +183,7 @@ Full write-up (Portuguese): [docs/ARQUITETURA.md](docs/ARQUITETURA.md) · Game D
 
 ## 👤 Author
 
-**Luiz Fernando Santana**: [GitHub](https://github.com/n4nd00o) · [LinkedIn](https://linkedin.com/in/YOUR-PROFILE) · luizfernandosantanadev@gmail.com
+**Luiz Fernando Santana**: [GitHub](https://github.com/n4nd00o) · [LinkedIn](https://www.linkedin.com/in/luiz-fernando-santana-trindade/) · luizfernandosantanadev@gmail.com
 
 ## 📄 License
 

@@ -364,7 +364,7 @@ nebula-titan/
 Estudante de [CURSO] na [INSTITUIÇÃO]
 
 - GitHub: [@n4nd00o](https://github.com/n4nd00o)
-- LinkedIn: [linkedin.com/in/SEU-PERFIL](https://linkedin.com/in/SEU-PERFIL)
+- LinkedIn: [linkedin.com/in/luiz-fernando-santana-trindade](https://www.linkedin.com/in/luiz-fernando-santana-trindade/)
 - E-mail: luizfernandosantanadev@gmail.com
 
 <!-- Se o projeto foi feito em grupo, liste aqui os demais integrantes e o papel de cada um. -->
