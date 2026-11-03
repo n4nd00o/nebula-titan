@@ -1,0 +1,42 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #05050d;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+#game {
+  display: block;
+  background: #05050d;
+  /* Mantém os pixels "duros" ao escalar (sem borrar a pixel art). */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  /* Evita zoom/rolagem por gestos de toque no celular. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+.error {
+  position: absolute;
+  inset: auto 16px 16px;
+  color: #ffcd75;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  text-align: center;
+}

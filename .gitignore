@@ -1,0 +1,18 @@
+# Dependências (o projeto não tem, mas por precaução)
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.idea/
+*.swp
+
+# Cobertura de testes
+coverage/

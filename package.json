@@ -1,0 +1,27 @@
+{
+  "name": "nebula-titan",
+  "version": "1.2.1",
+  "homepage": "https://nebula-titan.vercel.app",
+  "repository": { "type": "git", "url": "https://github.com/n4nd00o/nebula-titan.git" },
+  "description": "Shoot 'em up retrô inspirado em Galaga com uma batalha contra um chefe de partes destrutíveis. JavaScript puro + HTML5 Canvas, sem dependências.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "game",
+    "shmup",
+    "canvas",
+    "javascript",
+    "retro",
+    "boss-fight",
+    "pixel-art"
+  ],
+  "author": "Luiz Fernando Santana",
+  "license": "MIT"
+}
