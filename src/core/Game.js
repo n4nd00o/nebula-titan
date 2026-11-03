@@ -104,7 +104,7 @@ export class Game {
 
   draw() {
     const ctx = this.ctx;
-    ctx.fillStyle = '#05050d';
+    ctx.fillStyle = this.starfield.bg;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     this.starfield.draw(ctx);
     this.scene.draw(ctx);

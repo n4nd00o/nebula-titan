@@ -1,6 +1,6 @@
 # 📖 Game Design Document: Nebula Titan
 
-> Versão 1.2 · Especificação de design do jogo
+> Versão 1.3 · Especificação de design do jogo
 
 ---
 
@@ -9,12 +9,12 @@
 | Item | Descrição |
 |---|---|
 | **Título** | Nebula Titan |
-| **Gênero** | Shoot 'em up vertical: setores de ondas + boss rush (3 mini-chefes, Titã e o chefe final Leviatã) |
+| **Gênero** | Shoot 'em up vertical: 4 mundos de setores de ondas + boss rush (12 mini-chefes, 4 chefes e o chefe final Leviatã) |
 | **Plataforma** | Navegador (desktop e mobile) |
 | **Público** | Jogadores casuais e fãs de arcade; partidas de 2 a 5 minutos |
 | **Inspiração** | Galaga (1981) pela estrutura; Monster Hunter, Zelda e bullet hells modernos pelas mecânicas |
 | **Pitch** | *"Uma nave contra um titã. Escolha sua rota, roube o poder de cada guardião e desmonte o titã peça por peça."* |
-| **Modos** | **Campanha** (2 setores → 3 mini-chefes em ordem livre → Titã → Leviatã, com buffs) e **Duelo** (só o Titã, sem buffs) |
+| **Modos** | **Campanha** (4 mundos: 2 setores → 3 mini-chefes em ordem livre → chefe; o Mundo 4 termina no Leviatã), com buffs, save e seleção de mundo; e **Duelo** (só o Titã, sem buffs) |
 
 ## 2. Pilares de design
 
@@ -136,10 +136,12 @@ Entre fases há **2,6 s de transição**: o chefe fica invulnerável, treme e vo
 
 ## 6. Campanha e mini-chefes
 
-### 6.1 Estrutura
+> **v1.3:** esta seção descreve o **Mundo 1**. A partir da v1.3, o Titã fecha o Mundo 1 e abre o Mundo 2; o Leviatã passou a ser o último encontro do Mundo 4, depois do Arconte. Veja a seção [6C](#6c-os-quatro-mundos-v13).
+
+### 6.1 Estrutura (Mundo 1)
 
 ```
-                    [ LEVIATÃ ]       ← chefe final (8 fases), liberado pelo Titã
+                    [ MUNDO 2 ]       ← v1.3: o Titã abre o próximo mundo (até a v1.2, levava ao Leviatã)
                          |
                  [ NEBULA TITAN ]     ← liberado após os 3 mini-chefes (+ Bomba de Pulso)
                 /       |        \
@@ -150,7 +152,7 @@ Entre fases há **2,6 s de transição**: o chefe fica invulnerável, treme e vo
 
 - O jogador escolhe o próximo alvo na tela **Rota de Ataque** (mapa).
 - Cada mini-chefe concede um **buff permanente** até o fim da campanha.
-- Derrotar os três libera a **Bomba de Pulso** e o Nebula Titan.
+- Derrotar os três libera a **Bomba de Pulso** (o bônus do Mundo 1) e o Nebula Titan.
 - **Derrota:** o jogador recomeça a **luta atual** com vidas cheias e buffs mantidos; a pontuação da campanha é **zerada** (penalidade).
 - As **vidas acumulam** entre as fases (máximo 5). Os power-ups temporários (tiro duplo, rápido, escudo) não passam de uma luta para outra; os buffs, sim.
 - **Corrida perfeita:** zerar a campanha sem nenhuma morte (contando tentativas que terminaram em *continue*) vale **+100.000 pontos**.
@@ -246,6 +248,70 @@ Cada seção é construída em torno de **uma ameaça que um buff resolve**. Sem
 **Sinalização:** colchetes **amarelos** = ponto fraco comum; **cinza-azulados** = blindado; **verdes** = regenerando. Tiros comuns em blindagem fazem som metálico e mostram "BLINDADO! (PERFURANTE IGNORA)".
 
 **Música:** acelera 3% a cada seção e 28% no núcleo.
+
+## 6C. Os quatro mundos (v1.3)
+
+### Estrutura
+
+```
+MUNDO 1 Nebulosa Carmim   Setores 1-2 → Sentinela/Colmeia/Ceifador → NEBULA TITAN
+MUNDO 2 Cinturão Glacial  Setores 3-4 → Prisma/Vórtice/Escaravelho → HIDRA GLACIAL
+MUNDO 3 Forja Estelar     Setores 5-6 → Martelo/Gêmeos/Fornalha    → ÉGIDE
+MUNDO 4 Vazio Abissal     Setores 7-8 → Espectro/Oráculo/Eco       → ARCONTE → LEVIATÃ
+```
+
+Cada mundo apresenta **um alienígena novo** nos setores e **uma família de mecânicas** nos chefes. Vencer os 3 mini-chefes de um mundo dá um **bônus de mundo** (Mundo 1: Bomba de Pulso; 2: Bomba Extra; 3: Recarga de Bomba; 4: Bomba Nova).
+
+### Curva de dificuldade
+
+| Mundo | Ataques (`attackRate`) | Velocidade dos projéteis | Vida extra dos chefes na campanha |
+|:---:|:---:|:---:|---|
+| 1 | ×1,00 | ×1,00 | Titã +80% |
+| 2 | ×1,05 | ×1,05 | Hidra +40% |
+| 3 | ×1,10 | ×1,08 | Égide +50% |
+| 4 | ×1,15 | ×1,12 | Arconte +60%, Leviatã +120% |
+
+Os setores também ficam mais agressivos (mergulhos de 2,2 s no Setor 1 até 0,8 s no Setor 8, e até 6 mergulhadores simultâneos). A duração das lutas foi medida por simulação: com o poder de fogo esperado em cada mundo, as lutas contra chefes ficam mais longas a cada mundo (≈80 s, 85 s, 100 s, 106 s e 122 s no Leviatã, sem contar o tempo gasto desviando).
+
+### Mundo 2: Cinturão Glacial (projéteis que se dividem e gravidade)
+
+| Encontro | Fases | Mecânica | Buff |
+|---|---|---|---|
+| **Prisma** | Fragmentos (4) → Núcleo Refrator | Cristais que **se dividem em leque** no ar; fragmento destruído estilhaça em anel; orbes que explodem em anéis. | **Tiro Triplo**: 2 tiros diagonais (60% do dano) |
+| **Vórtice** | Turbinas (2) → Olho do Furacão | **Gravidade** puxa a nave (mais fraca a cada turbina perdida); na fase 2 ela alterna entre puxar e **empurrar**. Correntes de tiros com **curva**. | **Onda de Choque**: o dash apaga projéteis num raio de 80 px e fere drones |
+| **Escaravelho** | Mandíbulas (2) → Carapaça | Investidas laterais; o núcleo fica atrás de uma **carapaça indestrutível que abre por 2,4 s** e fecha por 2,6 s (abre soltando um anel; fechada, solta minas). | **Carapaça**: começa cada luta com escudo, que volta após 20 s sem dano |
+| **Hidra Glacial** (chefe) | Cabeças Gêmeas → Sopro Congelante → Escamas de Gelo (4, blindadas) → Coração (regenera) | Uma cabeça cortada sozinha **renasce em 9 s** (contagem no HUD); **sopro**: raio com 1 s de aviso que varre em direção à nave. | — |
+
+### Mundo 3: Forja Estelar (raios e fogo)
+
+| Encontro | Fases | Mecânica | Buff |
+|---|---|---|---|
+| **Martelo** | Pistões (2) → Martelo-Mestre | **Pancada**: trava na posição X da nave, mostra a sombra (0,85 s) e desce até y = 420; no impacto, **ondas de choque** correm para os lados. | **Sobrecarga**: cadência +25% |
+| **Gêmeos** | Irmãos (2) → Elo | Duas naves em órbita elíptica ligadas por um **raio letal** (2,6 s ligado, 1,6 s desligado, pisca antes); derrubar uma enfurece a outra. Fase 2: leques **espelhados**. | **Ala Dupla**: segunda nave aliada, do lado direito |
+| **Fornalha** | Chaminés (3) → Núcleo Derretido | **Colunas de fogo** com faixa de aviso (0,9 s) e 0,9 s de fogo; brasas que aceleram. Fase 2: dois **raios giratórios** de 270 px (círculo de alcance desenhado). | **Mísseis Teleguiados**: 2 mísseis a cada 1,1 s |
+| **Égide** (chefe) | Baterias (4) → Anel de Escudo (6 segmentos blindados giratórios) → Arma Principal (raio que varre) → Núcleo (regenera) | Os segmentos giram mais rápido a cada segmento perdido; o raio carrega 1,1 s mirando ao lado da nave e varre por cima dela. | — |
+
+### Mundo 4: Vazio Abissal (intangibilidade, *bullet hell* e imitação)
+
+| Encontro | Fases | Mecânica | Buff |
+|---|---|---|---|
+| **Espectro** | Lanternas (3) → Aparição | **Ciclo espectral**: sólido → desvanece → **intangível** (tiros atravessam, colchetes somem) → teletransporta → reaparece soltando um anel. | **Fantasma**: dash recarrega em 1 s e dá 0,5 s de invencibilidade |
+| **Oráculo** | Pétalas (4) → Olho do Oráculo | Flores de projéteis lentos que **fazem curva** em sentidos opostos; pede o **modo foco**. | **Foco Amplificado**: no modo foco, tiros causam +60% de dano |
+| **Eco** | Refletores (2) → Reflexo | Cópia sombria da nave do jogador que **segue a sua posição X** com atraso; os refletores disparam rajadas retas (atire nas pausas). Fase 2: voa **espelhado** e faz projéteis **subirem do fundo da tela** depois de um marcador. | **Escudo Reativo**: quando o escudo quebra, solta um pulso que limpa a tela e fere os pontos fracos |
+| **Arconte** (chefe) | Cápsulas Reais → Asas Gravitacionais → Canhão Tesoura → Máscara → Núcleo | Usa a tecnologia dos guardiões: cápsulas orbitais (Sentinela), gravidade (Vórtice), dois raios que se fecham como **tesoura**, máscara **blindada e espectral** (Espectro) e um núcleo com gravidade pulsante. | — |
+
+### Alienígenas novos
+
+| Tipo | Mundo | Vida | Fileira | Ataque e comportamento |
+|---|:---:|:---:|---|---|
+| **Azul (blindado)** | 2 | 7 | Cima | Mergulha devagar; tiro de cristal que se divide em anel de 6 |
+| **Roxo (divisor)** | 3 | 2 | Baixo | 2 agulhas; ao morrer, vira **2 drones verdes** que mergulham na hora |
+| **Vermelho (kamikaze)** | 4 | 1 | Baixo | Não atira; mergulha a 360 px/s perseguindo com força |
+
+### Salvar e selecionar mundo
+
+- O progresso é salvo no `localStorage` **após cada vitória**. **CONTINUAR** retoma no setor ou no mapa certo. O save é apagado ao zerar a campanha.
+- **MUNDO < N >** (mundos já alcançados) começa no mundo escolhido com os buffs dos mundos anteriores, pontuação zerada e 3 vidas.
 
 ## 7. Inimigos menores: alienígenas de escolta
 

@@ -28,7 +28,7 @@ export class Player {
     this.time = 0;
     this.focused = false;
     this.godMode = false;
-    // Buffs da campanha (Set com 'piercing', 'wingman', 'dash', 'bomb').
+    // Buffs da campanha (Set com ids de BUFFS em systems/Campaign.js).
     this.buffs = new Set();
     this.dashTime = 0; // > 0 enquanto está no meio de um dash
     this.dashCooldown = 0;
@@ -52,9 +52,10 @@ export class Player {
     }
     const len = Math.hypot(x, y);
     this.dashDir = { x: x / len, y: y / len };
+    const phantom = this.buffs.has('phantom'); // Fantasma: recarga e invencibilidade melhores
     this.dashTime = PLAYER.dashDuration;
-    this.dashCooldown = PLAYER.dashCooldown;
-    this.invuln = Math.max(this.invuln, PLAYER.dashInvuln);
+    this.dashCooldown = phantom ? PLAYER.phantomDashCooldown : PLAYER.dashCooldown;
+    this.invuln = Math.max(this.invuln, phantom ? PLAYER.phantomDashInvuln : PLAYER.dashInvuln);
     scene.onPlayerDash?.(this);
   }
 
@@ -122,7 +123,8 @@ export class Player {
     this.fireTimer -= dt;
     const wantsFire = input.isDown('fire') || input.pointer.active;
     if (wantsFire && this.fireTimer <= 0) {
-      this.fireTimer = this.rapidTime > 0 ? PLAYER.rapidCooldown : PLAYER.fireCooldown;
+      const base = this.rapidTime > 0 ? PLAYER.rapidCooldown : PLAYER.fireCooldown;
+      this.fireTimer = this.buffs.has('overdrive') ? base * PLAYER.overdriveFactor : base;
       scene.firePlayerShot(this);
     }
   }

@@ -11,13 +11,14 @@
  *
  * Modos:
  *  - duel:     luta direta contra o Nebula Titan (sem buffs);
- *  - campaign: setores, mini-chefes, Titã e Leviatã; usa e concede buffs.
+ *  - campaign: 4 mundos (setores, mini-chefes e chefes) até o Leviatã;
+ *              usa e concede buffs e salva o progresso após cada vitória.
  *
  * Sub-estados: playing | paused | gameover | victory
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, PLAYER, DEBUG, UI_COLORS } from '../config.js';
 import { Player } from '../entities/Player.js';
-import { PlayerBullet, EnemyBullet } from '../entities/projectiles.js';
+import { PlayerBullet, PlayerMissile, EnemyBullet } from '../entities/projectiles.js';
 import { Minion } from '../entities/Minion.js';
 import { PowerUp } from '../entities/PowerUp.js';
 import { Wingman } from '../entities/Wingman.js';
@@ -30,16 +31,17 @@ import { fireSpread, aimAtPlayer } from '../boss/patterns.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
 import { circleOverlap, pointSegmentDistance } from '../systems/Collision.js';
 import { computeResults, rulesForParTime, formatTime } from '../systems/Scoring.js';
-import { BUFFS, MINI_BOSS_IDS, PERFECT_RUN_BONUS } from '../systems/Campaign.js';
+import { BUFFS, REWARDS, WORLDS, PERFECT_RUN_BONUS, worldEncounters, worldIndexOf } from '../systems/Campaign.js';
 import { drawText } from '../graphics/text.js';
 import { rand, clamp, removeDead } from '../utils/math.js';
 import { TitleScene } from './TitleScene.js';
 import { MapScene } from './MapScene.js';
 
 const MAX_ENEMY_BULLETS = 450;
-/** Tempo-par da campanha inteira (soma dos tempos-par de todas as fases). */
-const CAMPAIGN_PAR_TIME = 90 + 110 + 120 * MINI_BOSS_IDS.length + 300 + 420;
-const CAMPAIGN_TITAN_HP_SCALE = 1.8;
+/** Tempo-par da campanha inteira (soma dos tempos-par de todas as fases de todos os mundos). */
+const CAMPAIGN_PAR_TIME = WORLDS.flatMap(worldEncounters).reduce((sum, id) => sum + ENCOUNTERS[id].parTime, 0);
+export const SAVE_KEY = 'campaignSave';
+export const UNLOCK_KEY = 'worldsUnlocked';
 
 export class PlayScene {
   /**
@@ -56,11 +58,26 @@ export class PlayScene {
     this.mode = campaign ? 'campaign' : 'duel';
     this.def = ENCOUNTERS[bossId];
 
+    // Mundo e dificuldade (no Duelo vale o Mundo 1).
+    this.worldIndex = campaign ? Math.max(0, worldIndexOf(bossId)) : 0;
+    this.world = WORLDS[this.worldIndex];
+    const difficulty = campaign ? campaign.difficultyFor(bossId) : { attackRate: 1, bulletSpeed: 1, hpScale: 1 };
+    this.bulletSpeed = difficulty.bulletSpeed;
+
     this.particles = new ParticleSystem();
     this.player = new Player();
     this.player.buffs = campaign ? campaign.buffs : new Set();
-    this.wingman = this.player.buffs.has('wingman') ? new Wingman(this.player) : null;
-    this.bombs = this.player.buffs.has('bomb') ? PLAYER.bombCharges : 0;
+    const buffs = this.player.buffs;
+    this.wingmen = [];
+    if (buffs.has('wingman')) this.wingmen.push(new Wingman(this.player, -1));
+    if (buffs.has('wingman2')) this.wingmen.push(new Wingman(this.player, 1));
+    this.bombMax = PLAYER.bombMax + (buffs.has('bombPlus') ? 1 : 0);
+    this.bombs = buffs.has('bomb') ? PLAYER.bombCharges + (buffs.has('bombPlus') ? 1 : 0) : 0;
+    this.bombRegenTimer = 0;
+    this.missileTimer = 0;
+    this.missileTargets = [];
+    this.carapaceTimer = 0;
+    if (buffs.has('carapace')) this.player.shield = true;
     this.playerBullets = [];
     this.enemyBullets = [];
     this.minions = [];
@@ -68,9 +85,12 @@ export class PlayScene {
     this.popups = [];
     this.hazards = []; // paredes de laser
 
-    // Na campanha o Titã chega reforçado: o jogador está com todos os buffs.
-    const hpScale = campaign && bossId === 'titan' ? CAMPAIGN_TITAN_HP_SCALE : 1;
-    this.boss = this.def.kind === 'waves' ? new WaveStage(this, this.def) : new Boss(this, this.def, { hpScale });
+    // Na campanha, Titã e Leviatã chegam reforçados (o jogador está cheio de buffs)
+    // e cada mundo acelera os ataques.
+    const { hpScale, attackRate } = difficulty;
+    this.boss = this.def.kind === 'waves'
+      ? new WaveStage(this, this.def, { attackRate })
+      : new Boss(this, this.def, { hpScale, attackRate });
 
     // Vidas acumulam na campanha (máximo 5); vida extra a cada 50.000 pontos.
     if (campaign) this.player.lives = campaign.lives;
@@ -91,6 +111,7 @@ export class PlayScene {
     this.pendingEnd = null;
     this.results = null;
     this.gainedBuffs = [];
+    this.worldCleared = null; // número do mundo concluído nesta vitória
     this.campaignResults = null;
     this.perfectBonus = 0;
     this.newRecord = false;
@@ -104,11 +125,20 @@ export class PlayScene {
   }
 
   enter() {
+    const world = this.world;
     this.game.starfield.setSpeed(1);
+    this.game.starfield.setTheme?.(world.theme);
     this.audio.setTempo(1);
-    this.audio.playMusic(this.def.music ?? (this.def.id === 'titan' ? 'boss' : 'mini'));
+    const isBoss = this.def.id === world.boss || this.def.id === 'leviathan' || this.def.id === 'titan';
+    this.audio.playMusic(this.def.music ?? (isBoss ? world.music.boss : world.music.mini));
     this.audio.play('warning');
-    this.announce(this.def.intro.title, this.def.intro.subtitle, 3, 'warning');
+    if (this.campaign && world.stages[0] === this.def.id) {
+      // Primeiro setor de cada mundo: apresenta o mundo novo.
+      this.announce(`MUNDO ${world.number} · ${this.def.name}`, world.name, 3.4, 'phase', world.tagline);
+      this.boss.entryDelay = 3.6; // a 1ª onda espera a apresentação do mundo
+    } else {
+      this.announce(this.def.intro.title, this.def.intro.subtitle, 3, 'warning');
+    }
   }
 
   exit() {
@@ -127,7 +157,15 @@ export class PlayScene {
 
   // ===================================================== API do "mundo"
   spawnEnemyBullet(options) {
-    if (this.enemyBullets.length < MAX_ENEMY_BULLETS) this.enemyBullets.push(new EnemyBullet(options));
+    if (this.enemyBullets.length >= MAX_ENEMY_BULLETS) return;
+    const k = this.bulletSpeed; // dificuldade do mundo: projéteis mais rápidos
+    const scaled = k === 1 ? options : {
+      ...options,
+      vx: (options.vx ?? 0) * k,
+      vy: (options.vy ?? 0) * k,
+      speed: options.speed != null ? options.speed * k : null,
+    };
+    this.enemyBullets.push(new EnemyBullet(scaled));
   }
 
   fireAimed(x, y, speed, style) {
@@ -138,12 +176,12 @@ export class PlayScene {
     this.powerUps.push(new PowerUp(type, x, y));
   }
 
-  /** Esquadrão entrando pelo topo da tela, em fila (os primeiros `orange` são laranja). */
-  spawnMinionWave(count = 4, { orange = 0 } = {}) {
+  /** Esquadrão entrando pelo topo da tela, em fila (os primeiros `orange` são laranja, os demais do tipo `type`). */
+  spawnMinionWave(count = 4, { orange = 0, type = 'green' } = {}) {
     const dir = Math.random() < 0.5 ? -1 : 1;
     const baseX = rand(110, W - 110);
     for (let i = 0; i < count; i++) {
-      this.minions.push(new Minion(baseX, i * 0.3, dir, { type: i < orange ? 'orange' : 'green' }));
+      this.minions.push(new Minion(baseX, i * 0.3, dir, { type: i < orange ? 'orange' : type }));
     }
   }
 
@@ -214,7 +252,7 @@ export class PlayScene {
     // No Leviatã a música acelera a cada seção.
     if (this.def.id === 'leviathan') this.audio.setTempo(1 + index * 0.03);
     if (phase?.enrage) this.audio.setTempo(this.def.id === 'leviathan' ? 1.28 : 1.2);
-    if (phase?.bombRefill && this.player.buffs.has('bomb') && this.bombs < PLAYER.bombMax) {
+    if (phase?.bombRefill && this.player.buffs.has('bomb') && this.bombs < this.bombMax) {
       this.bombs++;
       this.popup('+1 BOMBA', this.player.x, this.player.y - 30, '#e43b8c');
     }
@@ -238,31 +276,117 @@ export class PlayScene {
 
   // ===================================================== eventos do jogador
   firePlayerShot(player) {
-    const piercing = player.buffs.has('piercing');
+    const buffs = player.buffs;
+    const piercing = buffs.has('piercing');
+    // Foco Amplificado: no modo foco, cada tiro causa +60% de dano.
+    const focus = buffs.has('focus') && player.focused;
+    const base = piercing ? PLAYER.piercingDamage : PLAYER.bulletDamage;
+    const damage = focus ? base * PLAYER.focusDamage : base;
     const offsets = player.double ? [-9, 9] : [0];
-    for (const o of offsets) this.playerBullets.push(new PlayerBullet(player.x + o, player.y - 18, { piercing }));
+    for (const o of offsets) this.playerBullets.push(new PlayerBullet(player.x + o, player.y - 18, { piercing, damage, focus }));
     let shots = offsets.length;
-    if (this.wingman?.visible) {
-      this.playerBullets.push(new PlayerBullet(this.wingman.x, this.wingman.y - 14, { piercing }));
+    if (buffs.has('spread')) {
+      // Tiro Triplo: dois tiros diagonais mais fracos.
+      for (const side of [-1, 1]) {
+        const a = -Math.PI / 2 + side * PLAYER.spreadAngle;
+        this.playerBullets.push(new PlayerBullet(player.x + side * 6, player.y - 12, {
+          piercing, damage: damage * PLAYER.spreadDamage, vx: Math.cos(a) * PLAYER.bulletSpeed, focus,
+        }));
+      }
+      shots += 2;
+    }
+    for (const w of this.wingmen) {
+      if (!w.visible) continue;
+      this.playerBullets.push(new PlayerBullet(w.x, w.y - 14, { piercing }));
       shots++;
     }
     this.stats.shots += shots;
     this.audio.play('shoot');
   }
 
+  /** Mísseis teleguiados (buff da Fornalha): um de cada lado, a cada ~1 s. */
+  fireMissiles(dt) {
+    const player = this.player;
+    if (!player.buffs.has('missiles') || !player.alive) return;
+    this.missileTimer -= dt;
+    if (this.missileTimer > 0 || this.missileTargets.length === 0) return;
+    this.missileTimer = PLAYER.missileEvery;
+    for (const side of [-1, 1]) this.playerBullets.push(new PlayerMissile(player.x + side * 12, player.y, side));
+    this.stats.shots += 2;
+  }
+
+  /** Alvos possíveis dos mísseis neste quadro (pontos fracos e alienígenas visíveis). */
+  collectMissileTargets() {
+    const targets = [];
+    if (!this.boss.intangible) {
+      for (const part of this.boss.vulnerableParts()) {
+        const r = this.boss.partRect(part);
+        targets.push({ x: r.cx, y: r.cy });
+      }
+    }
+    for (const m of this.minions) if (m.active && !m.dead && m.y > 0) targets.push({ x: m.x, y: m.y, minion: m });
+    this.missileTargets = targets;
+  }
+
+  /** O alvo mais próximo do míssil. */
+  missileTarget(missile) {
+    let best = null;
+    let bestD = Infinity;
+    for (const t of this.missileTargets) {
+      if (t.minion?.dead) continue;
+      const d = Math.hypot(t.x - missile.x, t.y - missile.y);
+      if (d < bestD) {
+        bestD = d;
+        best = t;
+      }
+    }
+    return best;
+  }
+
   onPlayerDash(player) {
     this.audio.play('dash');
     this.particles.ring(player.x, player.y, '#ffcd75', 24, 0.25);
+    if (player.buffs.has('shockdash')) this.pulse(player.x, player.y, PLAYER.shockRadius, PLAYER.shockDamage, '#41a6f6');
+  }
+
+  /**
+   * Pulso de energia ao redor de (x, y): apaga projéteis inimigos no raio
+   * e fere alienígenas próximos (Onda de Choque e Escudo Reativo).
+   */
+  pulse(x, y, radius, minionDamage, color) {
+    for (const b of this.enemyBullets) {
+      if (Math.hypot(b.x - x, b.y - y) < radius) {
+        b.dead = true;
+        this.particles.add({ x: b.x, y: b.y, vy: -40, life: 0.3, size: 3, sizeEnd: 0, color, glow: true });
+      }
+    }
+    for (const m of this.minions) {
+      if (m.active && !m.dead && Math.hypot(m.x - x, m.y - y) < radius + m.radius) {
+        if (m.damage(minionDamage)) this.killMinion(m);
+      }
+    }
+    this.particles.ring(x, y, color, radius, 0.35);
   }
 
   onShieldBreak(player) {
     this.particles.ring(player.x, player.y, '#38b764', 40, 0.4);
     this.audio.play('shieldBreak');
     this.shake(4, 0.2);
+    this.carapaceTimer = 0;
+    if (player.buffs.has('reactive')) {
+      // Escudo Reativo: o escudo quebra soltando um pulso que limpa a tela.
+      this.clearEnemyBullets(true);
+      this.pulse(player.x, player.y, 160, 4, '#a7f070');
+      for (const part of this.boss.vulnerableParts()) this.boss.applyDamage(part, PLAYER.reactiveDamage, { ignoreArmor: true });
+      this.particles.ring(player.x, player.y, '#ffffff', 260, 0.5);
+      this.flash(0.4);
+      this.popup('ESCUDO REATIVO!', player.x, player.y - 40, '#a7f070');
+    }
   }
 
   onPlayerDeath(player) {
     this.stats.damageTaken++;
+    this.carapaceTimer = 0;
     this.campaign?.recordDeath();
     this.particles.explosion(player.x, player.y, 1.8);
     this.particles.debris(player.x, player.y, ['#f4f4f4', '#3b5dc9', '#b13e53'], 18);
@@ -293,8 +417,9 @@ export class PlayScene {
       m.dead = true;
       this.killMinion(m);
     }
+    const damage = PLAYER.bombDamage * (player.buffs.has('nova') ? PLAYER.novaDamageFactor : 1);
     for (const part of this.boss.vulnerableParts()) {
-      this.boss.applyDamage(part, PLAYER.bombDamage, { ignoreArmor: true });
+      this.boss.applyDamage(part, damage, { ignoreArmor: true });
     }
     player.invuln = Math.max(player.invuln, 1.2);
     this.particles.ring(player.x, player.y, '#e43b8c', 420, 0.7);
@@ -381,12 +506,37 @@ export class PlayScene {
     }
 
     this.stats.time += dt;
+    this.updateBuffTimers(dt);
     this.updateWorld(dt, true);
     this.checkExtraLife();
 
     if (this.pendingEnd) {
       this.endTimer -= dt;
       if (this.endTimer <= 0) this.finish(this.pendingEnd);
+    }
+  }
+
+  /** Buffs que agem com o tempo: Carapaça (escudo que volta) e Recarga de Bomba. */
+  updateBuffTimers(dt) {
+    const player = this.player;
+    const buffs = player.buffs;
+    if (this.boss.state !== 'fight') return;
+    if (buffs.has('carapace') && player.alive && !player.shield) {
+      this.carapaceTimer += dt;
+      if (this.carapaceTimer >= PLAYER.carapaceRecharge) {
+        this.carapaceTimer = 0;
+        player.shield = true;
+        this.popup('CARAPAÇA RESTAURADA', player.x, player.y - 34, '#38b764');
+        this.audio.play('powerup');
+      }
+    }
+    if (buffs.has('bombRegen') && buffs.has('bomb') && this.bombs < this.bombMax) {
+      this.bombRegenTimer += dt;
+      if (this.bombRegenTimer >= PLAYER.bombRegenEvery) {
+        this.bombRegenTimer = 0;
+        this.bombs++;
+        this.popup('+1 BOMBA', player.x, player.y - 30, '#e43b8c');
+      }
     }
   }
 
@@ -408,10 +558,15 @@ export class PlayScene {
   }
 
   updateWorld(dt, active) {
-    if (active) this.player.update(dt, this);
-    this.wingman?.update(dt, this.player);
+    if (active) {
+      this.player.update(dt, this);
+      this.applyPull(dt);
+    }
+    for (const w of this.wingmen) w.update(dt, this.player);
     this.boss.update(dt);
-    for (const b of this.playerBullets) b.update(dt);
+    this.collectMissileTargets();
+    if (active) this.fireMissiles(dt);
+    for (const b of this.playerBullets) b.update(dt, this);
     for (const b of this.enemyBullets) b.update(dt, this);
     for (const m of this.minions) m.update(dt, this);
     for (const p of this.powerUps) p.update(dt);
@@ -440,6 +595,26 @@ export class PlayScene {
     this.flashAlpha = Math.max(0, this.flashAlpha - dt * 2.5);
   }
 
+  /** Gravidade do chefe (Vórtice, Arconte): puxa ou empurra a nave. O dash escapa dela. */
+  applyPull(dt) {
+    const player = this.player;
+    const force = this.boss.pullForce?.();
+    if (!force || !player.alive || player.dashTime > 0) return;
+    const dx = force.x - player.x;
+    const dy = force.y - player.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 1) return;
+    player.x = clamp(player.x + (dx / d) * force.strength * dt, 20, W - 20);
+    player.y = clamp(player.y + (dy / d) * force.strength * dt, PLAYER.minY, H - 30);
+    if (Math.random() < 0.3) {
+      this.particles.add({
+        x: player.x + rand(-14, 14), y: player.y + rand(-10, 14),
+        vx: (dx / d) * 90, vy: (dy / d) * 90, life: 0.3, size: 2, sizeEnd: 0,
+        color: force.strength > 0 ? '#73eff7' : '#ffcd75',
+      });
+    }
+  }
+
   handleCollisions() {
     const { boss, player, particles } = this;
 
@@ -447,7 +622,7 @@ export class PlayScene {
     for (const b of this.playerBullets) {
       if (b.dead) continue;
       // Testa todo o trajeto desde o quadro anterior (evita "atravessar" peças finas).
-      const hit = boss.hitTestPath(b.x, b.prevY, b.x, b.y, b.radius);
+      const hit = boss.hitTestPath(b.prevX, b.prevY, b.x, b.y, b.radius);
       if (hit) {
         b.dead = true;
         if (hit.vulnerable) {
@@ -496,6 +671,13 @@ export class PlayScene {
       if (d < boss.laser.width * 0.4 + player.hitRadius) player.hit(this);
     }
 
+    // Raios letais dos chefes (sopro da Hidra, elo dos Gêmeos, colunas de fogo...)
+    for (const s of boss.lethalSegments()) {
+      if (!player.alive) break;
+      const d = pointSegmentDistance(player.x, player.y, s.x1, s.y1, s.x2, s.y2);
+      if (d < s.width * 0.4 + player.hitRadius) player.hit(this);
+    }
+
     // Paredes de laser (o dash dá invencibilidade para atravessar)
     for (const h of this.hazards) {
       if (player.alive && h.hits(player.x, player.y, player.hitRadius)) player.hit(this);
@@ -524,10 +706,18 @@ export class PlayScene {
   }
 
   killMinion(m) {
-    this.particles.explosion(m.x, m.y, m.type === 'orange' ? 1.1 : 0.8);
+    this.particles.explosion(m.x, m.y, m.type === 'green' ? 0.8 : 1.1);
     this.particles.debris(m.x, m.y, m.info?.debris ?? ['#38b764', '#a7f070'], 8);
     this.addScore(m.points, m.x, m.y);
     this.audio.play('minionDie');
+    // Roxo (divisor): parte-se em dois drones que mergulham na hora.
+    const split = m.info?.splitInto;
+    if (split) {
+      for (let i = 0; i < split.count; i++) {
+        const dir = i % 2 ? 1 : -1;
+        this.spawnMinion(m.x + dir * 10, m.y, { entryTime: 0.35, dir, type: split.type });
+      }
+    }
     if (Math.random() < (m.dropChance ?? 0.1)) {
       this.spawnPowerUp(ALIEN_DROPS[Math.floor(Math.random() * ALIEN_DROPS.length)], m.x, m.y);
     }
@@ -551,8 +741,10 @@ export class PlayScene {
       this.audio.play('victory');
       this.game.starfield.setSpeed(3);
       if (this.campaign) {
+        const worldBefore = this.campaign.worldIndex;
         this.gainedBuffs = this.campaign.recordVictory(this.def.id, this.stats, this.score, this.player.lives);
         if (this.gainedBuffs.length) setTimeout(() => this.audio.play('buff'), 900);
+        if (this.campaign.isWorldComplete(worldBefore) && !this.campaign.complete) this.worldCleared = worldBefore + 1;
         if (this.campaign.complete) {
           // Bônus por zerar o jogo inteiro sem nenhuma morte.
           this.perfectBonus = this.campaign.perfect ? PERFECT_RUN_BONUS : 0;
@@ -563,6 +755,7 @@ export class PlayScene {
             rulesForParTime(CAMPAIGN_PAR_TIME),
           );
         }
+        this.saveProgress();
       }
     } else {
       this.boss.passive = true;
@@ -579,6 +772,14 @@ export class PlayScene {
     this.state = kind;
   }
 
+  /** Salva a campanha (ou apaga o save ao zerar) e libera mundos para a seleção. */
+  saveProgress() {
+    const c = this.campaign;
+    this.storage.set(SAVE_KEY, c.complete ? null : c.toJSON());
+    const unlocked = c.complete ? WORLDS.length : c.worldIndex + 1;
+    this.storage.set(UNLOCK_KEY, Math.max(this.storage.get(UNLOCK_KEY, 1), unlocked));
+  }
+
   handleDebugInput() {
     const input = this.input;
     if (input.wasPressed('debugKill')) {
@@ -592,8 +793,9 @@ export class PlayScene {
     }
     if (input.wasPressed('debugBuffs')) {
       for (const id of Object.keys(BUFFS)) this.player.buffs.add(id);
-      this.wingman ??= new Wingman(this.player);
-      this.bombs = PLAYER.bombMax;
+      if (this.wingmen.length < 2) this.wingmen = [new Wingman(this.player, -1), new Wingman(this.player, 1)];
+      this.bombMax = PLAYER.bombMax + 1;
+      this.bombs = this.bombMax;
       this.popup('TODOS OS BUFFS', W / 2, H / 2, '#a7f070');
     }
     if (input.wasPressed('debugHitbox')) this.showHitboxes = !this.showHitboxes;
@@ -611,7 +813,7 @@ export class PlayScene {
     for (const p of this.powerUps) p.draw(ctx);
     for (const m of this.minions) m.draw(ctx, this.sprites);
     for (const b of this.playerBullets) b.draw(ctx);
-    this.wingman?.draw(ctx, this.sprites);
+    for (const w of this.wingmen) w.draw(ctx, this.sprites);
     this.player.draw(ctx, this.sprites);
     for (const b of this.enemyBullets) b.draw(ctx);
     for (const h of this.hazards) h.draw(ctx);
@@ -672,8 +874,9 @@ export class PlayScene {
         ctx.strokeRect(x + 0.5, by + 0.5, segW - 1, 7);
       }
       if (boss.state === 'fight') {
-        const hint = boss.hudHint?.() ?? `ALVO: ${boss.phase.title}`;
-        drawText(ctx, hint, W / 2, 62, { size: 6, align: 'center', color: UI_COLORS.muted });
+        const special = boss.hudHint?.();
+        const hint = special ?? `ALVO: ${boss.phase.title}`;
+        drawText(ctx, hint, W / 2, 62, { size: 6, align: 'center', color: special && this.def.kind !== 'waves' ? UI_COLORS.accent : UI_COLORS.muted });
       }
     }
 
@@ -682,17 +885,21 @@ export class PlayScene {
       this.sprites.draw(ctx, 'player', 18 + i * 22, H - 18, { scale: 0.45 });
     }
 
-    // Buffs da campanha (acima das vidas)
+    // Buffs da campanha (acima das vidas): recarga do dash + total de buffs
     const player = this.player;
     let bx = 10;
-    for (const id of ['piercing', 'wingman', 'dash']) {
-      if (!player.buffs.has(id)) continue;
-      const buff = BUFFS[id];
-      let label = buff.short;
-      if (id === 'dash' && player.dashCooldown > 0) label = `DASH ${player.dashCooldown.toFixed(1)}`;
-      const color = id === 'dash' && player.dashCooldown > 0 ? '#566c86' : buff.color;
-      drawText(ctx, label, bx, H - 44, { size: 6, color });
+    if (player.buffs.has('dash')) {
+      const label = player.dashCooldown > 0 ? `DASH ${player.dashCooldown.toFixed(1)}` : 'DASH OK';
+      drawText(ctx, label, bx, H - 44, { size: 6, color: player.dashCooldown > 0 ? '#566c86' : BUFFS.dash.color });
       bx += label.length * 6 + 10;
+    }
+    if (player.buffs.size > 0) {
+      const label = `BUFFS ${player.buffs.size}`;
+      drawText(ctx, label, bx, H - 44, { size: 6, color: UI_COLORS.muted });
+      bx += label.length * 6 + 10;
+    }
+    if (this.campaign) {
+      drawText(ctx, `MUNDO ${this.world.number}`, bx, H - 44, { size: 6, color: this.world.theme.accent });
     }
 
     // Botão/indicador da bomba (canto inferior direito; também é área de toque)
@@ -769,6 +976,16 @@ export class PlayScene {
     drawText(ctx, 'SHIFT modo foco (lento + hitbox)', W / 2, 376, { size: 7, align: 'center', color: UI_COLORS.muted });
     if (this.player.buffs.has('dash')) drawText(ctx, 'C  dash', W / 2, 392, { size: 7, align: 'center', color: UI_COLORS.muted });
     if (this.player.buffs.has('bomb')) drawText(ctx, 'X  bomba de pulso', W / 2, 408, { size: 7, align: 'center', color: UI_COLORS.muted });
+
+    // Lista dos buffs conquistados (4 por linha).
+    const owned = [...this.player.buffs];
+    if (owned.length) {
+      drawText(ctx, 'BUFFS CONQUISTADOS', W / 2, 440, { size: 7, align: 'center', color: UI_COLORS.accent });
+      for (let row = 0; row * 4 < owned.length; row++) {
+        const text = owned.slice(row * 4, row * 4 + 4).map((id) => BUFFS[id].short).join('  ');
+        drawText(ctx, text, W / 2, 458 + row * 14, { size: 6, align: 'center' });
+      }
+    }
   }
 
   drawGameOver(ctx) {
@@ -820,8 +1037,20 @@ export class PlayScene {
       ['RANK DA LUTA', r.rank],
     ], 145);
 
-    if (this.stateTime > 0.8 && this.gainedBuffs.length === 0) {
-      // Sem buff: setores dão só pontos; o Titã abre o caminho para o Leviatã.
+    if (this.stateTime > 0.8 && this.worldCleared) {
+      // Chefe do mundo derrotado: anuncia o próximo mundo.
+      const nextWorld = WORLDS[this.worldCleared];
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
+      ctx.fillRect(30, 240, W - 60, 76);
+      ctx.strokeStyle = nextWorld.theme.accent;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(30, 240, W - 60, 76);
+      drawText(ctx, `MUNDO ${this.worldCleared} CONCLUÍDO!`, W / 2, 252, { size: 10, align: 'center', color: '#ffcd75' });
+      drawText(ctx, `PRÓXIMO: MUNDO ${nextWorld.number}`, W / 2, 274, { size: 7, align: 'center', color: UI_COLORS.muted });
+      drawText(ctx, nextWorld.name, W / 2, 290, { size: 9, align: 'center', color: nextWorld.theme.accent });
+      drawText(ctx, 'PROGRESSO SALVO', W / 2, 326, { size: 6, align: 'center', color: '#38b764' });
+    } else if (this.stateTime > 0.8 && this.gainedBuffs.length === 0) {
+      // Sem buff: setores dão só pontos; chefes abrem o caminho.
       const next = this.campaign.available()[0];
       const title = isStage ? 'BÔNUS DE SETOR GARANTIDO' : 'CAMINHO ABERTO';
       ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
@@ -841,7 +1070,8 @@ export class PlayScene {
         ctx.strokeStyle = buff.color;
         ctx.lineWidth = 2;
         ctx.strokeRect(30, y, W - 60, 70);
-        drawText(ctx, i === 0 ? 'BUFF OBTIDO' : 'BÔNUS DE CAMPANHA', W / 2, y + 10, { size: 7, align: 'center', color: UI_COLORS.muted });
+        const label = REWARDS[this.def.id] === id ? 'BUFF OBTIDO' : `BÔNUS DO MUNDO ${this.world.number}`;
+        drawText(ctx, label, W / 2, y + 10, { size: 7, align: 'center', color: UI_COLORS.muted });
         drawText(ctx, buff.name, W / 2, y + 26, { size: 12, align: 'center', color: buff.color });
         drawText(ctx, buff.description, W / 2, y + 48, { size: 6, align: 'center' });
       });
@@ -871,10 +1101,12 @@ export class PlayScene {
     drawText(ctx, r.rank, W / 2, 279, { size: 36, align: 'center', color: r.rank === 'S' ? '#ffcd75' : '#73eff7' });
     if (c.perfect) drawText(ctx, 'CORRIDA PERFEITA!', W / 2, 324, { size: 10, align: 'center', color: '#ffcd75' });
 
-    drawText(ctx, 'SUA ROTA DE MINI-CHEFES', W / 2, 350, { size: 7, align: 'center', color: UI_COLORS.muted });
-    const route = c.order.filter((id) => MINI_BOSS_IDS.includes(id)).map((id) => ENCOUNTERS[id].name).join(' > ');
-    drawText(ctx, route, W / 2, 364, { size: 7, align: 'center' });
-    drawText(ctx, `PARTES DO LEVIATÃ DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 392, { size: 7, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, 'SUA ROTA DE MINI-CHEFES', W / 2, 346, { size: 7, align: 'center', color: UI_COLORS.muted });
+    WORLDS.forEach((w, i) => {
+      const route = c.order.filter((id) => w.minis.includes(id)).map((id) => ENCOUNTERS[id].name).join(' > ');
+      drawText(ctx, `${w.number}: ${route || '(seleção de mundo)'}`, W / 2, 362 + i * 13, { size: 6, align: 'center' });
+    });
+    drawText(ctx, `PARTES DO LEVIATÃ DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
     this.drawPrompt(ctx, 'ENTER  menu principal');
   }
 

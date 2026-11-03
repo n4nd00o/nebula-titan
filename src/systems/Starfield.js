@@ -1,7 +1,7 @@
 /**
  * Fundo de estrelas com parallax (3 camadas em velocidades diferentes).
  * O multiplicador de velocidade cria o efeito de "dobra espacial" (warp)
- * nas transições de fase.
+ * nas transições de fase. Cada mundo tem seu TEMA (cor de fundo e das estrelas).
  */
 import { rand, pick, approach } from '../utils/math.js';
 
@@ -19,6 +19,8 @@ export class Starfield {
     this.multiplier = 1;
     this.targetMultiplier = 1;
     this.time = 0;
+    this.bg = '#05050d';
+    this.themeKey = null;
     this.stars = Array.from({ length: count }, () => ({
       x: rand(0, width),
       y: rand(0, height),
@@ -30,6 +32,14 @@ export class Starfield {
 
   setSpeed(multiplier) {
     this.targetMultiplier = multiplier;
+  }
+
+  /** Troca o tema do mundo: cor de fundo e paleta das estrelas. */
+  setTheme(theme) {
+    if (!theme || this.themeKey === theme.bg) return;
+    this.themeKey = theme.bg;
+    this.bg = theme.bg;
+    for (const star of this.stars) star.color = pick(theme.stars);
   }
 
   update(dt) {

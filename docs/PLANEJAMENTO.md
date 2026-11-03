@@ -81,6 +81,22 @@ Nova ideia após a v1.1:
 
 **Ideia inicial × implementação:** os "alienígenas verdes" viraram o inimigo comum de formação; os "laranja, um pouco mais fortes" aguentam 3 tiros, atiram em leque e lideram mergulhos. O "bônus caso passe e zere sem mortes" virou o bônus de setor (pontos por fase) mais o **bônus de corrida perfeita** de +100.000.
 
+### 2.6b Evolução do escopo na versão 1.3: quatro mundos
+
+Nova ideia após a v1.2:
+
+> *"Eu queria fazer várias fases agora. Temos a fase principal e inicial; agora quero aumentar o escopo, fazer um sistema de progressão com a dificuldade aumentando, ao mesmo tempo que mantemos o esquema de fases comuns e fases com mini-chefes, uma fase com um chefe e uma com o boss final."*
+
+| Pergunta | Decisão | Motivo |
+|---|---|---|
+| Quantos mundos | **4** (o conteúdo atual vira o Mundo 1; o Leviatã fecha o Mundo 4) | Campanha longa, com uma curva de dificuldade clara |
+| Chefes novos ou variações | **Todos inéditos** (9 mini-chefes + 3 chefes) | Cada mundo com identidade própria |
+| Mini-chefes por mundo | **3, como no Mundo 1**, cada um com um buff | Mantém a rota à escolha em todos os mundos |
+| Como a dificuldade sobe | **Inimigos comuns novos**, **escala numérica por mundo** | Novidade de mecânica *e* de intensidade |
+| Persistência | **Progresso salvo** e **seleção de mundo** no título | A campanha ficou longa demais para uma sessão só |
+
+**Implementação:** a estrutura de mundo virou dado (`WORLDS`), o motor de chefes ganhou ganchos genéricos (raios letais, gravidade, intangibilidade) e cada mundo apresenta um alienígena novo e uma família de mecânicas (Mundo 2: projéteis que se dividem e gravidade; Mundo 3: raios e fogo; Mundo 4: intangibilidade, *bullet hell* e imitação do jogador).
+
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.
@@ -202,7 +218,7 @@ Desenvolvimento **iterativo e incremental**, em etapas curtas com uma versão jo
 
 As ideias que surgiram durante o desenvolvimento e ficaram para próximas versões estão no [Roadmap do README](../README.md#-roadmap). Destaques:
 
-- **Novos chefes** reaproveitando o sistema de partes (ex.: um chefe orgânico cujos tentáculos regeneram se não forem destruídos a tempo);
+- ~~Novos chefes reaproveitando o sistema de partes~~ (feito na v1.3: 12 chefes novos, incluindo a Hidra, cujas cabeças renascem);
 - **Modo "Boss Rush"** encadeando vários chefes;
 - **Acessibilidade**: opção de reduzir o tremor de tela e os flashes, além de modo de alto contraste;
 - **Ranking online** com um back-end simples.

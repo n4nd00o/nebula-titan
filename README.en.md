@@ -2,7 +2,7 @@
 
 # 🚀 NEBULA TITAN
 
-**A retro shoot 'em up with destructible bosses: alien formation sectors, three mini-bosses, a route of your choice, and a screen-filling star fortress.**
+**A retro shoot 'em up with destructible bosses: four worlds of rising difficulty, 12 mini-bosses, 4 world bosses, routes of your choice, and a screen-filling star fortress.**
 
 *A modern reinterpretation of 1980s arcade classics, inspired by Galaga (Namco, 1981).*
 
@@ -29,7 +29,7 @@ We picked **Galaga**, one of the most iconic arcade shooters. Instead of recreat
 
 > **Core idea:** every part you destroy **changes how the boss looks and behaves**. Rip off the right wing and the ship loses it, becomes unbalanced and tilts to that side. The remaining wing grows more aggressive and the shield generator hidden underneath is exposed. **The order of your choices changes the fight.**
 
-Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. Once that foundation was validated, **v1.1** added a **campaign with three mini-bosses** that grant buffs, and **v1.2** completed the progression: **two preparatory sectors** with Galaga-style alien formations and a **giant 8-phase final boss, the Leviathan**, where collected buffs become increasingly necessary. See the planning document (in Portuguese): [docs/PLANEJAMENTO.md](docs/PLANEJAMENTO.md).
+Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. Once that foundation was validated, **v1.1** added a **campaign with three mini-bosses** that grant buffs, and **v1.2** completed the progression: **two preparatory sectors** with Galaga-style alien formations and a **giant 8-phase final boss, the Leviathan**, where collected buffs become increasingly necessary. **v1.3** turned the campaign into a **4-world progression system**: every world keeps the structure of regular sectors, mini-bosses and a boss, with rising difficulty, new enemies, 9 new mini-bosses and 3 new bosses, 12 new buffs and saved progress. See the planning document (in Portuguese): [docs/PLANEJAMENTO.md](docs/PLANEJAMENTO.md).
 
 ## 🧭 Goals
 
@@ -44,8 +44,23 @@ Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. O
 
 | Mode | Description |
 |---|---|
-| **Campaign** | **Sector 1 → Sector 2** (mandatory) → **3 mini-bosses in any order** (each grants a **permanent buff**) → **Nebula Titan** → **LEVIATHAN** (final boss). Lives **carry over** (max 5); extra life every 50,000 points. Game over = retry the current stage with 3 lives, keeping buffs, score reset. Finishing with **zero deaths** grants **+100,000**. |
+| **Campaign** | **4 worlds**, each with **2 sectors** (mandatory) → **3 mini-bosses in any order** (each grants a **permanent buff**) → **world boss**. World 4 ends with the **LEVIATHAN** (final boss). Lives **carry over** (max 5); extra life every 50,000 points. Game over = retry the current stage with 3 lives, keeping buffs, score reset. Finishing with **zero deaths** grants **+100,000**. |
+| **Continue** | Resumes the saved campaign (the game saves after every victory). |
+| **World < N >** | Starts directly in a world you have reached, with the buffs from the previous worlds. |
 | **Titan Duel** | Straight fight against the final boss, no buffs (the original v1.0 challenge). |
+
+### The four worlds (v1.3)
+
+| World | Sectors (new enemy) | Mini-bosses (buff) | Boss | World bonus |
+|:---:|---|---|---|---|
+| **1 · Crimson Nebula** | 1-2 (green, orange) | Sentinel (Piercing) · Hive (Wingman) · Reaper (Dash) | **Nebula Titan** | Pulse Bomb |
+| **2 · Glacial Belt** | 3-4 (**armored blue**) | Prism (Triple Shot) · Vortex (Shockwave Dash) · Scarab (Carapace) | **Glacial Hydra** | Extra Bomb |
+| **3 · Stellar Forge** | 5-6 (**splitting purple**) | Hammer (Overdrive) · Twins (Second Wingman) · Furnace (Homing Missiles) | **Aegis** | Bomb Recharge |
+| **4 · Abyssal Void** | 7-8 (**kamikaze red**) | Specter (Phantom Dash) · Oracle (Focus Amp) · Echo (Reactive Shield) | **Archon** → **LEVIATHAN** | Nova Bomb |
+
+Each world speeds up enemy attacks (+5% to +15%) and bullets (+5% to +12%), and world bosses get extra HP to match your growing arsenal. Each world has its own star palette, background and music. New boss mechanics include **gravity that pulls your ship** (Vortex), a **shell that opens and closes** (Scarab), **heads that regrow** and a sweeping **freezing breath** (Hydra), **ground-pound shockwaves** (Hammer), a **lethal beam linking two ships** (Twins), **fire columns and rotating beams** (Furnace), a **rotating armored shield ring** (Aegis), **intangibility** (Specter), **curving bullet flowers** (Oracle), a **dark copy of your own ship** firing from the bottom of the screen (Echo), and an Archon that uses the tech of every guardian.
+
+### World 1 mini-bosses
 
 | Mini-boss | Mechanic | How it changes | Reward |
 |---|---|---|---|
@@ -56,11 +71,11 @@ Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. O
 
 Earned buffs reshape the remaining fights, so **route order matters**. To compensate, the Titan arrives **reinforced (+80% HP)** in the campaign.
 
-### Preparatory sectors
-Galaga-style **formation waves**: aliens swirl in, form a "breathing" formation and dive at you (missed dives return to their slot). **Green aliens** (1 HP, single shot) and **orange aliens** (3 HP, 3-way spread, dive pulling green escorts). Both also escort the bosses.
+### Sectors
+Every world opens with two Galaga-style **formation-wave** sectors: aliens swirl in, form a "breathing" formation and dive at you (missed dives return to their slot). **Green aliens** (1 HP, single shot), **orange aliens** (3 HP, 3-way spread, dive pulling green escorts), **blue aliens** (World 2, 7 HP, crystal shot that splits into a ring), **purple aliens** (World 3, split into two diving drones when destroyed) and **red kamikazes** (World 4, no shots, fast homing dives). All of them also escort the bosses.
 
 ## 🛸 Final boss: LEVIATHAN
-A ship **bigger than the screen**: you fly **over its hull** while the camera advances through **8 sections** (stern to bow). The hull is **procedurally drawn**. Each section is built around a buff that becomes **more necessary, never mandatory**:
+The last encounter of World 4, after the Archon. A ship **bigger than the screen**: you fly **over its hull** while the camera advances through **8 sections** (stern to bow). The hull is **procedurally drawn**. Each section is built around a buff that becomes **more necessary, never mandatory**:
 
 | Section | Threat | Buff that shines |
 |---|---|---|
@@ -73,7 +88,7 @@ A ship **bigger than the screen**: you fly **over its hull** while the camera ad
 | 7 Command Bridge | Armor + lasers + escorts | Piercing + Dash |
 | 8 Core | Everything at once | **All of them** |
 
-## 👾 Penultimate boss: Nebula Titan (four phases)
+## 👾 World 1 boss: Nebula Titan (four phases)
 
 The **NEBULA TITAN** is built from **8 independent parts**, each with its own health, hitbox, damaged look and reward.
 
@@ -92,18 +107,20 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 
 ## ✨ Features
 
-- 🧩 **4 modular bosses** (final boss + 3 mini-bosses) with destructible parts and 3 damage states per part.
-- 🗺️ **Campaign with player-chosen route**, map screen, **4 buffs** (piercing shot, wingman, dash, bomb) and continues.
+- 🌌 **4 worlds of rising difficulty**, each with sectors, 3 mini-bosses and a boss, plus its own palette, background and music.
+- 🧩 **17 modular bosses** (12 mini-bosses, 4 world bosses and the Leviathan) with destructible parts and 3 damage states per part.
+- 🗺️ **Campaign with player-chosen routes**, a map screen per world, **16 buffs** and continues.
+- 💾 **Saved progress** in the browser and **world select** on the title screen.
 - 🎨 **Procedurally generated pixel art** (with optional hand-drawn PNG overrides that never affect gameplay).
 - 🔊 **Fully synthesized audio** (SFX + music sequencer), no audio files at all.
 - 💥 Modern **game feel**: hit-stop, screen shake, flashes, particles, shockwaves, physics debris.
 - 🎯 **Fair design**: tiny hitbox, telegraphed attacks, focus mode, screen clear on death.
 - 🏆 Scoring with time/accuracy/no-damage bonuses, **S/A/B/C rank** and persistent high score.
 - 📱 Responsive and **touch-enabled**.
-- 👽 Galaga-style **formation sectors** with green and orange aliens.
+- 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
-- 🧪 **81 automated tests** + CI (generic tests run automatically for every registered boss).
+- 🧪 **172 automated tests** + CI (generic tests run automatically for every registered boss).
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls
@@ -155,12 +172,13 @@ npm test         # run the test suite
 1. **Fixed-timestep game loop**: deterministic simulation at 60 updates/s regardless of the monitor refresh rate.
 2. **Explicit state machines** for scenes (Title → Play → Pause/Victory/Game Over) and for the boss (entering → fight ⇄ transition → dying → dead).
 3. **Composition over inheritance**: the boss is a collection of `BossPart` objects.
-4. **Generic, data-driven boss engine**: all **5 bosses** share one `Boss` class. Wave sectors (`WaveStage`) implement the same "encounter" interface, so the play scene runs both polymorphically. Each boss is just a definition file (`src/boss/bosses/`) with parts, phases and optional hooks (tilt, orbiting parts, extra drawing). The mini-bosses were added with **zero boss-specific conditionals** in the engine.
+4. **Generic, data-driven boss engine**: all **17 bosses** share one `Boss` class. Wave sectors (`WaveStage`) implement the same "encounter" interface, so the play scene runs both polymorphically. Each boss is just a definition file (`src/boss/bosses/`) with parts, phases and optional hooks (tilt, orbiting parts, extra drawing). The 12 v1.3 bosses were added with **zero boss-specific conditionals** in the engine, only new generic hooks (lethal beams, gravity, intangibility, transparency).
 5. **Dependency inversion**: the `Boss` talks to the scene through a "world" interface and never touches the DOM, so it is **unit-tested in Node.js** with a `Proxy`-based fake world.
 6. **Procedural art pipeline**: sprites are defined as text; damage variants (cracks via deterministic random walks, flash, husk, rage tint) are generated algorithmically, even for hand-drawn PNGs.
 7. **Input abstraction**: game code asks for *actions* (`fire`, `left`), not keys.
 8. **Pixel-perfect, continuous collision** on boss parts: a part is only hit where its sprite has visible pixels, and the bullet path between frames is swept in 4 px steps.
 9. **Allocation-free entity removal** (`removeDead`) to reduce garbage-collector pauses.
+10. **Campaign as data**: the 4 worlds are a table (`WORLDS`) and the campaign state is serializable (`toJSON`/`fromJSON`) for save/load.
 
 Full write-up (Portuguese): [docs/ARQUITETURA.md](docs/ARQUITETURA.md) · Game Design Document: [docs/GDD.md](docs/GDD.md)
 

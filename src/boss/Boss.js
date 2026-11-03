@@ -6,7 +6,12 @@
  *   - as partes (posição, vida, sprite, regras de visibilidade/solidez);
  *   - as fases (alvos, movimento, ataques, eventos de início);
  *   - ganchos opcionais: inclinação, atualização por quadro (órbitas),
- *     desenhos extras (escudos, avisos) e tempos (entrada, transição, morte).
+ *     desenhos extras (escudos, avisos) e tempos (entrada, transição, morte);
+ *   - mecânicas especiais opcionais (mundos 2 a 4):
+ *       intangible(boss) -> true = tiros atravessam (Espectro)
+ *       alpha(boss)      -> transparência ao desenhar
+ *       segments(boss)   -> raios letais [{x1,y1,x2,y2,width}] (Hidra, Gêmeos, Fornalha...)
+ *       pull(boss)       -> gravidade {x, y, strength} que puxa a nave (Vórtice)
  *
  * Máquina de estados:
  *   entering -> fight <-> transition -> ... -> dying -> dead
@@ -44,12 +49,15 @@ export class Boss {
   /**
    * @param {object} world interface com a cena (ver seção "mundo" na arquitetura)
    * @param {object} def definição do chefe (src/boss/bosses/)
-   * @param {{hpScale?: number}} options hpScale multiplica a vida das partes
-   *        (o Titã é reforçado na campanha para compensar os buffs do jogador)
+   * @param {{hpScale?: number, attackRate?: number}} options
+   *        hpScale multiplica a vida das partes (o Titã e o Leviatã são reforçados
+   *        na campanha para compensar os buffs do jogador); attackRate acelera os
+   *        ataques (dificuldade crescente a cada mundo)
    */
-  constructor(world, def = NEBULA_TITAN, { hpScale = 1 } = {}) {
+  constructor(world, def = NEBULA_TITAN, { hpScale = 1, attackRate = 1 } = {}) {
     this.world = world;
     this.def = def;
+    this.attackRate = attackRate;
     this.timing = { ...DEFAULT_TIMING, ...(def.timing ?? {}) };
     this.x = GAME_WIDTH / 2;
     this.y = this.timing.startY;
@@ -137,6 +145,7 @@ export class Boss {
   /** Partes sólidas bloqueiam tiros (causando dano ou ricochete). */
   isPartSolid(part) {
     if (part.destroyed || !this.isPartVisible(part)) return false;
+    if (this.intangible) return false;
     return this.phaseIndex < part.solidUntilPhase;
   }
 
@@ -146,6 +155,28 @@ export class Boss {
     if (part.phase === this.phaseIndex) return true;
     // Quebra antecipada: parte exposta porque a peça que a cobria caiu.
     return Boolean(part.revealedBy && this.parts[part.revealedBy].destroyed && part.phase > this.phaseIndex);
+  }
+
+  /** Texto extra para o HUD (ex.: contagem regressiva da Hidra). */
+  hudHint() {
+    return this.def.hudHint?.(this) ?? null;
+  }
+
+  /** Chefe "fora de fase" (Espectro): visível, mas os tiros atravessam. */
+  get intangible() {
+    return Boolean(this.def.intangible?.(this));
+  }
+
+  /** Raios letais ativos agora (a cena testa a colisão com o jogador). */
+  lethalSegments() {
+    if (this.state !== 'fight' || this.passive) return [];
+    return this.def.segments?.(this) ?? [];
+  }
+
+  /** Gravidade que puxa a nave do jogador (null = nenhuma). */
+  pullForce() {
+    if (this.state !== 'fight' || this.passive) return null;
+    return this.def.pull?.(this) ?? null;
   }
 
   vulnerableParts() {
@@ -230,7 +261,7 @@ export class Boss {
         this.updateTilt(dt);
         this.phase.move(this, dt);
         this.laser.update(dt, this);
-        if (!this.passive) this.phase.attack(this, dt);
+        if (!this.passive) this.phase.attack(this, dt * this.attackRate);
         break;
       case 'transition':
         this.updateTilt(dt);
@@ -417,6 +448,7 @@ export class Boss {
     if (this.state === 'dead') return;
 
     ctx.save();
+    ctx.globalAlpha = this.def.alpha?.(this) ?? 1;
     ctx.translate(Math.round(this.x + this.shakeX), Math.round(this.y + this.shakeY));
     ctx.rotate(this.tilt);
     this.def.drawBehind?.(ctx, this);
@@ -441,7 +473,7 @@ export class Boss {
     ctx.restore();
 
     this.def.drawWorld?.(ctx, this);
-    if (this.state === 'fight') this.drawWeakPointMarkers(ctx);
+    if (this.state === 'fight' && !this.intangible) this.drawWeakPointMarkers(ctx);
     this.laser.draw(ctx, this);
     if (debug) this.drawDebug(ctx);
   }

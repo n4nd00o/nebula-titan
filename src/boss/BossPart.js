@@ -84,6 +84,14 @@ export class BossPart {
     return false;
   }
 
+  /** Traz uma parte destruída de volta com parte da vida (cabeças da Hidra). */
+  revive(ratio = 0.5) {
+    this.destroyed = false;
+    this.hp = Math.max(1, Math.round(this.maxHp * ratio));
+    this.flash = 0.2;
+    this.sinceHit = 0;
+  }
+
   /** Destrói a parte sem passar pelo dano (ex.: placa arrancada por roteiro). */
   forceDestroy() {
     this.hp = 0;

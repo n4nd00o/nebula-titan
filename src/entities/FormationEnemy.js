@@ -16,7 +16,7 @@ import { fireAlienShot } from './Minion.js';
 
 const ENTRY_DURATION = 2.2;
 const TO_SLOT_SPEED = 320;
-const DIVE_SPEED = 240;
+const DIVE_SPEED = 240; // padrão (cada tipo pode ter o seu: ALIEN_TYPES[type].diveSpeed)
 
 /**
  * Trajetórias de entrada parametrizadas por t ∈ [0, 1].
@@ -42,14 +42,19 @@ const PATHS = {
     const x0 = dir > 0 ? -20 : W + 20;
     return { x: x0 + dir * W * 0.7 * t, y: 230 - Math.sin(t * Math.PI) * 110 };
   },
+  // Cai pelo topo em zigue-zague até o meio da tela e sobe de volta (Mundos 2+).
+  dive(t, dir) {
+    const x0 = W / 2 - dir * 40;
+    return { x: x0 + Math.sin(t * Math.PI * 2) * dir * 150, y: -20 + Math.sin(t * Math.PI) * 360 };
+  },
 };
 
 export class FormationEnemy {
   /**
    * @param {object} opts
-   * @param {'green'|'orange'} opts.type
+   * @param {string} opts.type tipo em ALIEN_TYPES
    * @param {{col:number,row:number}} opts.slot vaga na formação
-   * @param {'swoop'|'side'} opts.path trajetória de entrada
+   * @param {'swoop'|'side'|'dive'} opts.path trajetória de entrada
    * @param {number} opts.dir lado de entrada (+1 esquerda, -1 direita)
    * @param {number} opts.delay atraso para entrar em fila
    * @param {object} opts.formation objeto que calcula a posição das vagas
@@ -135,18 +140,20 @@ export class FormationEnemy {
       case 'diving':
         this.t += dt;
         // Curva de perseguição nos primeiros instantes, depois segue reto.
-        if (this.t > 0.35 && this.t < 1.6 && scene.player.alive) {
+        const speed = this.info.diveSpeed ?? DIVE_SPEED;
+        const turnRate = this.info.diveTurn ?? 2.6;
+        if (this.t > 0.35 && this.t < (this.info.diveChase ?? 1.6) && scene.player.alive) {
           const current = Math.atan2(this.vy, this.vx);
           const desired = Math.atan2(scene.player.y - this.y, scene.player.x - this.x);
-          const turn = Math.max(-2.6 * dt, Math.min(2.6 * dt, angleDiff(current, desired)));
-          this.vx = Math.cos(current + turn) * DIVE_SPEED;
-          this.vy = Math.sin(current + turn) * DIVE_SPEED;
+          const turn = Math.max(-turnRate * dt, Math.min(turnRate * dt, angleDiff(current, desired)));
+          this.vx = Math.cos(current + turn) * speed;
+          this.vy = Math.sin(current + turn) * speed;
         } else if (this.t <= 0.35) {
           this.vy += 600 * dt; // fim do "pulo" inicial para fora da formação
         }
         if (!this.fired && this.t > 0.5) {
           this.fired = true;
-          fireAlienShot(scene, this.x, this.y + 10, this.info.shot);
+          if (this.info.shot) fireAlienShot(scene, this.x, this.y + 10, this.info.shot);
         }
         this.x += this.vx * dt;
         this.y += this.vy * dt;

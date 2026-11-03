@@ -5,6 +5,35 @@
 
 ---
 
+## 03/11/2026: Versão 1.3 (quatro mundos)
+
+### Motivação
+Aumentar o escopo com um **sistema de progressão**: dificuldade crescente, mantendo o esquema de fases comuns, fases com mini-chefes, uma fase com chefe e o chefe final. Decisões tomadas antes de começar: **4 mundos** (o conteúdo atual vira o Mundo 1 e o Leviatã fecha o Mundo 4), **chefes inéditos**, **3 mini-chefes por mundo** como no Mundo 1, e dificuldade com **inimigos comuns novos**, **escala numérica por mundo**, **progresso salvo** e **seleção de mundo**.
+
+### O que foi feito
+1. **Campanha como dados:** a `Campaign` passou a ler uma tabela `WORLDS` (setores, mini-chefes, chefe, chefe final, bônus, dificuldade, música e tema). As regras (`available`, `recordVictory`...) valem para qualquer mundo. A campanha virou **serializável** para o save.
+2. **Ganchos genéricos no motor:** em vez de condicionais por chefe, o `Boss` ganhou ganchos opcionais: raios letais (`segments`), gravidade (`pull`), intangibilidade (`intangible`/`alpha`), dica no HUD e velocidade de ataque por mundo. Toda mecânica nova foi construída com eles.
+3. **12 chefes novos**, cada um com uma ideia central diferente (gravidade, carapaça que abre e fecha, cabeças que renascem, raio entre duas naves, colunas de fogo, nave intangível, cópia do jogador...). Os testes genéricos validaram os 12 automaticamente assim que foram registrados.
+4. **Projéteis novos** (curva, aceleração, divisão), **alienígenas novos** e **12 buffs novos**, quase todos ligados ao tema do mini-chefe que os concede.
+5. **Save e seleção de mundo** no título, com tema visual e música por mundo.
+
+### Problemas encontrados e soluções
+| Problema | Solução |
+|---|---|
+| A Fornalha tinha as chaminés em cima do casco: o tiro do jogador, que sobe, batia no casco antes de chegar nelas. O teste genérico de "alvo atingível" passava, porque testa um ponto no centro da peça. | Chaminés movidas para baixo do casco. Ao posicionar peças, considerar de onde vem o tiro (de baixo para cima). |
+| Na fase 2 do Escaravelho, a carapaça começava fechada e cobria o núcleo, o que falhava o teste de alvo atingível. | No início da fase, a carapaça já começa aberta (posição ajustada na hora, não animada). |
+| Um projétil que se divide gerava 60 filhos em vez de 6 quando era atualizado de novo antes de ser removido. | `doSplit` zera `split` depois de dividir. Achado por um teste unitário novo. |
+| As capturas de tela no Edge headless mostravam o jogo "congelado" no início. | No modo headless o `requestAnimationFrame` roda poucos quadros. A página de prévia passou a **avançar a simulação** chamando `game.update()` em laço, o que é determinístico. |
+| A apresentação do mundo era coberta pelo aviso "ONDA 1/3" depois de 1,5 s. | `WaveStage.entryDelay`: a primeira onda espera a apresentação terminar. |
+| Simulando a duração das lutas, a Hidra (Mundo 2) terminava mais rápido que o Titã (Mundo 1), embora o jogador chegue com mais buffs. | Vida extra para os chefes de mundo na campanha (Hidra +40%, Égide +50%, Arconte +60%, Leviatã +120%). As lutas agora ficam mais longas a cada mundo. |
+
+### Aprendizados
+- Ganchos **genéricos** (um raio letal, uma força) rendem mais que mecânicas específicas: a mesma ideia de "raio" virou sopro, elo, coluna de fogo, raio giratório, canhão que varre e tesoura.
+- Testes genéricos sobre um registro (`BOSSES`) pagam o custo de volta a cada chefe novo.
+- Ver o jogo continua indispensável: a verificação visual pegou problemas de legibilidade que os testes não veem.
+
+---
+
 ## 03/11/2026: Versão 1.2.1 (casco do Leviatã invisível)
 
 ### Problema

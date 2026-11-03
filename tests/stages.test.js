@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { WaveStage } from '../src/stages/WaveStage.js';
 import { STAGES } from '../src/stages/stageData.js';
 import { ALIEN_TYPES } from '../src/entities/alienTypes.js';
+import { FormationEnemy } from '../src/entities/FormationEnemy.js';
 import { createFakeWorld } from './helpers.js';
 
 /** Mundo falso que guarda os inimigos e os atualiza, como a PlayScene faz. */
@@ -26,11 +27,12 @@ function step(stage, world, enemies, seconds) {
 }
 
 for (const [id, def] of Object.entries(STAGES)) {
-  test(`${def.name}: ondas cabem na formação (8 laranjas, 24 verdes)`, () => {
+  test(`${def.name}: ondas cabem na formação (8 vagas em cima, 24 embaixo)`, () => {
     for (const wave of def.waves) {
-      const count = (type) => wave.groups.filter((g) => g.type === type).reduce((n, g) => n + g.count, 0);
-      assert.ok(count('orange') <= 8, `${wave.title}: laranjas demais`);
-      assert.ok(count('green') <= 24, `${wave.title}: verdes demais`);
+      const count = (tier) => wave.groups.filter((g) => ALIEN_TYPES[g.type].tier === tier).reduce((n, g) => n + g.count, 0);
+      assert.ok(count('top') <= 8, `${wave.title}: inimigos demais na fileira de cima`);
+      assert.ok(count('bottom') <= 24, `${wave.title}: inimigos demais nas fileiras de baixo`);
+      for (const g of wave.groups) assert.ok(ALIEN_TYPES[g.type], `${wave.title}: tipo ${g.type} não existe`);
     }
   });
 
@@ -55,13 +57,56 @@ for (const [id, def] of Object.entries(STAGES)) {
   });
 }
 
-test('formação: laranjas na fileira de cima, verdes abaixo, vagas únicas', () => {
-  const { world, enemies } = stageWorld();
-  const stage = new WaveStage(world, STAGES.stage2);
-  step(stage, world, enemies, 1.6);
-  const slots = enemies.map((e) => `${e.slot.col},${e.slot.row}`);
-  assert.equal(new Set(slots).size, slots.length, 'duas naves na mesma vaga');
-  for (const e of enemies) assert.equal(e.slot.row === 0, e.type === 'orange');
+test('formação: tipos "top" na fileira de cima, os demais abaixo, vagas únicas', () => {
+  for (const id of ['stage2', 'stage6', 'stage8']) {
+    const { world, enemies } = stageWorld();
+    const stage = new WaveStage(world, STAGES[id]);
+    for (let w = 0; w < stage.phaseCount; w++) {
+      step(stage, world, enemies, 1.6);
+      const wave = enemies.filter((e) => !e.dead);
+      const slots = wave.map((e) => `${e.slot.col},${e.slot.row}`);
+      assert.equal(new Set(slots).size, slots.length, `${id}: duas naves na mesma vaga`);
+      for (const e of wave) assert.equal(e.slot.row === 0, e.info.tier === 'top');
+      for (const e of wave) e.damage(99);
+      step(stage, world, enemies, 2);
+    }
+  }
+});
+
+test('cada mundo apresenta um alienígena novo nos seus setores', () => {
+  const types = (ids) => new Set(ids.flatMap((id) => STAGES[id].waves.flatMap((w) => w.groups.map((g) => g.type))));
+  assert.ok(types(['stage3', 'stage4']).has('blue'));
+  assert.ok(types(['stage5', 'stage6']).has('purple'));
+  assert.ok(types(['stage7', 'stage8']).has('red'));
+  assert.ok(!types(['stage1', 'stage2']).has('blue'), 'Mundo 1 só tem verdes e laranjas');
+});
+
+test('mundos mais avançados têm setores mais agressivos', () => {
+  const minDive = (id) => Math.min(...STAGES[id].waves.map((w) => w.diveEvery));
+  assert.ok(minDive('stage8') < minDive('stage4') && minDive('stage4') < minDive('stage2'));
+});
+
+test('kamikaze vermelho mergulha mais rápido que o verde e não atira', () => {
+  const dive = (type) => {
+    const world = createFakeWorld();
+    const formation = { time: 0, slotPos: () => ({ x: 240, y: 100 }) };
+    const e = new FormationEnemy({ type, slot: { col: 0, row: 1 }, path: 'swoop', dir: 1, delay: 0, formation });
+    e.state = 'formation';
+    e.x = 240;
+    e.y = 100;
+    e.startDive();
+    let maxSpeed = 0;
+    for (let i = 0; i < 60; i++) {
+      e.update(1 / 60, world);
+      maxSpeed = Math.max(maxSpeed, Math.hypot(e.vx, e.vy));
+    }
+    return { shots: world.bullets.length, maxSpeed };
+  };
+  const red = dive('red');
+  const green = dive('green');
+  assert.equal(red.shots, 0, 'o kamikaze atirou');
+  assert.ok(green.shots > 0, 'o verde deveria atirar');
+  assert.ok(red.maxSpeed > green.maxSpeed * 1.3);
 });
 
 test('alienígenas mergulham e atiram; abater em mergulho vale mais', () => {

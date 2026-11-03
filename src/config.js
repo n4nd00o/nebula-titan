@@ -52,6 +52,22 @@ export const PLAYER = Object.freeze({
   bombCharges: 2,
   bombMax: 3, // o Leviatã recarrega bombas em algumas seções
   bombDamage: 6,
+  // Buffs dos mundos 2 a 4
+  spreadAngle: 0.22, // Tiro Triplo: abertura dos tiros diagonais (rad)
+  spreadDamage: 0.6, // os tiros diagonais são mais fracos
+  shockRadius: 80, // Onda de Choque do dash
+  shockDamage: 3,
+  carapaceRecharge: 20, // segundos sem dano para a Carapaça voltar
+  overdriveFactor: 0.8, // Sobrecarga: recarga do tiro x0,8
+  missileEvery: 1.1,
+  missileDamage: 1.5,
+  missileSpeed: 380,
+  bombRegenEvery: 30, // Recarga de Bomba: +1 carga a cada N segundos
+  phantomDashCooldown: 1, // Fantasma
+  phantomDashInvuln: 0.5,
+  focusDamage: 1.6, // Foco Amplificado: multiplicador no modo foco
+  reactiveDamage: 4, // Escudo Reativo: dano do pulso nos pontos fracos
+  novaDamageFactor: 3, // Bomba Nova
 });
 
 /** Paleta de cores usada pela interface (HUD). */

@@ -15,7 +15,7 @@ export class Minion {
    * @param {number} baseX posição X de entrada
    * @param {number} delay atraso antes de aparecer (para entrar em fila)
    * @param {number} direction lado da curva em "S" (-1 ou 1)
-   * @param {{startY?: number, entryTime?: number, type?: 'green'|'orange'}} options
+   * @param {{startY?: number, entryTime?: number, type?: string}} options
    *        drones nascidos de ninhos/hangares começam mais abaixo e mergulham mais cedo
    */
   constructor(baseX, delay, direction, { startY = -20, entryTime = 1.3, type = 'green' } = {}) {
@@ -83,9 +83,10 @@ export class Minion {
     this.state = 'diving';
     const target = scene.player;
     const angle = Math.atan2(target.y - this.y, target.x - this.x);
-    this.vx = Math.cos(angle) * 230;
-    this.vy = Math.max(80, Math.sin(angle) * 230);
-    fireAlienShot(scene, this.x, this.y + 10, this.info.shot);
+    const speed = Math.max(230, this.info.diveSpeed ?? 0);
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.max(80, Math.sin(angle) * speed);
+    if (this.info.shot) fireAlienShot(scene, this.x, this.y + 10, this.info.shot);
   }
 
   /** Retorna true se o drone foi destruído. */
@@ -109,6 +110,7 @@ export class Minion {
 
 /** Disparo padrão de um alienígena (1 agulha ou leque de 3), mirado no jogador. */
 export function fireAlienShot(scene, x, y, shot) {
+  if (!shot) return;
   const p = scene.player;
   const base = Math.atan2(p.y - y, p.x - x);
   const spread = shot.count > 1 ? 0.35 : 0;
@@ -121,6 +123,7 @@ export function fireAlienShot(scene, x, y, shot) {
       kind: shot.kind,
       color: shot.color,
       radius: shot.radius,
+      split: shot.split ?? null,
     });
   }
 }

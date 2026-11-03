@@ -9,7 +9,10 @@
  *
  * Qualquer sprite pode ser substituído por um PNG desenhado à mão.
  * Veja docs/GUIA_DE_SPRITES.md.
+ *
+ * Os sprites dos Mundos 2 a 4 ficam em spriteDataWorlds.js.
  */
+import { WORLD_SPRITES } from './spriteDataWorlds.js';
 
 /** Espelha cada linha (largura par): "abc" -> "abccba". */
 const mirrorEven = (rows) => rows.map((r) => r + [...r].reverse().join(''));
@@ -442,4 +445,5 @@ export const SPRITES = Object.freeze({
   core: { rows: CORE, description: 'Núcleo de energia' },
   cannon: { rows: CANNON, description: 'Canhão principal' },
   minion: { rows: MINION, description: 'Drone inimigo' },
+  ...WORLD_SPRITES,
 });

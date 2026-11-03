@@ -3,6 +3,33 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - 2026-11-03
+
+### Adicionado
+- **Progressão em 4 mundos** com dificuldade crescente. Cada mundo segue o esquema **2 setores → 3 mini-chefes (ordem livre) → chefe**; o Mundo 4 termina no Leviatã.
+  - Mundo 1, **Nebulosa Carmim**: o conteúdo anterior (Setores 1-2, Sentinela, Colmeia, Ceifador, Nebula Titan).
+  - Mundo 2, **Cinturão Glacial**: Setores 3-4, **Prisma**, **Vórtice**, **Escaravelho** e o chefe **Hidra Glacial**.
+  - Mundo 3, **Forja Estelar**: Setores 5-6, **Martelo**, **Gêmeos**, **Fornalha** e o chefe **Égide**.
+  - Mundo 4, **Vazio Abissal**: Setores 7-8, **Espectro**, **Oráculo**, **Eco**, o chefe **Arconte** e o **Leviatã**.
+- **3 alienígenas novos**: azul blindado (tiro de cristal que se divide), roxo divisor (vira 2 drones) e vermelho kamikaze.
+- **12 buffs novos**: Tiro Triplo, Onda de Choque, Carapaça, Bomba Extra, Sobrecarga, Ala Dupla, Mísseis Teleguiados, Recarga de Bomba, Fantasma, Foco Amplificado, Escudo Reativo e Bomba Nova (16 no total).
+- **Dificuldade por mundo**: ataques e projéteis mais rápidos (`attackRate`, `bulletSpeed`) e chefes de mundo reforçados (`hpScale`).
+- **Progresso salvo** no navegador após cada vitória (opção **CONTINUAR**) e **seleção de mundo** no título.
+- Tema por mundo: cor de fundo, estrelas e música (`ice`, `forge`, `void`); apresentação do mundo no primeiro setor.
+- Ganchos genéricos no motor de chefes: `segments` (raios letais), `pull` (gravidade), `intangible` e `alpha` (Espectro), `hudHint`, `attackRate`; `BossPart.revive` (cabeças da Hidra).
+- Projéteis inimigos com **curva** (`spin`), **aceleração** (`accel`) e **divisão** (`split`), e o novo formato `shard`. Mísseis teleguiados do jogador (`PlayerMissile`).
+- Módulos `src/boss/beams.js` (desenho de raios) e `src/boss/phasing.js` (ciclo espectral), e `src/graphics/spriteDataWorlds.js` (45 sprites novos).
+- 91 testes novos (total: 172), incluindo `tests/worlds.test.js`.
+
+### Alterado
+- `Campaign` reescrita em torno da tabela `WORLDS`; serializável com `toJSON()`/`fromJSON()`.
+- Mapa da campanha gerado a partir do mundo atual; o título ganhou menu dinâmico.
+- Setores: vagas da formação por *tier* (`top`/`bottom`) em vez de por cor; nova trajetória de entrada `dive`.
+- HUD: recarga do dash, total de buffs e mundo atual; a pausa lista os buffs conquistados.
+
+### Corrigido
+- Um projétil que se divide não se divide mais de uma vez se for atualizado de novo antes de ser removido.
+
 ## [1.2.1] - 2026-11-03
 
 ### Corrigido

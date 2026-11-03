@@ -12,8 +12,13 @@ const OFFSET_X = -34;
 const OFFSET_Y = 14;
 
 export class Wingman {
-  constructor(player) {
-    this.x = player.x + OFFSET_X;
+  /**
+   * @param {object} player
+   * @param {number} side -1 = à esquerda (Ala Companheira), +1 = à direita (Ala Dupla)
+   */
+  constructor(player, side = -1) {
+    this.side = side;
+    this.x = player.x - OFFSET_X * side;
     this.y = player.y + OFFSET_Y;
     this.visible = true;
     this.time = 0;
@@ -24,8 +29,8 @@ export class Wingman {
     this.visible = player.alive;
     if (!player.alive) return;
     // Segue a posição-alvo com atraso (sensação de formação de voo).
-    const tx = player.x + OFFSET_X;
-    const ty = player.y + OFFSET_Y + Math.sin(this.time * 3) * 3;
+    const tx = player.x - OFFSET_X * this.side;
+    const ty = player.y + OFFSET_Y + Math.sin(this.time * 3 + (this.side > 0 ? Math.PI : 0)) * 3;
     this.x = approach(this.x, tx, Math.max(60, Math.abs(tx - this.x) * 8) * dt);
     this.y = approach(this.y, ty, Math.max(60, Math.abs(ty - this.y) * 8) * dt);
   }

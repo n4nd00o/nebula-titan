@@ -134,33 +134,36 @@ Cada cena implementa a mesma interface informal: `enter()`, `exit()`, `update(dt
 Arquivos: [`src/stages/WaveStage.js`](../src/stages/WaveStage.js), [`src/stages/stageData.js`](../src/stages/stageData.js), [`src/entities/FormationEnemy.js`](../src/entities/FormationEnemy.js)
 
 - **`WaveStage`** é o diretor da fase e também a **formação**: `slotPos({col,row})` calcula a posição de cada vaga com balanço e "respiração".
-- **`FormationEnemy`** é uma máquina de estados: `waiting → entering` (trajetória paramétrica `swoop`/`side`) `→ toSlot → formation → diving` (salto, curva de perseguição, tiro) `→ toSlot` (se sair por baixo, reaparece no topo).
+- **`FormationEnemy`** é uma máquina de estados: `waiting → entering` (trajetória paramétrica `swoop`/`side`/`dive`) `→ toSlot → formation → diving` (salto, curva de perseguição, tiro) `→ toSlot` (se sair por baixo, reaparece no topo).
 - O diretor escolhe mergulhadores e atiradores com frequência inversamente proporcional aos inimigos restantes, e o laranja puxa escoltas verdes.
 - Os inimigos entram na lista de inimigos da cena (`world.addEnemy`), então colisão, pontuação, bomba e drops funcionam igual aos drones dos chefes.
+- **v1.3:** as vagas são distribuídas por **tier** (`ALIEN_TYPES[type].tier`: `top` = fileira de cima, `bottom` = três fileiras de baixo), não por cor; o comportamento especial de cada tipo é dado (`diveSpeed`, `diveTurn`, `shot: null`, `splitInto`, `leader`). O `WaveStage` recebe `attackRate` (dificuldade do mundo).
 
 ### 4.1 Campanha
 
 Arquivo: [`src/systems/Campaign.js`](../src/systems/Campaign.js)
 
+> **v1.3: mundos como dados.** A campanha é descrita pela tabela `WORLDS`. Cada mundo declara `stages`, `minis`, `boss`, `finale` (só o Mundo 4: Leviatã), `completionReward`, `difficulty` (`attackRate`, `bulletSpeed`), `hpScale` por chefe, `music` e `theme` (fundo e estrelas). O mundo atual é calculado (`worldIndex` = primeiro mundo não concluído), então não há estado extra para manter sincronizado. `difficultyFor(id)` entrega à `PlayScene` os multiplicadores do mundo do encontro. `Campaign.startingAt(n)` cria uma campanha no mundo `n` com os buffs dos anteriores (seleção de mundo), e `toJSON()`/`fromJSON()` salvam e carregam o progresso (com versão e validação: saves inválidos, antigos ou já concluídos são ignorados).
+
 O estado da campanha (chefes derrotados, buffs, rota, pontuação e estatísticas acumuladas) vive em um objeto **`Campaign` de lógica pura**, sem DOM, que é passado de cena em cena (`MapScene` → `PlayScene` → `MapScene`...). As regras ficam todas ali:
 
 | Método | Regra |
 |---|---|
-| `available()` | Setor 1 → Setor 2 (lineares) → mini-chefes restantes → Titã → Leviatã |
+| `available()` | No mundo atual: setores (lineares) → mini-chefes restantes → chefe do mundo → chefe final (Mundo 4) |
 | `nextIsStage` | Indica se a próxima etapa é linear (pula o mapa) |
 | `recordDeath()` / `perfect` | Conta todas as mortes (inclusive em tentativas fracassadas) para o bônus de corrida perfeita |
-| `recordVictory(id, stats, score)` | Marca a vitória, acumula estatísticas e devolve os buffs ganhos (o do chefe + a bomba, se foi o terceiro) |
+| `recordVictory(id, stats, score)` | Marca a vitória, acumula estatísticas e devolve os buffs ganhos (o do chefe + o bônus do mundo, se foi o terceiro) |
 | `recordContinue()` | Derrota: zera a pontuação, volta para 3 vidas e mantém os buffs |
 
 As **vidas** vivem na campanha (`campaign.lives`, máx. 5) e passam de fase em fase; a **vida extra por pontuação** usa `campaign.nextLifeAt`, que persiste entre as fases e é reiniciado no *continue*.
 
-A `PlayScene` recebe `{ bossId, campaign }`. Os buffs são lidos de `campaign.buffs` e aplicados à nave (`Player.buffs`), à criação da `Wingman` e às cargas de bomba. Na campanha, o Titã é criado com `hpScale = 1.8` para compensar os buffs.
+A `PlayScene` recebe `{ bossId, campaign }`. Os buffs são lidos de `campaign.buffs` e aplicados à nave (`Player.buffs`), à criação das `Wingman` (uma ou duas) e às cargas de bomba. A dificuldade do mundo vira `hpScale` e `attackRate` no `Boss`/`WaveStage` e um multiplicador de velocidade em `spawnEnemyBullet`. Depois de cada vitória a cena salva a campanha (`campaignSave`) e o número de mundos liberados (`worldsUnlocked`).
 
 ## 5. O motor de chefes
 
 > **Encontros (v1.2):** a `PlayScene` não roda só chefes. Ela roda qualquer **encontro** registrado em [`src/encounters.js`](../src/encounters.js): uma fase de ondas (`WaveStage`) ou um chefe (`Boss`). Os dois expõem a **mesma interface** (`update`, `draw`, `state`, `phaseIndex`, `phaseCount`, `phase`, `phaseHealthRatio`, `hitTestPath`, `touches`, `vulnerableParts`, `applyDamage`, `laser`, `passive`). É polimorfismo por *duck typing*: a cena nunca pergunta "isto é um chefe?".
 
-Desde a v1.1, a classe `Boss` é um **motor genérico**: ela executa qualquer **definição de chefe** em `src/boss/bosses/` (Nebula Titan, Sentinela, Colmeia e Ceifador). Na v1.0 o motor conhecia detalhes do Titã ("asas", "casco", "placa"). Esses detalhes foram movidos para **dados e ganchos** da definição:
+Desde a v1.1, a classe `Boss` é um **motor genérico**: ela executa qualquer **definição de chefe** em `src/boss/bosses/` (hoje são 17: os 4 de cada mundo e o Leviatã). Na v1.0 o motor conhecia detalhes do Titã ("asas", "casco", "placa"). Esses detalhes foram movidos para **dados e ganchos** da definição:
 
 | Campo/gancho da definição | Uso | Exemplo |
 |---|---|---|
@@ -188,6 +191,19 @@ O motor também ganhou **dano por contato** (`boss.touches()`), usado pela inves
 | `def.contactDamage = false` | `Boss.touches` | Chefes "abaixo" do jogador não causam contato |
 | `phase.bombRefill` | `PlayScene.onPhaseStart` | +1 carga de bomba ao entrar na seção |
 | `world.spawnLaserWall()` | `PlayScene` + `entities/LaserWall.js` | Perigo de cenário com aviso, brecha e colisão por faixa |
+
+**Recursos adicionados na v1.3 (Mundos 2 a 4), todos opcionais:**
+
+| Recurso | Onde | Como funciona |
+|---|---|---|
+| `def.segments(boss)` | `Boss.lethalSegments` + `PlayScene.handleCollisions` | Lista de **raios letais** `{x1, y1, x2, y2, width}`; a cena testa a distância ponto-segmento. Usado por sopro, elo, colunas, raios giratórios, canhão e tesoura. Desenho comum em `src/boss/beams.js` (aviso + raio) |
+| `def.pull(boss)` | `Boss.pullForce` + `PlayScene.applyPull` | **Gravidade** `{x, y, strength}` (negativa empurra); o dash escapa |
+| `def.intangible(boss)` / `def.alpha(boss)` | `Boss.isPartSolid` / `Boss.draw` | Chefe fora de fase: os tiros atravessam e os colchetes somem. Ciclo comum em `src/boss/phasing.js` |
+| `def.hudHint(boss)` | `Boss.hudHint` | Texto extra no HUD (contagem regressiva das cabeças da Hidra) |
+| `def.onPartDestroyed`, `BossPart.revive()` | `Boss` / `BossPart` | Reações à perda de partes (estilhaços) e partes que renascem |
+| `options.attackRate` | `Boss.update` | Multiplica o `dt` dos ataques (dificuldade do mundo) |
+| `def.icon` | `MapScene` | Sprite e escala do nó no mapa |
+| `EnemyBullet`: `spin`, `accel`, `split`, `kind: 'shard'` | `entities/projectiles.js` | Projéteis que fazem curva, aceleram e se dividem |
 
 ### 5.0 O casco procedural do Leviatã
 
@@ -387,10 +403,12 @@ flowchart LR
 | Unitário | `node:test` | Matemática, colisão, pontuação, integridade dos sprites |
 | Lógica de domínio | `node:test` + mundo falso (`Proxy`) | Todas as fases e transições do Titã, quebra antecipada, hit test por pixel |
 | Testes genéricos | Laço sobre `BOSSES` | Para **cada chefe registrado**: definição válida, alvos atingíveis, fluxo completo, estabilidade em 20 s de luta |
-| Campanha | `node:test` | Setores obrigatórios, buffs por chefe, liberação do Titã/bomba/Leviatã, vidas, continue, corrida perfeita |
+| Campanha | `node:test` | 4 mundos em sequência, setores obrigatórios, buffs e bônus de mundo, Leviatã após o Arconte, dificuldade crescente, seleção de mundo, salvar/carregar, vidas, continue, corrida perfeita |
+| Mundos novos | `node:test` (`tests/worlds.test.js`) | Projéteis (divisão, curva, aceleração), mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo |
 | Setores | `node:test` + mundo falso que atualiza os inimigos | Formação válida, vagas únicas, ondas completas, mergulhos e tiros |
 | Leviatã | `node:test` | Câmera por seção, blindagem, regeneração, contato e paredes de laser |
-| Integração (manual/automatizada) | Simulação headless com DOM falso e bot | Partida completa até vitória e até game over |
+| Integração (manual/automatizada) | Simulação headless com DOM falso e bot | Partida completa até vitória e até game over; os 25 encontros da campanha com todos os buffs até a vitória e a troca de mundo |
+| Visual | Edge headless + página de prévia que avança a simulação | Capturas de tela de cada chefe e fase |
 | Integração contínua | GitHub Actions | `npm test` a cada push/PR |
 
 ## 11. Como estender
@@ -400,7 +418,9 @@ flowchart LR
 | Ajustar dificuldade do jogador | `src/config.js` → `PLAYER` |
 | Ajustar vida/posição das partes | `src/boss/bosses/<chefe>.js` → `PARTS` |
 | Criar/alterar ataques | `src/boss/bosses/<chefe>.js` → `PHASES[n].attack` |
-| Criar um chefe novo | Novo arquivo em `src/boss/bosses/` + registro em `bosses/index.js` (+ nó no `MapScene` se for da campanha) |
+| Criar um chefe novo | Novo arquivo em `src/boss/bosses/` + registro em `bosses/index.js` (+ colocar o id em um mundo de `WORLDS`; o mapa é gerado sozinho) |
+| Criar um mundo novo | Nova entrada em `WORLDS` (`src/systems/Campaign.js`) + setores em `stageData.js` + chefes |
+| Ajustar a dificuldade de um mundo | `WORLDS[n].difficulty` e `WORLDS[n].hpScale` |
 | Mudar buffs/recompensas | `src/systems/Campaign.js` → `BUFFS`, `REWARDS`; valores em `config.js` → `PLAYER` |
 | Novo padrão de tiro | `src/boss/patterns.js` |
 | Novo efeito sonoro | `src/core/AudioEngine.js` → `SFX` |

@@ -2,7 +2,7 @@
 
 # 🚀 NEBULA TITAN
 
-**Um shoot 'em up retrô com chefes de partes destrutíveis: setores de alienígenas, três mini-chefes, uma rota à sua escolha e uma fortaleza estelar que ocupa a tela inteira.**
+**Um shoot 'em up retrô com chefes de partes destrutíveis: quatro mundos com dificuldade crescente, 12 mini-chefes, 4 chefes de mundo, rotas à sua escolha e uma fortaleza estelar que ocupa a tela inteira.**
 
 *Releitura moderna dos clássicos arcade dos anos 80, inspirada em Galaga (Namco, 1981).*
 
@@ -27,7 +27,7 @@
 
 1. [Sobre o projeto](#-sobre-o-projeto)
 2. [Objetivos](#-objetivos)
-3. [Modos de jogo e campanha](#-modos-de-jogo-e-campanha)
+3. [Modos de jogo e campanha](#-modos-de-jogo-e-campanha) · [Os quatro mundos](#os-quatro-mundos-v13)
 4. [O chefe final: Leviatã](#-o-chefe-final-leviatã-a-fortaleza-estelar) · [O Titã](#-o-penúltimo-chefe-as-quatro-fases-do-titã)
 5. [Funcionalidades](#-funcionalidades)
 6. [Como jogar](#-como-jogar)
@@ -52,7 +52,7 @@ O ponto de partida escolhido foi o **Galaga**, um dos *shoot 'em ups* mais icôn
 
 > **A ideia central:** cada parte do chefe que você destrói **muda a aparência e o comportamento dele**. Arrancar a asa direita deixa a nave sem a asa, desequilibrada e inclinada para aquele lado. A asa que sobra passa a atacar com mais fúria e o gerador de escudo escondido atrás dela fica exposto. **A ordem das suas escolhas muda a luta.**
 
-O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
+O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A **versão 1.3** transformou a campanha em um **sistema de progressão com 4 mundos**: cada mundo mantém o esquema de setores comuns, mini-chefes e um chefe, com dificuldade crescente, inimigos novos, 9 mini-chefes e 3 chefes inéditos, 12 buffs novos e progresso salvo. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
 
 ## 🧭 Objetivos
 
@@ -67,21 +67,58 @@ O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entre
 
 | Modo | Descrição |
 |---|---|
-| **Campanha** | **Setor 1 → Setor 2** (obrigatórios) → **3 mini-chefes na ordem que quiser** (cada um dá um **buff permanente**) → **Nebula Titan** → **LEVIATÃ** (chefe final). As vidas **acumulam** entre as fases (máximo 5). Se perder todas, você **recomeça a fase atual** com 3 vidas e os buffs mantidos, mas a pontuação é zerada. Zerar o jogo **sem nenhuma morte** vale **+100.000 pontos**. |
+| **Campanha** | **4 mundos**, cada um com **2 setores** (obrigatórios) → **3 mini-chefes na ordem que quiser** (cada um dá um **buff permanente**) → **chefe do mundo**. O Mundo 4 termina no **LEVIATÃ** (chefe final). As vidas **acumulam** entre as fases (máximo 5). Se perder todas, você **recomeça a fase atual** com 3 vidas e os buffs mantidos, mas a pontuação é zerada. Zerar o jogo **sem nenhuma morte** vale **+100.000 pontos**. |
+| **Continuar** | Retoma a campanha salva (o jogo salva após cada vitória). |
+| **Mundo < N >** | Começa direto em um mundo já alcançado, com os buffs dos mundos anteriores. |
 | **Duelo com o Titã** | Luta direta contra o chefe final, sem buffs: o desafio puro da versão 1.0. |
 
-### Os setores preparatórios
+### Os quatro mundos (v1.3)
 
-Duas fases obrigatórias de **ondas em formação**, uma homenagem direta ao Galaga: os alienígenas entram fazendo curvas, montam uma formação que "respira" no topo da tela e mergulham contra você. Se errarem o mergulho, voltam para a vaga. Os setores não dão buffs, só **pontos** (abater em mergulho vale o dobro).
+A campanha é dividida em **4 mundos com dificuldade crescente**. Todos seguem a mesma estrutura: **2 setores comuns → 3 mini-chefes em ordem livre → chefe do mundo**. O Mundo 4 termina no **Leviatã**, o chefe final.
+
+| Mundo | Tema | Setores (inimigo novo) | Mini-chefes (buff) | Chefe | Bônus do mundo |
+|:---:|---|---|---|---|---|
+| **1 · Nebulosa Carmim** | O começo | Setores 1-2 (verde e laranja) | Sentinela (Perfurante) · Colmeia (Ala) · Ceifador (Dash) | **Nebula Titan** | Bomba de Pulso |
+| **2 · Cinturão Glacial** | Gelo e cristais | Setores 3-4 (**azul blindado**) | Prisma (Tiro Triplo) · Vórtice (Onda de Choque) · Escaravelho (Carapaça) | **Hidra Glacial** | Bomba Extra |
+| **3 · Forja Estelar** | Fábricas e fogo | Setores 5-6 (**roxo divisor**) | Martelo (Sobrecarga) · Gêmeos (Ala Dupla) · Fornalha (Mísseis) | **Égide** | Recarga de Bomba |
+| **4 · Vazio Abissal** | O coração da frota | Setores 7-8 (**vermelho kamikaze**) | Espectro (Fantasma) · Oráculo (Foco Amplificado) · Eco (Escudo Reativo) | **Arconte** → **LEVIATÃ** | Bomba Nova |
+
+**Como a dificuldade sobe:** cada mundo acelera os ataques (+5% a +15%) e os projéteis inimigos (+5% a +12%), os setores mergulham e atiram com mais frequência, e os chefes chegam reforçados para compensar os buffs acumulados (Hidra +40%, Égide +50%, Arconte +60%, Leviatã +120% de vida). Cada mundo tem **paleta de estrelas, cor de fundo e música próprias**.
+
+**Progresso salvo:** a campanha é salva no navegador após cada vitória (**CONTINUAR** no título). Mundos já alcançados ficam disponíveis em **MUNDO < N >**: você começa nele com os buffs dos mundos anteriores.
+
+#### Mini-chefes e chefes dos mundos novos
+
+| Encontro | Mecânica central |
+|---|---|
+| **Prisma** | Fragmentos orbitais lançam cristais que **se dividem no ar**; fragmento destruído estilhaça em anel. |
+| **Vórtice** | Uma **gravidade puxa a sua nave**; na fase 2 ela pulsa e também **empurra**. O dash escapa da força. |
+| **Escaravelho** | O núcleo fica atrás de uma **carapaça indestrutível que abre e fecha**: ataque na janela certa. |
+| **Hidra Glacial** (chefe) | Cabeças que **renascem** se você não cortar as duas em 9 s, **sopro congelante** (raio que varre a tela), escamas blindadas e um coração que regenera. |
+| **Martelo** | **Pancadas** avisadas por sombra que soltam **ondas de choque** rente ao chão. |
+| **Gêmeos** | Duas naves em órbita ligadas por um **raio letal**; derrubar uma enfurece a outra. |
+| **Fornalha** | **Colunas de fogo** com faixa de aviso e, na fase 2, dois **raios giratórios** como ponteiros de relógio. |
+| **Égide** (chefe) | Quatro canhões, um **anel de escudo blindado giratório**, um **canhão de raio que varre** e um núcleo que regenera. |
+| **Espectro** | Sai de fase: fica **intangível** (tiros atravessam), teletransporta e reaparece atirando. |
+| **Oráculo** | *Bullet hell* de flores de projéteis que **fazem curva**: feito para o **modo foco**. |
+| **Eco** | Uma **cópia sombria da sua nave** que segue você; na fase 2 voa espelhada e faz projéteis **subirem do fundo da tela**. |
+| **Arconte** (chefe) | Usa a tecnologia de todos os guardiões: cápsulas orbitais, gravidade, **tesoura de raios**, máscara blindada e espectral e um núcleo final com tudo junto. |
+
+### Os setores (ondas em formação)
+
+Cada mundo começa com duas fases obrigatórias de **ondas em formação**, uma homenagem direta ao Galaga: os alienígenas entram fazendo curvas, montam uma formação que "respira" no topo da tela e mergulham contra você. Se errarem o mergulho, voltam para a vaga. Os setores não dão buffs, só **pontos** (abater em mergulho vale o dobro).
 
 | Inimigo | Vida | Ataque | Comportamento |
 |---|:---:|---|---|
 | **Alienígena verde** | 1 | 1 agulha mirada | Frágil e numeroso; mergulha sozinho ou como escolta |
 | **Alienígena laranja** | 3 | Leque de 3 tiros | Fica na fileira de cima e mergulha **puxando escoltas verdes** |
+| **Alienígena azul** *(Mundo 2)* | 7 | Cristal que se divide em anel | **Blindado**: fica na fileira de cima e mergulha devagar |
+| **Alienígena roxo** *(Mundo 3)* | 2 | 2 agulhas | **Divisor**: ao ser destruído, vira **2 drones verdes** que mergulham na hora |
+| **Alienígena vermelho** *(Mundo 4)* | 1 | Nenhum | **Kamikaze**: mergulha muito rápido e persegue a nave |
 
-Os dois tipos também aparecem como **escolta** nas lutas contra os chefes.
+Todos os tipos também aparecem como **escolta** nas lutas contra os chefes.
 
-### Os mini-chefes
+### Os mini-chefes do Mundo 1
 
 | Mini-chefe | Mecânica | Como ele muda | Buff ao derrotar |
 |---|---|---|---|
@@ -94,7 +131,7 @@ Os dois tipos também aparecem como **escolta** nas lutas contra os chefes.
 
 ## 🛸 O chefe final: LEVIATÃ, a fortaleza estelar
 
-Uma nave **maior que a tela**: o jogador voa **sobre o casco** e, a cada fase, a câmera avança para a próxima das **8 seções**, da popa até a proa. O casco é **desenhado proceduralmente** e cada seção tem visual próprio. Cada seção é construída em torno de um buff, que fica **cada vez mais necessário, mas nunca obrigatório**:
+Último encontro do Mundo 4, depois do Arconte. Uma nave **maior que a tela**: o jogador voa **sobre o casco** e, a cada fase, a câmera avança para a próxima das **8 seções**, da popa até a proa. O casco é **desenhado proceduralmente** e cada seção tem visual próprio. Cada seção é construída em torno de um buff, que fica **cada vez mais necessário, mas nunca obrigatório**:
 
 | Seção | Pontos fracos | Ameaça | Buff que brilha |
 |:---:|---|---|---|
@@ -107,7 +144,7 @@ Uma nave **maior que a tela**: o jogador voa **sobre o casco** e, a cada fase, a
 | 7 · Ponte de Comando | Ponte blindada | Blindagem + lasers + escoltas laranja | Perfurante + Dash · +1 bomba |
 | 8 · Núcleo | Núcleo regenerativo | Espirais, anéis, lasers e escoltas | **Todos** |
 
-## 👾 O penúltimo chefe: as quatro fases do Titã
+## 👾 O chefe do Mundo 1: as quatro fases do Titã
 
 O **NEBULA TITAN** é uma nave-mãe montada a partir de **8 partes independentes**. Cada uma tem vida, hitbox, aparência danificada e recompensa próprias. A luta avança em quatro fases, e cada fase expõe um novo ponto fraco:
 
@@ -129,9 +166,12 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 
 ## ✨ Funcionalidades
 
-- 🧩 **4 chefes modulares** (1 chefe final + 3 mini-chefes) com partes destrutíveis, fases e 3 estados visuais de dano por parte (intacta → rachada → em chamas → carcaça).
-- 🗺️ **Campanha com rota à escolha**, mapa de seleção, **4 buffs** (tiro perfurante, nave aliada, dash e bomba) e sistema de *continue*.
-- 👽 **Setores com alienígenas em formação** (verdes e laranja) no estilo clássico do Galaga: entrada em curvas, formação que "respira" e mergulhos com escolta.
+- 🌌 **4 mundos com dificuldade crescente**, cada um com setores, 3 mini-chefes e um chefe, além de paleta, fundo e música próprios.
+- 🧩 **17 chefes modulares** (12 mini-chefes, 4 chefes de mundo e o Leviatã) com partes destrutíveis, fases e 3 estados visuais de dano por parte (intacta → rachada → em chamas → carcaça).
+- ⚙️ **Mecânicas de chefe variadas**: gravidade que puxa a nave, chefes intangíveis, carapaças que abrem e fecham, cabeças que renascem, raios letais com aviso, projéteis que se dividem e fazem curva, e ataques que vêm do fundo da tela.
+- 🗺️ **Campanha com rota à escolha**, mapa de seleção por mundo, **16 buffs** (tiro perfurante e triplo, duas naves aliadas, dash com onda de choque, mísseis teleguiados, carapaça, bombas e mais) e sistema de *continue*.
+- 💾 **Progresso salvo** no navegador e **seleção de mundo** no menu.
+- 👽 **Setores com alienígenas em formação** (5 tipos: verde, laranja, azul blindado, roxo divisor e vermelho kamikaze) no estilo clássico do Galaga: entrada em curvas, formação que "respira" e mergulhos com escolta.
 - 🛸 **Chefe final de 8 fases maior que a tela**, com câmera que avança seção por seção e casco gerado por código; blindagem, regeneração e paredes de laser.
 - ❤️ **Vidas acumuladas** (máximo 5), vida extra a cada 50.000 pontos e bônus de **corrida perfeita** (sem mortes).
 - 🎨 **Pixel art gerada por código** (com suporte a substituição por PNGs desenhados à mão, sem alterar a jogabilidade).
@@ -140,7 +180,7 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 🎯 **Design justo**: hitbox reduzida, ataques telegrafados, modo foco (movimento preciso) e limpeza de tela ao morrer.
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
 - 📱 **Responsivo**: escala para qualquer tela e aceita controle por toque no celular.
-- 🧪 **81 testes automatizados**: todos os chefes e setores, campanha, colisões, pontuação e integridade dos sprites.
+- 🧪 **172 testes automatizados**: todos os chefes e setores, a campanha de 4 mundos, salvar/carregar, as mecânicas novas, colisões, pontuação e integridade dos sprites.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
@@ -236,8 +276,8 @@ flowchart LR
     PlayScene --> ParticleSystem & Collision & Scoring
     Boss --> BossPart & BossLaser
     PlayScene --> WaveStage --> FormationEnemy
-    Boss -->|executa| Defs[bosses/*.js<br/>Titã, Leviatã, Sentinela, Colmeia, Ceifador]
-    Defs --> patterns[patterns.js]
+    Boss -->|executa| Defs[bosses/*.js<br/>17 definições de chefe<br/>4 mundos]
+    Defs --> patterns[patterns.js · beams.js · phasing.js]
 ```
 
 Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/ARQUITETURA.md)):
@@ -245,7 +285,8 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 1. **Game loop com passo fixo (*fixed timestep*)**: a simulação roda sempre a 60 atualizações por segundo, independentemente do monitor (60 Hz ou 144 Hz). Isso garante comportamento determinístico e justo.
 2. **Máquinas de estado**: o jogo (Título → Jogo → Pausa/Vitória/Derrota) e o chefe (entrada → combate ⇄ transição → morte) são máquinas de estado explícitas, o que evita condicionais espalhadas.
 3. **Composição em vez de herança**: o chefe é um conjunto de `BossPart`. Adicionar uma parte nova não exige mudar a classe `Boss`.
-4. **Motor de chefes genérico e orientado a dados**: os **5 chefes** usam a mesma classe `Boss`. Cada chefe é só um arquivo de definição (`src/boss/bosses/`) com partes, fases e ganchos opcionais (inclinação, órbitas, desenhos extras). Os 3 mini-chefes foram adicionados **sem nenhuma condicional específica** no motor.
+4. **Motor de chefes genérico e orientado a dados**: os **17 chefes** usam a mesma classe `Boss`. Cada chefe é só um arquivo de definição (`src/boss/bosses/`) com partes, fases e ganchos opcionais (inclinação, órbitas, desenhos extras, raios letais, gravidade, intangibilidade). Os 12 chefes da v1.3 foram adicionados **sem nenhuma condicional específica** no motor: só ganchos genéricos novos.
+11. **Campanha como dados**: os 4 mundos são uma tabela (`WORLDS` em `Campaign.js`) com setores, mini-chefes, chefe, bônus, dificuldade, música e tema. A campanha é **serializável** (`toJSON`/`fromJSON`) para salvar o progresso.
 5. **Inversão de dependência**: o `Boss` conversa com a cena por uma interface (o "mundo") e não conhece o DOM. Por isso ele pode ser **testado no Node.js** com um mundo falso.
 6. **Arte procedural com fallback para PNG**: os sprites são definidos como texto e as variações de dano (rachaduras, carcaça, flash, fúria) são **geradas por algoritmo**. Um PNG desenhado à mão pode substituir qualquer sprite sem alterar hitboxes.
 7. **Abstração de entrada**: o código pergunta por **ações** (`fire`, `left`) e não por teclas, então teclado e toque compartilham a mesma lógica.
@@ -259,7 +300,7 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (81 testes) cobre:
+A suíte (172 testes) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).
@@ -267,12 +308,13 @@ A suíte (81 testes) cobre:
 - **Mecânicas dos mini-chefes**: rotação acelerada das cápsulas, barreiras bloqueando tiros, produção de drones por ninho e o ciclo aviso → investida → retorno do Ceifador.
 - **Setores**: as ondas cabem na formação, as vagas são únicas, os inimigos entram, formam, mergulham e atiram, e o setor termina quando todos caem.
 - **Leviatã**: câmera avançando exatamente uma seção por fase, blindagem × perfurante, regeneração dos reatores, ausência de dano por contato e paredes de laser (brecha e aviso).
-- **Campanha**: setores obrigatórios antes dos mini-chefes, buffs em qualquer ordem, liberação do Titã/bomba/Leviatã, vidas acumuladas (máx. 5), *continue* e corrida perfeita.
+- **Campanha**: os 4 mundos em sequência, setores obrigatórios antes dos mini-chefes, buffs em qualquer ordem, bônus de mundo, Leviatã só depois do Arconte, dificuldade crescente, seleção de mundo, **salvar/carregar** (inclusive saves inválidos), vidas acumuladas (máx. 5), *continue* e corrida perfeita.
+- **Mecânicas dos mundos novos**: projéteis que se dividem e fazem curva, mísseis teleguiados, cabeças da Hidra que renascem, sopro com aviso, carapaça que bloqueia o núcleo, gravidade que puxa e empurra, raios dos Gêmeos e da Fornalha, pancada do Martelo, intangibilidade do Espectro, o Eco seguindo o jogador e as 5 fases do Arconte.
 - **Pontuação**: bônus, ranks e casos de borda (divisão por zero e tempo acima do par).
 - **Integridade da arte**: largura consistente dos sprites, cores existentes na paleta, simetria e espelhamento das asas.
 - **Utilitários matemáticos**: interpolação, rotação, ângulos e gerador pseudoaleatório determinístico.
 
-Além dos testes unitários, **a campanha inteira e o duelo** são validados com uma **simulação headless** (DOM falso + "bot" jogando): título → mapa → 3 mini-chefes → Titã → vitória, e também derrota → *continue*. A mesma simulação foi usada para **medir a duração de cada luta** e balancear a dificuldade.
+Além dos testes unitários, **os 25 encontros da campanha** (8 setores, 12 mini-chefes, 4 chefes e o Leviatã) são validados com uma **simulação headless** da cena completa, com todos os buffs ativos, até a tela de vitória e a troca de mundo. A verificação visual é feita com capturas de tela do jogo no Edge headless. Antes disso, **a campanha e o duelo** já eram validados com uma **simulação headless** (DOM falso + "bot" jogando): título → mapa → 3 mini-chefes → Titã → vitória, e também derrota → *continue*. A mesma simulação foi usada para **medir a duração de cada luta** e balancear a dificuldade.
 
 ## 🎓 Conhecimentos adquiridos
 
@@ -281,7 +323,7 @@ Além dos testes unitários, **a campanha inteira e o duelo** são validados com
 - **Matemática aplicada**: vetores, trigonometria (mira, espirais, rotação de hitboxes), interpolação, *easing* e detecção de colisão geométrica.
 - **Computação gráfica 2D**: Canvas API, transformações, modos de composição (`lighter`, `source-atop`), manipulação de pixels com `ImageData` e geração procedural de texturas.
 - **Áudio digital**: síntese subtrativa, envelopes ADSR simplificados, ruído filtrado e agendamento de eventos musicais com *lookahead*.
-- **Engenharia de software**: modularização, composição, design orientado a dados, inversão de dependência, **refatoração para generalizar** (de 1 chefe para um motor de N chefes), *clean code* e documentação técnica.
+- **Engenharia de software**: modularização, composição, design orientado a dados, inversão de dependência, **refatoração para generalizar** (de 1 chefe para um motor de N chefes, e de 1 campanha para N mundos), serialização de estado (salvar/carregar), *clean code* e documentação técnica.
 - **Testes automatizados**: testes unitários com `node:test`, *test doubles* com `Proxy` e simulação headless.
 - **DevOps básico**: versionamento com Git, integração contínua com GitHub Actions e deploy contínuo com a Vercel.
 
@@ -311,7 +353,7 @@ nebula-titan/
 │   ├── systems/             # Partículas, colisão, fundo, pontuação, campanha
 │   ├── entities/            # Jogador, nave aliada, projéteis, alienígenas, power-ups, lasers
 │   ├── boss/                # Motor de chefes: partes, laser, padrões de tiro
-│   │   └── bosses/          # Definições: Titã, Leviatã, Sentinela, Colmeia, Ceifador
+│   │   └── bosses/          # 17 definições de chefe (4 mundos + Leviatã)
 │   ├── stages/              # Setores de ondas: diretor (WaveStage) e dados das ondas
 │   ├── encounters.js        # Registro de todos os encontros (setores + chefes)
 │   ├── scenes/              # Título (menu), mapa da campanha e batalha
@@ -345,11 +387,13 @@ nebula-titan/
 - [x] Campanha com 3 mini-chefes, rota à escolha e buffs (v1.1)
 - [x] Motor de chefes genérico (novos chefes = novos arquivos de dados)
 - [x] Setores de ondas em formação + chefe final de 8 fases maior que a tela (v1.2)
+- [x] Progressão em 4 mundos, 12 chefes novos, 3 alienígenas novos, 12 buffs novos, save e seleção de mundo (v1.3)
 - [ ] Sprites desenhados à mão (modo misto)
 - [ ] Menu de opções (volume, reduzir tremor de tela, dificuldade)
 - [ ] Suporte a gamepad (Gamepad API)
 - [ ] Ranking online
-- [ ] Mais mini-chefes e rotas alternativas na campanha
+- [ ] Modo "Boss Rush" com todos os chefes já derrotados
+- [ ] Testes de jogo com pessoas para ajustar a dificuldade dos mundos 2 a 4
 
 ## 🙏 Créditos e inspiração
 

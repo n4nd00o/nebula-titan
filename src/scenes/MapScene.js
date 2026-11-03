@@ -1,49 +1,78 @@
 /**
- * MapScene — "Rota de Ataque": o jogador escolhe o próximo alvo da campanha.
+ * MapScene — "Rota de Ataque": o jogador escolhe o próximo alvo do mundo atual.
  *
- * Três mini-chefes na base do mapa, o Nebula Titan no topo (bloqueado até
- * os três caírem). Cada nó mostra o buff que concede, o que transforma a
- * ordem das lutas em uma decisão estratégica.
+ * Três mini-chefes na base do mapa, o chefe do mundo acima (bloqueado até
+ * os três caírem) e, no Mundo 4, o Leviatã no topo. Cada nó mostra o buff
+ * que concede, o que transforma a ordem das lutas em uma decisão estratégica.
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, UI_COLORS } from '../config.js';
 import { drawText } from '../graphics/text.js';
-import { BOSSES } from '../boss/bosses/index.js';
-import { BUFFS, REWARDS, MINI_BOSS_IDS } from '../systems/Campaign.js';
+import { ENCOUNTERS } from '../encounters.js';
+import { BUFFS, REWARDS } from '../systems/Campaign.js';
 import { PlayScene } from './PlayScene.js';
 import { TitleScene } from './TitleScene.js';
 
-const NODES = [
-  { id: 'sentinel', x: 90, y: 340, sprite: 'sentinel', scale: 0.75 },
-  { id: 'hive', x: W / 2, y: 372, sprite: 'hive', scale: 0.7 },
-  { id: 'reaper', x: W - 90, y: 340, sprite: 'reaper', scale: 0.75 },
-  { id: 'titan', x: W / 2, y: 240, sprite: 'hull', scale: 0.8 },
-  { id: 'leviathan', x: W / 2, y: 140, sprite: 'bridge', scale: 0.75 },
-];
 const NODE_RADIUS = 40;
+
+/** Ícones dos chefes do Mundo 1 (os chefes novos declaram `icon` na definição). */
+const LEGACY_ICONS = {
+  sentinel: { sprite: 'sentinel', scale: 0.75 },
+  hive: { sprite: 'hive', scale: 0.7 },
+  reaper: { sprite: 'reaper', scale: 0.75 },
+  titan: { sprite: 'hull', scale: 0.8 },
+  leviathan: { sprite: 'bridge', scale: 0.75 },
+};
+
+const iconFor = (id) => ENCOUNTERS[id].icon ?? LEGACY_ICONS[id] ?? { sprite: 'minion', scale: 1 };
+
+/** Monta os nós do mapa para um mundo. */
+export function buildNodes(world) {
+  const [a, b, c] = world.minis;
+  const bossY = world.finale ? 240 : 205;
+  const nodes = [
+    { id: a, x: 90, y: 340, kind: 'mini' },
+    { id: b, x: W / 2, y: 372, kind: 'mini' },
+    { id: c, x: W - 90, y: 340, kind: 'mini' },
+    { id: world.boss, x: W / 2, y: bossY, kind: 'boss' },
+  ];
+  if (world.finale) nodes.push({ id: world.finale, x: W / 2, y: 140, kind: 'finale' });
+  return nodes.map((n) => ({ ...n, ...iconFor(n.id) }));
+}
 
 export class MapScene {
   constructor(game, campaign) {
     this.game = game;
     this.campaign = campaign;
     this.time = 0;
+    this.world = campaign.world;
+    this.nodes = buildNodes(this.world);
     const available = campaign.available();
-    this.selected = NODES.findIndex((n) => n.id === available[0]);
-    // Anúncios únicos quando o Titã e o Leviatã são liberados.
-    this.showUnlock = campaign.titanUnlocked && !campaign.unlockShown;
-    campaign.unlockShown = campaign.titanUnlocked;
-    this.showFinalUnlock = campaign.leviathanUnlocked && !campaign.finalUnlockShown;
-    campaign.finalUnlockShown = campaign.leviathanUnlocked;
+    this.selected = Math.max(0, this.nodes.findIndex((n) => n.id === available[0]));
+    // Anúncios únicos quando o chefe do mundo e o chefe final são liberados.
+    const i = campaign.worldIndex;
+    this.showUnlock = campaign.bossUnlocked && !campaign.shown.has(`boss${i}`);
+    if (campaign.bossUnlocked) campaign.shown.add(`boss${i}`);
+    this.showFinalUnlock = campaign.finaleUnlocked && !campaign.shown.has(`finale${i}`);
+    if (campaign.finaleUnlocked) campaign.shown.add(`finale${i}`);
   }
 
   enter() {
     this.game.starfield.setSpeed(0.6);
+    this.game.starfield.setTheme(this.world.theme);
     this.game.audio.setTempo(1);
     this.game.audio.playMusic('map');
   }
 
   get availableIndexes() {
     const ids = this.campaign.available();
-    return NODES.map((n, i) => (ids.includes(n.id) ? i : -1)).filter((i) => i >= 0);
+    return this.nodes.map((n, i) => (ids.includes(n.id) ? i : -1)).filter((i) => i >= 0);
+  }
+
+  isLocked(node) {
+    const c = this.campaign;
+    if (node.kind === 'boss') return !c.bossUnlocked;
+    if (node.kind === 'finale') return !c.finaleUnlocked;
+    return false;
   }
 
   update(dt) {
@@ -57,7 +86,7 @@ export class MapScene {
 
     // Toque/clique: escolher e iniciar o nó tocado.
     if (input.tap) {
-      const hit = NODES.findIndex((n) => Math.hypot(n.x - input.tap.x, n.y - input.tap.y) < NODE_RADIUS);
+      const hit = this.nodes.findIndex((n) => Math.hypot(n.x - input.tap.x, n.y - input.tap.y) < NODE_RADIUS);
       if (options.includes(hit)) {
         this.selected = hit;
         this.start();
@@ -76,36 +105,30 @@ export class MapScene {
   }
 
   start() {
-    const node = NODES[this.selected];
+    const node = this.nodes[this.selected];
     if (!node || !this.campaign.canFight(node.id)) return;
     this.game.audio.play('select');
     this.game.changeScene(new PlayScene(this.game, { bossId: node.id, campaign: this.campaign }));
   }
 
   draw(ctx) {
-    const { campaign } = this;
+    const { campaign, world } = this;
     const sprites = this.game.sprites;
 
-    drawText(ctx, 'ROTA DE ATAQUE', W / 2, 28, { size: 16, align: 'center', color: UI_COLORS.accent });
-    drawText(ctx, 'Escolha o próximo alvo. A ordem importa!', W / 2, 54, { size: 6, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, `MUNDO ${world.number}: ${world.name}`, W / 2, 16, { size: 8, align: 'center', color: world.theme.accent });
+    drawText(ctx, 'ROTA DE ATAQUE', W / 2, 32, { size: 16, align: 'center', color: UI_COLORS.accent });
+    drawText(ctx, 'Escolha o próximo alvo. A ordem importa!', W / 2, 56, { size: 6, align: 'center', color: UI_COLORS.muted });
     drawText(ctx, `PONTOS ${String(campaign.score).padStart(7, '0')}`, W / 2, 72, { size: 7, align: 'center' });
 
-    // Buffs já conquistados
-    const owned = [...campaign.buffs];
-    drawText(ctx, owned.length ? 'BUFFS:' : 'SEM BUFFS AINDA', 14, 96, { size: 6, color: UI_COLORS.muted });
-    let bx = 60;
-    for (const id of owned) {
-      drawText(ctx, BUFFS[id].short, bx, 96, { size: 6, color: BUFFS[id].color });
-      bx += BUFFS[id].short.length * 6 + 12;
-    }
+    // Buffs já conquistados (resumo)
+    drawText(ctx, campaign.buffs.size ? `BUFFS: ${campaign.buffs.size}` : 'SEM BUFFS AINDA', 14, 96, { size: 6, color: UI_COLORS.muted });
+    drawText(ctx, `VIDAS ${campaign.lives}/5   MORTES ${campaign.deaths}`, W - 14, 96, { size: 6, align: 'right', color: UI_COLORS.muted });
 
-    // Ligações: mini-chefes -> Titã -> Leviatã
-    const titan = NODES[3];
-    const leviathan = NODES[4];
-    const links = [
-      ...NODES.slice(0, 3).map((n) => [n, titan, campaign.defeated.has(n.id)]),
-      [titan, leviathan, campaign.defeated.has('titan')],
-    ];
+    // Ligações: mini-chefes -> chefe -> chefe final
+    const boss = this.nodes[3];
+    const finale = this.nodes[4];
+    const links = this.nodes.slice(0, 3).map((n) => [n, boss, campaign.defeated.has(n.id)]);
+    if (finale) links.push([boss, finale, campaign.defeated.has(boss.id)]);
     for (const [from, to, done] of links) {
       ctx.strokeStyle = done ? '#a7f070' : '#333c57';
       ctx.setLineDash([6, 6]);
@@ -118,19 +141,20 @@ export class MapScene {
     }
     ctx.setLineDash([]);
 
-    // Setores preparatórios já vencidos + vidas
-    drawText(ctx, 'SETOR 1 OK   SETOR 2 OK', W / 2, 428, { size: 6, align: 'center', color: '#38b764' });
-    drawText(ctx, `VIDAS ${campaign.lives}/5   MORTES ${campaign.deaths}`, W - 14, 96, { size: 6, align: 'right', color: UI_COLORS.muted });
+    // Setores do mundo já vencidos
+    const sectors = world.stages.map((id) => `${ENCOUNTERS[id].name} OK`).join('   ');
+    drawText(ctx, sectors, W / 2, 437, { size: 6, align: 'center', color: '#38b764' });
 
-    NODES.forEach((node, i) => this.drawNode(ctx, sprites, node, i === this.selected));
+    this.nodes.forEach((node, i) => this.drawNode(ctx, sprites, node, i === this.selected));
     this.drawInfo(ctx);
 
     if (this.showUnlock && this.time < 3.5) {
       const alpha = Math.min(1, (3.5 - this.time) * 2);
+      const reward = BUFFS[world.completionReward];
       ctx.fillStyle = `rgba(26, 28, 44, ${0.9 * alpha})`;
-      ctx.fillRect(0, 230, W, 64);
-      drawText(ctx, 'O CAMINHO ESTÁ LIVRE!', W / 2, 242, { size: 12, align: 'center', color: '#e43b8c', alpha });
-      drawText(ctx, 'BOMBA DE PULSO DESBLOQUEADA (TECLA X)', W / 2, 266, { size: 7, align: 'center', alpha });
+      ctx.fillRect(0, boss.y - 10, W, 64);
+      drawText(ctx, 'O CAMINHO ESTÁ LIVRE!', W / 2, boss.y + 2, { size: 12, align: 'center', color: '#e43b8c', alpha });
+      drawText(ctx, `${reward.name} DESBLOQUEADA!`, W / 2, boss.y + 26, { size: 7, align: 'center', alpha });
     }
     if (this.showFinalUnlock && this.time < 3.5) {
       const alpha = Math.min(1, (3.5 - this.time) * 2);
@@ -146,7 +170,7 @@ export class MapScene {
   drawNode(ctx, sprites, node, selected) {
     const { campaign } = this;
     const defeated = campaign.defeated.has(node.id);
-    const locked = (node.id === 'titan' && !campaign.titanUnlocked) || (node.id === 'leviathan' && !campaign.leviathanUnlocked);
+    const locked = this.isLocked(node);
     const bob = selected ? Math.sin(this.time * 4) * 3 : 0;
 
     ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
@@ -157,10 +181,16 @@ export class MapScene {
     ctx.lineWidth = selected ? 3 : 2;
     ctx.stroke();
 
+    // Ícone limitado ao círculo (sprites grandes não vazam do nó).
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, NODE_RADIUS - 3, 0, Math.PI * 2);
+    ctx.clip();
     const alpha = defeated ? 0.3 : locked ? 0.2 : 1;
     sprites.draw(ctx, node.sprite, node.x, node.y + bob, { scale: node.scale, alpha });
+    ctx.restore();
 
-    const name = BOSSES[node.id].name;
+    const name = ENCOUNTERS[node.id].name;
     drawText(ctx, name, node.x, node.y + NODE_RADIUS + 8, { size: 7, align: 'center', color: defeated ? '#38b764' : UI_COLORS.text });
     if (defeated) drawText(ctx, 'DERROTADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#a7f070' });
     if (locked) drawText(ctx, 'BLOQUEADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#566c86' });
@@ -184,9 +214,9 @@ export class MapScene {
   }
 
   drawInfo(ctx) {
-    const node = NODES[this.selected];
+    const node = this.nodes[this.selected];
     if (!node) return;
-    const def = BOSSES[node.id];
+    const def = ENCOUNTERS[node.id];
     const y = 448;
     ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
     ctx.fillRect(20, y, W - 40, 120);
@@ -202,13 +232,15 @@ export class MapScene {
       const buff = BUFFS[REWARDS[node.id]];
       drawText(ctx, `RECOMPENSA: ${buff.name}`, W / 2, y + 72, { size: 8, align: 'center', color: buff.color });
       drawText(ctx, buff.description, W / 2, y + 90, { size: 6, align: 'center', color: UI_COLORS.muted });
-    } else if (node.id === 'titan') {
-      const remaining = MINI_BOSS_IDS.filter((id) => !this.campaign.defeated.has(id)).length;
-      const text = remaining > 0 ? `DERROTE MAIS ${remaining} MINI-CHEFE(S) PARA LIBERAR` : 'GUARDIÃO DO LEVIATÃ. VOCÊ ESTÁ PRONTO.';
+    } else if (node.kind === 'boss') {
+      const remaining = this.world.minis.filter((id) => !this.campaign.defeated.has(id)).length;
+      const next = this.world.finale ? 'GUARDIÃO DO LEVIATÃ.' : `CHEFE DO MUNDO ${this.world.number}.`;
+      const text = remaining > 0 ? `DERROTE MAIS ${remaining} MINI-CHEFE(S) PARA LIBERAR` : `${next} VOCÊ ESTÁ PRONTO.`;
       drawText(ctx, text, W / 2, y + 80, { size: 7, align: 'center', color: remaining > 0 ? '#566c86' : '#ffcd75' });
     } else {
-      const text = this.campaign.leviathanUnlocked ? 'CHEFE FINAL. BOA SORTE, PILOTO.' : 'DERROTE O NEBULA TITAN PARA LIBERAR';
-      drawText(ctx, text, W / 2, y + 80, { size: 7, align: 'center', color: this.campaign.leviathanUnlocked ? '#ffcd75' : '#566c86' });
+      const unlocked = this.campaign.finaleUnlocked;
+      const text = unlocked ? 'CHEFE FINAL. BOA SORTE, PILOTO.' : `DERROTE ${ENCOUNTERS[this.world.boss].name} PARA LIBERAR`;
+      drawText(ctx, text, W / 2, y + 80, { size: 7, align: 'center', color: unlocked ? '#ffcd75' : '#566c86' });
     }
   }
 }

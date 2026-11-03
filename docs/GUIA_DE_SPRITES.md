@@ -48,6 +48,21 @@ O jogo funciona **completo sem nenhuma imagem**: toda a pixel art é gerada por 
 | `bladeL.png` | Lâmina esquerda (borda direita encosta no corpo) | 14 × 11 | 42 × 33 |
 | `bladeR.png` | Lâmina direita (espelho) | 14 × 11 | 42 × 33 |
 
+| **Mundos 2 a 4** *(definidos em `src/graphics/spriteDataWorlds.js`)* | | | |
+| `alienBlue.png` / `alienPurple.png` / `alienRed.png` | Alienígenas azul, roxo e vermelho (apontam para **baixo**) | 13 × 9 | 39 × 27 |
+| `prism.png` · `shard.png` | Prisma: núcleo de cristal · fragmento orbital | 16 × 16 · 8 × 9 | 48 × 48 · 24 × 27 |
+| `vortex.png` · `turbine.png` · `vortexEye.png` | Vórtice: anel · turbina · olho | 20 × 14 · 10 × 9 · 10 × 10 | 60 × 42 · 30 × 27 · 30 × 30 |
+| `scarabCore.png` · `shellL/R.png` · `mandibleL/R.png` | Escaravelho: núcleo · metades da carapaça · mandíbulas | 12 × 10 · 8 × 14 · 6 × 9 | 36 × 30 · 24 × 42 · 18 × 27 |
+| `hydraBody.png` · `hydraHeadL/R/C.png` · `iceScale.png` · `hydraHeart.png` | Hidra: corpo · cabeças · escama · coração | 28 × 18 · 12 × 10 (C: 14 × 12) · 8 × 7 · 10 × 9 | 84 × 54 · 36 × 30 · 24 × 21 · 30 × 27 |
+| `hammer.png` · `piston.png` | Martelo: cabeça · pistão | 24 × 8 · 6 × 12 | 72 × 24 · 18 × 36 |
+| `twin.png` · `twinLink.png` | Gêmeos: nave irmã · núcleo do elo | 14 × 10 · 10 × 10 | 42 × 30 · 30 × 30 |
+| `furnace.png` · `vent.png` · `furnaceCore.png` | Fornalha: casco · chaminé · núcleo | 28 × 14 · 8 × 8 · 12 × 8 | 84 × 42 · 24 × 24 · 36 × 24 |
+| `aegisBody.png` · `aegisCannon.png` · `aegisShield.png` · `aegisGun.png` · `aegisCore.png` | Égide: fortaleza · canhão de canto · segmento do anel · arma principal · núcleo | 32 × 15 · 8 × 9 · 8 × 5 · 12 × 12 · 12 × 12 | 96 × 45 · 24 × 27 · 24 × 15 · 36 × 36 · 36 × 36 |
+| `specter.png` · `lantern.png` | Espectro: corpo · lanterna | 18 × 14 · 6 × 7 | 54 × 42 · 18 × 21 |
+| `oracle.png` · `petal.png` · `oracleEye.png` | Oráculo: mandala · pétala · olho | 24 × 16 · 8 × 8 · 12 × 10 | 72 × 48 · 24 × 24 · 36 × 30 |
+| `echo.png` · `reflector.png` | Eco: cópia sombria da nave (de cabeça para baixo) · refletor | 30 × 28 · 8 × 10 | 90 × 84 · 24 × 30 |
+| `archon.png` · `archonWingL/R.png` · `archonCannon.png` · `archonMask.png` · `archonCore.png` · `archonPod.png` | Arconte: casco · asas · canhão · máscara · núcleo · cápsula | 32 × 17 · 14 × 12 · 10 × 10 · 14 × 9 · 12 × 12 · 10 × 10 | 96 × 51 · 42 × 36 · 30 × 30 · 42 × 27 · 36 × 36 · 30 × 30 |
+
 > 💡 **Desenhe exatamente nesses tamanhos** (1 pixel do arquivo = 1 "pixel" do jogo). Também é possível desenhar em múltiplos (ex.: 2× ou 3×), porque o jogo redimensiona para o tamanho da tabela, mas as rachaduras automáticas ficam mais finas.
 
 ### Encaixe das peças do chefe

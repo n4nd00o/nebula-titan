@@ -1,5 +1,5 @@
 /**
- * WaveStage — "diretor" das fases de ondas (Setores 1 e 2).
+ * WaveStage — "diretor" das fases de ondas (os Setores de cada mundo).
  *
  * Implementa a mesma interface de "encontro" que o Boss (update, draw,
  * state, phaseIndex, phaseCount, hitTestPath, touches...), o que permite à
@@ -13,6 +13,7 @@
 import { GAME_WIDTH as W } from '../config.js';
 import { FormationEnemy } from '../entities/FormationEnemy.js';
 import { fireAlienShot } from '../entities/Minion.js';
+import { ALIEN_TYPES } from '../entities/alienTypes.js';
 
 const COLUMNS = 8;
 const COLUMN_ORDER = [3, 4, 2, 5, 1, 6, 0, 7]; // preenche do centro para fora
@@ -24,9 +25,15 @@ const FORMATION_TOP = 96;
 const NO_LASER = Object.freeze({ active: false, isLethal: false, cancel() {}, draw() {} });
 
 export class WaveStage {
-  constructor(world, def) {
+  /**
+   * @param {object} world a cena
+   * @param {object} def definição do setor (stageData.js)
+   * @param {{attackRate?: number}} options attackRate > 1 = mergulhos e tiros mais frequentes
+   */
+  constructor(world, def, { attackRate = 1 } = {}) {
     this.world = world;
     this.def = def;
+    this.attackRate = attackRate;
     this.phaseIndex = 0;
     this.state = 'entering';
     this.stateTime = 0;
@@ -38,6 +45,7 @@ export class WaveStage {
     this.parts = {};
     this.destroyedOrder = [];
     this.phaseLabel = 'ONDA';
+    this.entryDelay = 1.5; // espera antes da 1ª onda (maior quando a cena apresenta um mundo novo)
     this.x = W / 2;
     this.y = 120;
   }
@@ -79,6 +87,14 @@ export class WaveStage {
     return false;
   }
 
+  lethalSegments() {
+    return [];
+  }
+
+  pullForce() {
+    return null;
+  }
+
   vulnerableParts() {
     return [];
   }
@@ -104,10 +120,10 @@ export class WaveStage {
 
     switch (this.state) {
       case 'entering':
-        if (this.stateTime >= 1.5) this.startWave(0);
+        if (this.stateTime >= this.entryDelay) this.startWave(0);
         break;
       case 'fight':
-        if (!this.passive) this.direct(dt);
+        if (!this.passive) this.direct(dt * this.attackRate);
         if (this.enemies.length > 0 && this.aliveEnemies.length === 0) this.completeWave();
         break;
       case 'transition':
@@ -135,7 +151,7 @@ export class WaveStage {
     this.enemies = [];
     this.setState('fight');
 
-    const usedCols = { green: 0, orange: 0 };
+    const usedCols = { top: 0, bottom: 0 };
     for (const group of this.wave.groups) {
       for (let i = 0; i < group.count; i++) {
         const slot = this.nextSlot(group.type, usedCols);
@@ -154,10 +170,11 @@ export class WaveStage {
     this.world.announce(`ONDA ${index + 1}/${this.phaseCount}`, this.wave.title, 2.2, 'phase', this.wave.hint ?? '');
   }
 
-  /** Laranjas ocupam a fileira de cima; verdes, as três de baixo. */
+  /** Tipos "top" (laranja, azul) ocupam a fileira de cima; os demais, as três de baixo. */
   nextSlot(type, used) {
-    const n = used[type]++;
-    if (type === 'orange') return { col: COLUMN_ORDER[n % COLUMNS], row: 0 };
+    const tier = ALIEN_TYPES[type].tier;
+    const n = used[tier]++;
+    if (tier === 'top') return { col: COLUMN_ORDER[n % COLUMNS], row: 0 };
     return { col: COLUMN_ORDER[n % COLUMNS], row: 1 + Math.floor(n / COLUMNS) % 3 };
   }
 
@@ -176,7 +193,7 @@ export class WaveStage {
       const leader = inFormation[Math.floor(Math.random() * inFormation.length)];
       leader.startDive();
       // Laranja mergulha "puxando" até 2 escoltas verdes (formação em V).
-      if (leader.type === 'orange') {
+      if (leader.info.leader) {
         inFormation
           .filter((e) => e.type === 'green' && e.slot.row === 1 && Math.abs(e.slot.col - leader.slot.col) <= 1)
           .slice(0, 2)
@@ -187,8 +204,9 @@ export class WaveStage {
     this.timers.shoot -= dt;
     if (this.timers.shoot <= 0 && inFormation.length > 0) {
       this.timers.shoot = wave.shootEvery;
-      const shooter = inFormation[Math.floor(Math.random() * inFormation.length)];
-      fireAlienShot(this.world, shooter.x, shooter.y + 10, { ...shooter.info.shot, count: 1 });
+      const shooters = inFormation.filter((e) => e.info.shot);
+      const shooter = shooters[Math.floor(Math.random() * shooters.length)];
+      if (shooter) fireAlienShot(this.world, shooter.x, shooter.y + 10, { ...shooter.info.shot, count: 1 });
     }
   }
 

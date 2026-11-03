@@ -127,6 +127,12 @@ const TRACKS = {
 TRACKS.mini = { bpm: 152, chords: [[-5, -2, 2], [3, 7, 10], [5, 9, 12], [2, 6, 9]], step: TRACKS.boss.step };
 // Música dos setores: mais 'heroica', em Dó maior (C G Am F).
 TRACKS.stage = { bpm: 132, chords: [[3, 7, 10], [-2, 2, 5], [0, 3, 7], [-4, 0, 3]], step: TRACKS.boss.step };
+// Mundo 2 (gelo): Ré menor, mais contida (Dm Bb C A).
+TRACKS.ice = { bpm: 128, chords: [[5, 8, 12], [1, 5, 8], [3, 7, 10], [0, 4, 7]], step: TRACKS.boss.step };
+// Mundo 3 (forja): Sol menor, rápida e martelada (Gm Eb F D).
+TRACKS.forge = { bpm: 148, chords: [[-2, 1, 5], [-6, -2, 1], [-4, 0, 3], [-7, -3, 0]], step: TRACKS.boss.step };
+// Mundo 4 (vazio): Si menor, sombria (Bm G A F#).
+TRACKS.void = { bpm: 138, chords: [[2, 5, 9], [-2, 2, 5], [0, 4, 7], [-3, 1, 4]], step: TRACKS.boss.step };
 
 export class AudioEngine {
   constructor(storage) {
