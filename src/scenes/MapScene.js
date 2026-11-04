@@ -31,18 +31,46 @@ const LEGACY_ICONS = {
 
 export const iconFor = (id) => ENCOUNTERS[id].icon ?? LEGACY_ICONS[id] ?? { sprite: 'minion', scale: 1 };
 
-/** Monta os nós do mapa para um mundo. */
+/**
+ * Monta os nós do mapa para um mundo.
+ * Mundo 5 (v1.5): dois círculos de 3 mini-chefes (o de baixo primeiro) e o Ômega no topo.
+ */
 export function buildNodes(world) {
-  const [a, b, c] = world.minis;
-  const bossY = world.finale ? 240 : 205;
-  const nodes = [
-    { id: a, x: 90, y: 340, kind: 'mini' },
-    { id: b, x: W / 2, y: 372, kind: 'mini' },
-    { id: c, x: W - 90, y: 340, kind: 'mini' },
-    { id: world.boss, x: W / 2, y: bossY, kind: 'boss' },
-  ];
-  if (world.finale) nodes.push({ id: world.finale, x: W / 2, y: 140, kind: 'finale' });
-  return nodes.map((n) => ({ ...n, ...iconFor(n.id) }));
+  const xs = [90, W / 2, W - 90];
+  let nodes;
+  if (world.circles) {
+    const [inner, outer] = world.circles;
+    nodes = [
+      ...inner.map((id, i) => ({ id, x: xs[i], y: 380, kind: 'mini', circle: 0, r: 32 })),
+      ...outer.map((id, i) => ({ id, x: xs[i], y: 256, kind: 'mini', circle: 1, r: 32 })),
+      { id: world.boss, x: W / 2, y: 162, kind: 'boss', r: 36 },
+    ];
+  } else {
+    const [a, b, c] = world.minis;
+    const bossY = world.finale ? 240 : 205;
+    nodes = [
+      { id: a, x: 90, y: 340, kind: 'mini' },
+      { id: b, x: W / 2, y: 372, kind: 'mini' },
+      { id: c, x: W - 90, y: 340, kind: 'mini' },
+      { id: world.boss, x: W / 2, y: bossY, kind: 'boss' },
+    ];
+    if (world.finale) nodes.push({ id: world.finale, x: W / 2, y: 140, kind: 'finale' });
+  }
+  return nodes.map((n) => ({ r: NODE_RADIUS, ...n, ...iconFor(n.id) }));
+}
+
+/** Ligações do mapa: [de, para] por índice de nó. */
+export function buildLinks(world, nodes) {
+  const boss = nodes.findIndex((n) => n.kind === 'boss');
+  const finale = nodes.findIndex((n) => n.kind === 'finale');
+  const links = [];
+  if (world.circles) {
+    for (let i = 0; i < 3; i++) links.push([i, i + 3], [i + 3, boss]);
+  } else {
+    for (let i = 0; i < 3; i++) links.push([i, boss]);
+  }
+  if (finale >= 0) links.push([boss, finale]);
+  return links;
 }
 
 export class MapScene {
@@ -78,6 +106,7 @@ export class MapScene {
     const c = this.campaign;
     if (node.kind === 'boss') return !c.bossUnlocked;
     if (node.kind === 'finale') return !c.finaleUnlocked;
+    if (node.circle === 1) return this.world.circles[0].some((id) => !c.defeated.has(id));
     return false;
   }
 
@@ -102,7 +131,7 @@ export class MapScene {
 
     // Toque/clique: escolher e iniciar o nó tocado.
     if (input.tap) {
-      const hit = this.nodes.findIndex((n) => Math.hypot(n.x - input.tap.x, n.y - input.tap.y) < NODE_RADIUS);
+      const hit = this.nodes.findIndex((n) => Math.hypot(n.x - input.tap.x, n.y - input.tap.y) < n.r);
       if (options.includes(hit)) {
         this.selected = hit;
         this.start();
@@ -149,24 +178,24 @@ export class MapScene {
     drawText(ctx, `VIDAS ${campaign.lives}/5   MORTES ${campaign.deaths}`, W - 14, 96, { size: 6, align: 'right', color: UI_COLORS.muted });
 
     // Ligações: mini-chefes -> chefe -> chefe final
-    const boss = this.nodes[3];
-    const finale = this.nodes[4];
-    const links = this.nodes.slice(0, 3).map((n) => [n, boss, campaign.defeated.has(n.id)]);
-    if (finale) links.push([boss, finale, campaign.defeated.has(boss.id)]);
+    const boss = this.nodes.find((n) => n.kind === 'boss');
+    const links = buildLinks(world, this.nodes).map(([a, b]) => [this.nodes[a], this.nodes[b], campaign.defeated.has(this.nodes[a].id)]);
     for (const [from, to, done] of links) {
       ctx.strokeStyle = done ? '#a7f070' : '#333c57';
       ctx.setLineDash([6, 6]);
       ctx.lineDashOffset = -this.time * 20;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(from.x, from.y - NODE_RADIUS);
-      ctx.lineTo(to.x, to.y + NODE_RADIUS);
+      ctx.moveTo(from.x, from.y - from.r);
+      ctx.lineTo(to.x, to.y + to.r);
       ctx.stroke();
     }
     ctx.setLineDash([]);
 
     // Setores do mundo já vencidos
-    const sectors = world.stages.map((id) => `${ENCOUNTERS[id].name} OK`).join('   ');
+    const sectors = world.circles
+      ? 'DOIS CÍRCULOS: VENÇA OS 3 DE BAIXO PARA ABRIR OS 3 DE CIMA'
+      : world.stages.map((id) => `${ENCOUNTERS[id].name} OK`).join('   ');
     drawText(ctx, sectors, W / 2, 112, { size: 6, align: 'center', color: '#38b764' });
 
     this.nodes.forEach((node, i) => this.drawNode(ctx, sprites, node, i === this.selected));
@@ -199,7 +228,7 @@ export class MapScene {
 
     ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
     ctx.beginPath();
-    ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
+    ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = defeated ? '#38b764' : locked ? '#333c57' : selected ? '#ffcd75' : '#566c86';
     ctx.lineWidth = selected ? 3 : 2;
@@ -208,23 +237,23 @@ export class MapScene {
     // Ícone limitado ao círculo (sprites grandes não vazam do nó).
     ctx.save();
     ctx.beginPath();
-    ctx.arc(node.x, node.y, NODE_RADIUS - 3, 0, Math.PI * 2);
+    ctx.arc(node.x, node.y, node.r - 3, 0, Math.PI * 2);
     ctx.clip();
     const alpha = defeated ? 0.3 : locked ? 0.2 : 1;
     sprites.draw(ctx, node.sprite, node.x, node.y + bob, { scale: node.scale, alpha });
     ctx.restore();
 
     const name = ENCOUNTERS[node.id].name;
-    drawText(ctx, name, node.x, node.y + NODE_RADIUS + 8, { size: 7, align: 'center', color: defeated ? '#38b764' : UI_COLORS.text });
+    drawText(ctx, name, node.x, node.y + node.r + 8, { size: 7, align: 'center', color: defeated ? '#38b764' : UI_COLORS.text });
     if (defeated) drawText(ctx, 'DERROTADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#a7f070' });
     if (locked) drawText(ctx, 'BLOQUEADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#566c86' });
     if (!defeated && REWARDS[node.id]) {
       const buff = BUFFS[REWARDS[node.id]];
-      drawText(ctx, buff.short, node.x, node.y + NODE_RADIUS + 20, { size: 6, align: 'center', color: buff.color });
+      drawText(ctx, buff.short, node.x, node.y + node.r + 20, { size: 6, align: 'center', color: buff.color });
     }
 
     if (selected) {
-      const r = NODE_RADIUS + 8 + Math.sin(this.time * 8) * 2;
+      const r = node.r + 8 + Math.sin(this.time * 8) * 2;
       ctx.strokeStyle = '#ffcd75';
       ctx.lineWidth = 2;
       for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
@@ -258,7 +287,7 @@ export class MapScene {
       drawText(ctx, buff.description, W / 2, y + 90, { size: 6, align: 'center', color: UI_COLORS.muted });
     } else if (node.kind === 'boss') {
       const remaining = this.world.minis.filter((id) => !this.campaign.defeated.has(id)).length;
-      const next = this.world.finale ? 'GUARDIÃO DO LEVIATÃ.' : `CHEFE DO MUNDO ${this.world.number}.`;
+      const next = this.world.finale ? 'GUARDIÃO DO LEVIATÃ.' : this.world.circles ? 'O CRIADOR DA FROTA.' : `CHEFE DO MUNDO ${this.world.number}.`;
       const text = remaining > 0 ? `DERROTE MAIS ${remaining} MINI-CHEFE(S) PARA LIBERAR` : `${next} VOCÊ ESTÁ PRONTO.`;
       drawText(ctx, text, W / 2, y + 80, { size: 7, align: 'center', color: remaining > 0 ? '#566c86' : '#ffcd75' });
     } else {

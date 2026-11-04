@@ -131,3 +131,33 @@ O jogo funciona **completo sem nenhuma imagem**: toda a pixel art é gerada por 
 | **GIF de gameplay** | Topo do README (o item mais importante para recrutadores!) | 480 × 640, até 10 s |
 
 Para gravar o GIF: [ScreenToGif](https://www.screentogif.com) (Windows, gratuito). Salve em `docs/images/gameplay.gif` e descomente a linha correspondente no topo do `README.md`.
+
+## Mundo 5 e Ômega (v1.5)
+
+Definidos em `src/graphics/spriteDataFinal.js` (tamanho em pixels de tela; cada pixel de arte vale 3x3):
+
+| Nome | Tamanho | Uso |
+|---|---|---|
+| `chronos` | 48x48 | Cronos: mostrador |
+| `gear` | 30x30 | Cronos e Ômega: engrenagem |
+| `chronoCore` | 24x24 | Cronos: núcleo |
+| `mirrorWingL` / `mirrorWingR` | 27x36 | Reflexo e Ômega: asas de cristal |
+| `mirrorCore` | 30x30 | Reflexo: núcleo |
+| `parasite` | 66x36 | Parasita: carapaça |
+| `sac` | 24x21 | Parasita: bolsa de esporos |
+| `parasiteCore` | 24x24 | Parasita: núcleo |
+| `legion` | 78x27 | Legião: porta-naves |
+| `bay` | 30x21 | Legião e Ômega: hangar |
+| `legionCore` | 24x24 | Legião: núcleo |
+| `gunner` | 60x27 | Artilheiro: casco |
+| `gunBarrel` | 18x30 | Artilheiro e Ômega: canhão |
+| `gunnerCore` | 24x24 | Artilheiro: núcleo |
+| `phoenix` | 42x27 | Fênix: corpo |
+| `flameWingL` / `flameWingR` | 42x30 | Fênix e Ômega: asas de fogo |
+| `phoenixCore` / `ashCore` | 24x24 | Fênix: coração e coração renascido |
+| `omega` | 120x51 | Ômega: casco |
+| `omegaNode` | 24x24 | Ômega: nó orbital |
+| `omegaVeil` | 36x21 | Ômega: véu do vazio |
+| `omegaCore` | 42x42 | Ômega: núcleo |
+
+Ao desenhar um PNG, mantenha o mesmo tamanho: a hitbox continua vindo do sprite de texto.

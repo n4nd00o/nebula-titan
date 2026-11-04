@@ -6,6 +6,62 @@
 
 ---
 
+## [1.5.0] - 2026-11-04
+
+**Pedido:** "O chefe final está muito fácil agora que terminou todos os outros buffs. Quero uma tela que mostre os buffs que tenho, quero poder mudar no computador os botões das habilidades e quero adicionar uma fase final final com um chefe final extremamente difícil e com 6 mini-chefes com buffs únicos."
+
+A **v1.5.0** está pronta. Os 333 testes passam. O equilíbrio do Mundo 5 e do novo Leviatã ainda não foi testado por uma pessoa: só pelos testes e pelas capturas de tela.
+
+#### Chefe final mais difícil
+- **Os chefes de mundo agora escalam com os seus buffs:** cada buff que você tem dá a eles +4% de vida e +1,2% de velocidade de ataque. Vale para o Titã, a Hidra, a Égide, o Arconte, o Leviatã e o Ômega. Com os 16 buffs dos Mundos 1 a 4, o Leviatã chega com cerca de 64% a mais de vida e 19% a mais de ataque. Mini-chefes não escalam, porque são eles que dão os buffs.
+- **O Leviatã tem 10 fases** (eram 8):
+  - **Defesas do Núcleo:** quatro pilares e dois raios giratórios.
+  - **Núcleo:** ganhou um canhão de raio que mira e avisa antes.
+  - **Último Suspiro:** o núcleo reacende com espirais densas, raios, minas e lasers.
+
+#### Mundo 5: Singularidade (a fase final final)
+Ele abre depois do Leviatã e não tem setores. São 6 mini-chefes em dois círculos: você vence os 3 de baixo, em qualquer ordem, para abrir os 3 de cima.
+
+| Guardião | Mecânica | Buff único |
+|---|---|---|
+| **Cronos** | Anéis congelados que disparam de repente e ponteiros-raio | **Tempo Bala**: no modo foco, tiros inimigos 35% mais lentos |
+| **Reflexo** | Cristais que ricocheteiam nas bordas e tiros espelhados | **Ricochete**: tiro em blindagem vira míssil |
+| **Parasita** | Bolsas que regeneram, esporos que perseguem e gravidade | **Vampirismo**: parte de chefe destruída restaura o escudo |
+| **Legião** | Kamikazes e paredes de laser | **Orbitais**: dois orbes apagam projéteis |
+| **Artilheiro** | Canhões que miram, avisam e disparam raios | **Supercarga**: raio com 8x o dano a cada 5 s |
+| **Fênix** | Chuva de brasas e um coração que renasce (3 fases) | **Renascer**: uma vez por luta, você não perde a vida |
+
+Vencer os 6 dá o bônus **Ascensão** (+25% de dano). Depois vem o **ÔMEGA**, o criador da frota: 8 fases, cada uma usando a arma de um guardião, e um núcleo final que regenera e usa tudo ao mesmo tempo. Ele tem +140% de vida base, além da escala pelos buffs.
+
+#### Tela de buffs
+**MEUS BUFFS** mostra os 23 buffs, um mundo por página: os que você tem aparecem com o efeito e de quem vieram, e os que faltam aparecem como "???" com o chefe que os dá. Dá para abrir:
+- na pausa (botão ou tecla `I`), e a luta continua do mesmo ponto;
+- no Mapa de Progresso (botão BUFFS);
+- no título.
+
+#### Teclas configuráveis
+A opção **CONTROLES** no título troca as teclas de todas as ações (mover, atirar, foco, dash, bomba, pausa), com uma tecla principal e uma alternativa.
+- Se a tecla já era de outra ação, ela passa para a nova e a tela avisa.
+- Teclas do sistema (Enter, Esc, I, M...) são reservadas.
+- Tem a opção "restaurar padrão", e tudo fica salvo no navegador.
+- Os textos de ajuda no título e na pausa mostram as suas teclas.
+
+#### Como verifiquei
+- **Testes:**
+  - os 7 chefes novos entraram sozinhos nos testes genéricos e na garantia contra chefes imortais;
+  - os testes novos rodam a cena de jogo de verdade para provar o efeito de cada buff;
+  - as teclas foram testadas na lógica e no `Input` real.
+- **Bug achado pelos testes:** o véu do Ômega começava a fase intangível. Já está corrigido.
+- **Capturas de tela** de todos os chefes novos, das 8 fases do Ômega, das fases novas do Leviatã, dos mapas, da pausa e das telas novas. Elas mostraram ligações do mapa por cima dos nomes, e eu corrigi.
+
+A documentação (READMEs, CHANGELOG, GDD, arquitetura, planejamento, diário, catálogo de testes e guia de sprites) está atualizada.
+
+#### O que fica com você
+- **Jogar o Mundo 5 e o Leviatã novo.** O Ômega foi feito para ser extremamente difícil. Se algum chefe estiver injusto ou fácil, me diga qual e em que fase.
+- **Sprites desenhados à mão (opcional):** os 24 sprites novos estão listados no `docs/GUIA_DE_SPRITES.md`.
+
+---
+
 ## [1.4.1] - 2026-11-04
 
 **Pedido:** "A Hidra Glacial, chefe do setor 2, não tem como destruir os pontos fracos de cima na fase 3."

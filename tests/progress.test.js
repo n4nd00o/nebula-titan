@@ -106,9 +106,11 @@ test('Toque: zonas de pausa, bomba e dash nos cantos; o resto da tela move a nav
   assert.equal(touchZone(W / 2, H / 2), null);
 });
 
-test('Pausa: botões CONTINUAR e MENU respondem ao toque', () => {
+// v1.5: a pausa ganhou o botão MEUS BUFFS entre CONTINUAR e MENU.
+test('Pausa: botões CONTINUAR, MEUS BUFFS e MENU respondem ao toque', () => {
   assert.equal(pauseButtonAt({ x: W / 2, y: 238 }), 'resume');
-  assert.equal(pauseButtonAt({ x: W / 2, y: 282 }), 'menu');
+  assert.equal(pauseButtonAt({ x: W / 2, y: 282 }), 'buffs');
+  assert.equal(pauseButtonAt({ x: W / 2, y: 326 }), 'menu');
   assert.equal(pauseButtonAt({ x: 10, y: 10 }), null);
 });
 

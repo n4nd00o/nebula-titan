@@ -3,6 +3,27 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.5.0] - 2026-11-04
+
+### Adicionado
+- **Mundo 5, SINGULARIDADE** (liberado ao vencer o Leviatã): sem setores, **6 mini-chefes em dois círculos** (o 2º círculo abre quando o 1º cai inteiro, ordem livre dentro de cada um) e o chefe final verdadeiro **ÔMEGA**.
+  - 1º círculo: **Cronos** (anéis congelados e ponteiros-raio giratórios), **Reflexo** (cristais que ricocheteiam nas bordas e tiros refletidos), **Parasita** (bolsas que regeneram, esporos teleguiados e gravidade).
+  - 2º círculo: **Legião** (kamikazes e paredes de laser), **Artilheiro** (canhões que miram, avisam e disparam raios), **Fênix** (chuva de brasas e um coração que renasce: 3 fases).
+  - **ÔMEGA**: 8 fases, cada uma com a arma de um guardião (nós orbitais, ponteiros, espelhos, legião, véu intangível, artilharia, inferno) e um núcleo final que regenera e usa tudo ao mesmo tempo.
+- **7 buffs novos** (23 no total): **Tempo Bala**, **Ricochete**, **Vampirismo**, **Orbitais**, **Supercarga**, **Renascer** e o bônus do mundo **Ascensão**.
+- **Tela MEUS BUFFS** (`BuffsScene`): todos os buffs por mundo, com efeito e origem; os que faltam aparecem como "???". Abre pela pausa (botão ou `I`), pelo Mapa de Progresso (botão BUFFS) e pelo título. Na pausa, a luta é retomada exatamente como estava (`Game.resumeScene`).
+- **Teclas configuráveis** (`ControlsScene` + `src/core/KeyBindings.js`): todas as ações (mover, atirar, foco, dash, bomba, pausa) com tecla principal e alternativa, transferência automática em caso de conflito, teclas reservadas, "restaurar padrão" e textos de ajuda que mostram as teclas atuais. Salvo no navegador (`keyBindings`).
+- Projéteis inimigos que **ricocheteiam** nas laterais (`bounce`); módulo `src/boss/sweepers.js` (ponteiros-raio, canhões de raio com aviso, chuva de brasas); 24 sprites novos (`src/graphics/spriteDataFinal.js`).
+- Testes novos: `tests/controls.test.js` e `tests/buffs.test.js` (a cena de jogo real com um jogo falso), Mundo 5 e escala por buffs em `campaign.test.js`; os 7 chefes novos entram automaticamente nos testes genéricos e na garantia contra chefes imortais. Total: **333 testes**.
+
+### Alterado
+- **Chefes de mundo escalam com os buffs do jogador:** cada buff dá **+4% de vida e +1,2% de velocidade de ataque** aos chefes de mundo, ao Leviatã e ao Ômega (mini-chefes não escalam). Pedido: "o chefe final está muito fácil agora que terminou todos os outros buffs".
+- **Leviatã com 10 fases** (eram 8): **Defesas do Núcleo** (4 pilares + dois raios giratórios), o núcleo ganhou um **canhão de raio**, e a nova fase **Último Suspiro** (o núcleo reacende). As fases 8 a 10 acontecem na seção do núcleo.
+- A campanha termina no Ômega (`FINAL_BOSS_ID`); vencer o Leviatã agora conclui o Mundo 4 e abre o Mundo 5.
+- Mapa de Progresso com 5 planetas; Rota de Ataque e fases internas com o layout de dois círculos.
+- Pausa: botões **CONTINUAR / MEUS BUFFS / MENU** e controles atuais na tela. Descrições dos buffs sem teclas fixas.
+- Testes alterados porque a regra do jogo mudou: Leviatã com 10 fases, campanha com 5 mundos e 23 buffs, pausa com 3 botões.
+
 ## [1.4.1] - 2026-11-04
 
 ### Corrigido

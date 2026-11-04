@@ -13,7 +13,12 @@
  *   5 Reatores Gêmeos .... regeneram: exige poder de fogo (Ala Companheira) (+1 bomba)
  *   6 Tempestade ......... cortina de projéteis: hora da Bomba
  *   7 Ponte de Comando ... blindagem + lasers + escoltas (+1 bomba)
- *   8 Núcleo ............. tudo junto; o núcleo regenera
+ *   8 Defesas do Núcleo .. (v1.5) quatro pilares + dois raios giratórios do núcleo
+ *   9 Núcleo ............. tudo junto; o núcleo regenera; canhão de raio
+ *  10 Último Suspiro ..... (v1.5) o núcleo reacende: espirais densas, raios e lasers
+ *
+ * As fases 8 a 10 acontecem na seção do núcleo (a câmera para de avançar).
+ * Na campanha, o Leviatã também escala com os buffs do jogador (Campaign.difficultyFor).
  *
  * O casco não é sólido (está "abaixo" do jogador): só as peças sobre ele
  * bloqueiam tiros. O casco é desenhado por código (graphics/leviathanHull.js).
@@ -22,10 +27,17 @@ import { GAME_WIDTH } from '../../config.js';
 import { approach, rand } from '../../utils/math.js';
 import { fireSpread, fireRing, aimAtPlayer, every } from '../patterns.js';
 import { drawLeviathanHull } from '../../graphics/leviathanHull.js';
+import { resetHands, updateHands, handSegments, drawHands, updateCannonBeam, cannonSegment, drawCannonBeam } from '../sweepers.js';
 
 const CENTER_X = GAME_WIDTH / 2;
 const SECTION_H = 240;
-const sectionCenter = (i) => -(i + 0.5) * SECTION_H;
+const SECTIONS = 8;
+/** Seção do casco onde acontece a fase i (as fases extras ficam na seção do núcleo). */
+const sectionOf = (i) => Math.min(i, SECTIONS - 1);
+const sectionCenter = (i) => -(sectionOf(i) + 0.5) * SECTION_H;
+const HAND_LENGTHS = [330, 330];
+const BEAM_COLORS = ['rgba(228, 59, 140, 0.35)', 'rgba(228, 59, 140, 0.9)'];
+const PYLON_IDS = ['pylonA', 'pylonB', 'pylonC', 'pylonD'];
 
 const ORB = { kind: 'orb', color: '#e43b8c', radius: 4 };
 const ORB_ORANGE = { kind: 'orb', color: '#ef7d57', radius: 4 };
@@ -58,8 +70,13 @@ const PARTS = [
   { id: 'bridgeTurretL', name: 'Torreta da Ponte E', sprite: 'turret', ox: -160, oy: -1545, solidUntilPhase: 7 },
   { id: 'bridgeTurretR', name: 'Torreta da Ponte D', sprite: 'turret', ox: 160, oy: -1545, solidUntilPhase: 7 },
   { id: 'bridge', name: 'Ponte de Comando', sprite: 'bridge', ox: 0, oy: -1575, hp: 120, armor: 0.5, phase: 6, look: 'husk', points: 10000, drop: 'shield', explosionScale: 3 },
-  // S8 Núcleo
-  { id: 'core', name: 'Núcleo do Leviatã', sprite: 'levCore', ox: 0, oy: -1800, hp: 160, regen: 2.5, regenDelay: 2, phase: 7, look: 'remove', pulse: true, points: 30000, explosionScale: 3.5, debrisColors: ['#e43b8c', '#ffcd75', '#8e478c'] },
+  // S8 Núcleo: pilares de defesa (v1.5), o núcleo e o núcleo reacendido (v1.5)
+  ...PYLON_IDS.map((id, i) => ({
+    id, name: 'Pilar de Defesa', sprite: 'generator', ox: [-170, -80, 80, 170][i], oy: -1730, hp: 55, phase: 7,
+    visibleFromPhase: 7, look: 'husk', points: 5000, drop: i === 1 ? 'shield' : null, debrisColors: ['#e43b8c', '#8e478c'],
+  })),
+  { id: 'core', name: 'Núcleo do Leviatã', sprite: 'levCore', ox: 0, oy: -1800, hp: 160, regen: 2.5, regenDelay: 2, phase: 8, look: 'remove', pulse: true, points: 30000, explosionScale: 3.5, debrisColors: ['#e43b8c', '#ffcd75', '#8e478c'] },
+  { id: 'lastCore', name: 'Núcleo Reacendido', sprite: 'levCore', ox: 0, oy: -1800, hp: 110, regen: 4, regenDelay: 1.5, phase: 9, visibleFromPhase: 9, look: 'remove', pulse: true, points: 40000, explosionScale: 4, debrisColors: ['#ffcd75', '#e43b8c', '#ffffff'] },
 ];
 
 /** Movimento comum: a nave deriva levemente e a câmera segue a seção atual. */
@@ -200,6 +217,24 @@ const PHASES = [
     },
   },
   {
+    id: 'pylons', title: 'DEFESAS DO NÚCLEO', hint: 'Raios giratórios! Destrua os pilares.',
+    targets: PYLON_IDS,
+    bombRefill: true,
+    onStart: resetHands,
+    move: cruise,
+    attack(boss, dt) {
+      const w = boss.world;
+      updateHands(boss, dt, [0.5, -0.5]);
+      alive(boss, PYLON_IDS).forEach((id, i) => {
+        if (every(boss, id, 2.2, dt, 0.6 + i * 0.5)) {
+          const p = partPos(boss, id);
+          fireSpread(w, p.x, p.y + 14, aimAtPlayer(w, p.x, p.y), 2, 0.25, 185, NEEDLE);
+        }
+      });
+      if (every(boss, 'wave', 7, dt, 3)) w.spawnMinionWave(3, { type: 'red' });
+    },
+  },
+  {
     id: 'core', title: 'NÚCLEO DO LEVIATÃ', hint: 'Use TUDO o que você conquistou!',
     targets: ['core'],
     enrage: true,
@@ -215,6 +250,29 @@ const PHASES = [
       if (every(boss, 'ring', 3, dt, 2)) fireRing(w, c.x, c.y, 16, 95, boss.time, ORB_ORANGE);
       if (every(boss, 'wall', ratio < 0.5 ? 3.2 : 4.2, dt, 3)) laserWall(boss, 96);
       if (every(boss, 'wave', 6, dt, 4)) w.spawnMinionWave(4, { orange: 2 });
+      // v1.5: canhão de raio no núcleo (mira, avisa e dispara).
+      updateCannonBeam(boss, 'coreBeam', { x: c.x, y: c.y + 20 }, dt, { rest: ratio < 0.5 ? 2 : 3 });
+    },
+  },
+  {
+    id: 'lastBreath', title: 'ÚLTIMO SUSPIRO', hint: 'O núcleo reacendeu! Aguente firme.',
+    targets: ['lastCore'],
+    bombRefill: true,
+    onStart(boss) {
+      resetHands(boss);
+      delete boss.vars.coreBeam;
+    },
+    move: cruise,
+    attack(boss, dt) {
+      const w = boss.world;
+      const c = partPos(boss, 'lastCore');
+      updateHands(boss, dt, [0.65, -0.8]);
+      if (every(boss, 'spiral', 0.12, dt, 0.6)) {
+        boss.timers.spin = (boss.timers.spin ?? 0) + 0.3;
+        fireRing(w, c.x, c.y, 4, 130, boss.timers.spin, ORB);
+      }
+      if (every(boss, 'mines', 2.4, dt, 1.2)) fireSpread(w, c.x, c.y + 20, Math.PI / 2, 3, 1.4, 95, MINE);
+      if (every(boss, 'wall', 3.6, dt, 2.5)) laserWall(boss, 96);
     },
   },
 ];
@@ -223,8 +281,8 @@ export const LEVIATHAN = Object.freeze({
   id: 'leviathan',
   name: 'LEVIATÃ',
   intro: { title: 'ALERTA MÁXIMO', subtitle: 'FORTALEZA ESTELAR LEVIATÃ' },
-  description: 'A fortaleza estelar. Oito seções. Todos os seus buffs serão testados.',
-  parTime: 420,
+  description: 'A fortaleza estelar. Dez fases. Todos os seus buffs serão testados.',
+  parTime: 540,
   size: { w: 420, h: 200 },
   contactDamage: false, // o jogador voa sobre o casco
   music: 'boss',
@@ -235,10 +293,31 @@ export const LEVIATHAN = Object.freeze({
   phases: PHASES,
 
   /** A câmera posiciona a seção da fase i perto do topo da tela. */
-  phaseHomeY: (i) => 310 + i * SECTION_H,
+  phaseHomeY: (i) => 310 + sectionOf(i) * SECTION_H,
 
   /** Explosões de morte acontecem na seção atual. */
   focusPoint: (boss) => ({ x: 0, y: sectionCenter(boss.phaseIndex) }),
 
   drawBehind: drawLeviathanHull,
+
+  /** Raios giratórios do núcleo (fases 8 e 10) e o canhão de raio (fase 9). */
+  segments(boss) {
+    const segs = [];
+    if (boss.phaseIndex === 7 || boss.phaseIndex === 9) {
+      const c = partPos(boss, 'core');
+      segs.push(...handSegments({ ...boss, x: c.x, y: c.y }, HAND_LENGTHS, 12));
+    }
+    const beam = cannonSegment(boss.vars.coreBeam, { width: 16 });
+    if (beam) segs.push(beam);
+    return segs;
+  },
+
+  drawWorld(ctx, boss) {
+    if (boss.state !== 'fight') return;
+    if (boss.phaseIndex === 7 || boss.phaseIndex === 9) {
+      const c = partPos(boss, 'core');
+      drawHands(ctx, { ...boss, x: c.x, y: c.y, vars: boss.vars, state: boss.state }, HAND_LENGTHS, 12, 1.5, BEAM_COLORS);
+    }
+    drawCannonBeam(ctx, boss.vars.coreBeam, BEAM_COLORS, { width: 16 });
+  },
 });

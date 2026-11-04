@@ -313,6 +313,27 @@ Os setores também ficam mais agressivos (mergulhos de 2,2 s no Setor 1 até 0,8
 - O progresso é salvo no `localStorage` **após cada vitória**. **CONTINUAR** retoma no setor ou no mapa certo. O save é apagado ao zerar a campanha.
 - **MUNDO < N >** (mundos já alcançados) começa no mundo escolhido com os buffs dos mundos anteriores, pontuação zerada e 3 vidas.
 
+### Mundo 5: Singularidade (v1.5)
+
+- **Estrutura:** sem setores. **6 mini-chefes em dois círculos de 3**: o 2º círculo só abre quando o 1º cai inteiro (ordem livre dentro de cada círculo). Depois, o chefe final **ÔMEGA**.
+- **Tema:** o berço da frota. Cada guardião representa uma ideia de leitura de tela, e cada um dá um **buff único** ligado a essa ideia:
+
+| Guardião | Ideia | Buff único |
+|---|---|---|
+| Cronos | Tempo: anéis congelados que disparam de repente; ponteiros-raio | **Tempo Bala**: no modo foco, projéteis inimigos a 65% da velocidade |
+| Reflexo | Trajetórias que voltam: cristais que ricocheteiam | **Ricochete**: tiro em blindagem vira míssil teleguiado |
+| Parasita | Pressão: bolsas que regeneram, esporos, gravidade | **Vampirismo**: parte de chefe destruída restaura o escudo |
+| Legião | Multidão: kamikazes e paredes de laser | **Orbitais**: dois orbes giram e apagam projéteis |
+| Artilheiro | Aviso: raios que miram e avisam antes | **Supercarga**: a cada 5 s, raio perfurante com 8x o dano |
+| Fênix | A luta que não acaba: o coração renasce | **Renascer**: uma vez por luta, não perde a vida |
+| (bônus do mundo) | — | **Ascensão**: +25% de dano em todos os tiros |
+
+- **ÔMEGA** (extremamente difícil por projeto): 8 fases, uma para a arma de cada guardião (nós orbitais, ponteiros, espelhos, legião, véu intangível, artilharia, inferno) e o núcleo final, que regenera e combina ponteiros, canhão de raio, espirais, lasers, brasas e kamikazes. Vida base +140% na campanha, além da escala por buffs.
+
+### Escala por buffs (v1.5)
+
+Chefes de mundo (Titã, Hidra, Égide, Arconte, Leviatã e Ômega) recebem **+4% de vida e +1,2% de velocidade de ataque por buff** que o jogador tiver. Motivo: com todos os buffs, o Leviatã ficava fácil. Mini-chefes não escalam, porque são eles que dão os buffs. O Leviatã também ganhou duas fases (Defesas do Núcleo e Último Suspiro), raios giratórios e um canhão de raio no núcleo.
+
 ### Mapa de progresso e treino (v1.4)
 
 - **Galáxia:** os 4 mundos como planetas ligados por uma rota. Cada planeta mostra o estado (**VOCÊ ESTÁ AQUI**, **CONCLUÍDO**, **JÁ VISITADO**, **BLOQUEADO**) e quantas fases foram vencidas. Ao concluir um mundo, a nave viaja até o próximo planeta.

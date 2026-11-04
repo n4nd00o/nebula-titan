@@ -111,6 +111,19 @@ Pedido após o teste de jogo da v1.3:
 
 **Implementação:** teste de garantia que joga cada chefe com tiros vindos de baixo (achou o Vórtice e também o Oráculo), `Progress.js` de lógica pura + `ProgressScene`, modo `practice` na `PlayScene` e uma camada de toque centralizada (`touchZone`).
 
+### 2.6d Evolução na versão 1.5: Mundo 5 e Ômega
+
+Pedido após zerar a campanha:
+
+> *"Uma sugestão: primeiro, o chefe final está muito fácil agora que terminou todos os outros buffs. Outra coisa: quero que tenha uma tela que mostre os buffs que tenho, quero poder mudar no computador os botões das habilidades e quero adicionar uma fase final final com um chefe final extremamente difícil e com 6 mini-chefes com buffs únicos."*
+
+| Pergunta | Decisão | Motivo |
+|---|---|---|
+| Como endurecer o Leviatã | **Mais fases + escala pelos buffs + ataques novos** | Vale também para os outros chefes de mundo |
+| Onde fica a tela de buffs | **Pausa, mapa de progresso e título** | Consultar a qualquer momento |
+| Quais teclas remapear | **Todas as ações** | Acessibilidade e preferência pessoal |
+| Estrutura da fase final | **Mundo 5 depois do Leviatã**: 6 mini-chefes em 2 círculos + Ômega, sem setores | Clímax direto, mantendo a escolha de rota |
+
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.

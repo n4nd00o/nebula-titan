@@ -5,6 +5,33 @@
 
 ---
 
+## 04/11/2026: Versão 1.5 (Mundo 5, Ômega, buffs, controles)
+
+### Motivação
+Pedidos depois de zerar a campanha: o **chefe final estava muito fácil** com todos os buffs; uma **tela que mostre os buffs** que o jogador tem; **trocar as teclas das habilidades** no computador; e uma **fase final final** com um **chefe extremamente difícil** e **6 mini-chefes com buffs únicos**. Decisões tomadas antes de começar: o Leviatã ganha **mais fases + escala pelos buffs + ataques novos**; a tela de buffs aparece **na pausa, no mapa e no título**; **todas as ações** são remapeáveis; o novo conteúdo é um **Mundo 5 depois do Leviatã**, sem setores, com os mini-chefes em **dois círculos de 3**.
+
+### O que foi feito
+1. **Escala por buffs** em `Campaign.difficultyFor`: +4% de vida e +1,2% de ataque por buff, só para chefes de mundo. É uma regra pura e testável, e vale para os chefes futuros sem mexer neles.
+2. **Leviatã com 10 fases:** as fases novas reaproveitam a seção do núcleo (a câmera para de avançar), então o casco procedural não precisou mudar.
+3. **Mundo 5:** a tabela `WORLDS` ganhou `circles`, e `available()` libera um círculo de cada vez. Os 6 mini-chefes e o Ômega usam os ganchos que o motor já tinha (raios, gravidade, intangibilidade). A única novidade de motor foi o **ricochete** de projéteis. Raios reutilizáveis foram para `sweepers.js`.
+4. **7 buffs únicos**, cada um ligado ao tema do guardião que o concede (o relógio dá Tempo Bala, a fênix dá Renascer...).
+5. **Meus Buffs** e **Controles**: telas novas. As teclas viraram dados (`KeyBindings.js`), e o `Input` monta o mapa tecla → ação a partir deles.
+
+### Problemas encontrados e soluções
+| Problema | Solução |
+|---|---|
+| O véu do Ômega (fase 5) estava intangível justamente no instante em que a fase começava, e o teste genérico de "alvo atingível" falhou. | O ciclo do véu passou a contar a partir do início da fase (`timers`), e não do relógio global do chefe. |
+| Abrir a tela de buffs pela pausa reiniciaria a luta (`changeScene` chama `enter()`). | `Game.resumeScene`: volta para a cena pausada sem reiniciá-la. |
+| Se a PAUSA fosse remapeada sem o ESC, não haveria como sair dos menus. | ESC virou tecla fixa de pausa/voltar, além da tecla escolhida. |
+| No celular, a tela de controles ficaria esperando uma tecla para sempre. | Um toque cancela a espera, e a tela avisa que trocar teclas precisa de teclado. |
+| Na Rota de Ataque do Mundo 5, as ligações entre os círculos passavam por cima dos nomes (visto nas capturas). | Círculos mais afastados (y 380 e 256) e o Ômega mais alto. |
+
+### Aprendizados
+- Pôr a dificuldade **nos dados** (escala por buffs) resolve o problema "fácil demais" em todos os chefes de uma vez.
+- Os testes genéricos e a garantia contra chefes imortais validaram os 7 chefes novos sem nenhuma linha de teste específica, e ainda pegaram um bug (o véu).
+
+---
+
 ## 04/11/2026: Versão 1.4.1 (Hidra imortal na fase 3)
 
 ### Motivação

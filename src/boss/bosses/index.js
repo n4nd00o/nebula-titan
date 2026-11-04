@@ -20,6 +20,13 @@ import { ORACLE } from './oracle.js';
 import { ECHO } from './echo.js';
 import { ARCHON } from './archon.js';
 import { LEVIATHAN } from './leviathan.js';
+import { CHRONOS } from './chronos.js';
+import { MIRROR } from './mirror.js';
+import { PARASITE } from './parasite.js';
+import { LEGION } from './legion.js';
+import { GUNNER } from './gunner.js';
+import { PHOENIX } from './phoenix.js';
+import { OMEGA } from './omega.js';
 
 export {
   NEBULA_TITAN, SENTINEL, HIVE, REAPER,
@@ -27,6 +34,7 @@ export {
   HAMMER, TWINS, FURNACE, AEGIS,
   SPECTER, ORACLE, ECHO, ARCHON,
   LEVIATHAN,
+  CHRONOS, MIRROR, PARASITE, LEGION, GUNNER, PHOENIX, OMEGA,
 };
 
 export const BOSSES = Object.freeze({
@@ -51,4 +59,12 @@ export const BOSSES = Object.freeze({
   echo: ECHO,
   archon: ARCHON,
   leviathan: LEVIATHAN,
+  // Mundo 5 (Singularidade)
+  chronos: CHRONOS,
+  mirror: MIRROR,
+  parasite: PARASITE,
+  legion: LEGION,
+  gunner: GUNNER,
+  phoenix: PHOENIX,
+  omega: OMEGA,
 });

@@ -4,46 +4,16 @@
  * O jogo nunca pergunta "a tecla ArrowLeft está pressionada?", e sim
  * "a AÇÃO 'left' está ativa?". Isso desacopla a lógica do hardware e
  * permite remapear teclas ou adicionar controles (toque, gamepad) sem
- * mexer no código do jogo.
+ * mexer no código do jogo. As teclas vêm de KeyBindings.js (configuráveis).
  *
  *  - isDown(action):     ação mantida pressionada
  *  - wasPressed(action): ação pressionada NESTE passo de simulação
  */
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
+import { buildKeyMap, defaultBindings, loadBindings, STORAGE_KEY } from './KeyBindings.js';
 
-export const KEY_BINDINGS = Object.freeze({
-  ArrowLeft: 'left',
-  KeyA: 'left',
-  ArrowRight: 'right',
-  KeyD: 'right',
-  ArrowUp: 'up',
-  KeyW: 'up',
-  ArrowDown: 'down',
-  KeyS: 'down',
-  Space: 'fire',
-  KeyJ: 'fire',
-  KeyZ: 'fire',
-  ShiftLeft: 'focus',
-  ShiftRight: 'focus',
-  KeyC: 'dash',
-  KeyL: 'dash',
-  KeyX: 'bomb',
-  KeyK: 'bomb',
-  Enter: 'confirm',
-  NumpadEnter: 'confirm',
-  KeyP: 'pause',
-  Escape: 'pause',
-  KeyQ: 'quit',
-  KeyM: 'mute',
-  KeyV: 'vibration',
-  KeyF: 'fullscreen',
-  Tab: 'map',
-  // Atalhos de depuração (só funcionam com ?debug na URL)
-  KeyT: 'debugKill',
-  KeyB: 'debugBuffs',
-  KeyG: 'debugGod',
-  KeyH: 'debugHitbox',
-});
+/** Mapa padrão tecla -> ação (as teclas podem ser trocadas em CONTROLES). */
+export const KEY_BINDINGS = Object.freeze(buildKeyMap(defaultBindings()));
 
 /**
  * Zonas de toque da tela de jogo (coordenadas lógicas 480x640).
@@ -60,7 +30,15 @@ export function touchZone(x, y) {
 }
 
 export class Input {
-  constructor(target, canvas = null) {
+  /**
+   * @param {EventTarget} target onde escutar o teclado (window)
+   * @param {HTMLCanvasElement|null} canvas para toque/clique
+   * @param {{get: Function, set: Function}|null} storage teclas salvas pelo jogador
+   */
+  constructor(target, canvas = null, storage = null) {
+    this.storage = storage;
+    this.setBindings(loadBindings(storage?.get(STORAGE_KEY, null)), false);
+    this.capture = null; // função que recebe a PRÓXIMA tecla (tela de controles)
     this.down = new Set();
     this.pressed = new Set();
     this.pointer = { active: false, x: 0, y: 0, id: null };
@@ -69,14 +47,22 @@ export class Input {
     this.canvas = canvas;
 
     target.addEventListener('keydown', (e) => {
-      const action = KEY_BINDINGS[e.code];
+      if (this.capture) {
+        // Tela de controles esperando uma tecla: ela não vira ação.
+        e.preventDefault();
+        const cb = this.capture;
+        this.capture = null;
+        cb(e.code);
+        return;
+      }
+      const action = this.keyMap[e.code];
       if (!action) return;
       e.preventDefault(); // evita rolar a página com setas/espaço
       if (!e.repeat && !this.down.has(action)) this.pressed.add(action);
       this.down.add(action);
     });
     target.addEventListener('keyup', (e) => {
-      const action = KEY_BINDINGS[e.code];
+      const action = this.keyMap[e.code];
       if (action) this.down.delete(action);
     });
     target.addEventListener('blur', () => this.down.clear());
@@ -133,6 +119,14 @@ export class Input {
     // Sem menu de contexto / seleção ao segurar o dedo na tela.
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('pointercancel', release);
+  }
+
+  /** Troca as teclas (e salva, se pedido). */
+  setBindings(bindings, save = true) {
+    this.bindings = bindings;
+    this.keyMap = buildKeyMap(bindings);
+    this.down?.clear();
+    if (save) this.storage?.set(STORAGE_KEY, bindings);
   }
 
   isDown(action) {

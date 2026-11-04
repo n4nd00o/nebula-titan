@@ -42,6 +42,16 @@ export class PlayerBullet {
   }
 
   draw(ctx) {
+    if (this.super) {
+      // Raio da SUPERCARGA (buff do Artilheiro)
+      ctx.fillStyle = 'rgba(167, 240, 112, 0.45)';
+      ctx.fillRect(Math.round(this.x - 6), Math.round(this.y - 22), 12, 44);
+      ctx.fillStyle = '#a7f070';
+      ctx.fillRect(Math.round(this.x - 3), Math.round(this.y - 20), 6, 40);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.round(this.x - 1), Math.round(this.y - 18), 2, 36);
+      return;
+    }
     if (this.focus) {
       ctx.fillStyle = '#e43b8c';
       ctx.fillRect(Math.round(this.x - 2.5), Math.round(this.y - 9), 5, 18);
@@ -123,13 +133,14 @@ export class PlayerMissile extends PlayerBullet {
  *  - homing/turnRate: persegue o jogador por `homing` segundos
  *  - spin:  gira o vetor velocidade (rad/s) — tiros que fazem curva
  *  - accel: aceleração (px/s²) até `maxSpeed`
+ *  - bounce: quantas vezes RICOCHETEIA nas laterais da tela (Reflexo, Ômega)
  *  - split: { at, count, speed, spread?, ring?, style? } — após `at` segundos
  *           o projétil some e vira `count` projéteis (leque ou anel)
  */
 export class EnemyBullet {
   constructor({
     x, y, vx = 0, vy = 0, kind = 'orb', color = '#e43b8c', radius = 4,
-    homing = 0, turnRate = 0, speed = null, life = 9, spin = 0, accel = 0, maxSpeed = 400, split = null,
+    homing = 0, turnRate = 0, speed = null, life = 9, spin = 0, accel = 0, maxSpeed = 400, split = null, bounce = 0,
   }) {
     this.x = x;
     this.y = y;
@@ -146,6 +157,7 @@ export class EnemyBullet {
     this.accel = accel;
     this.maxSpeed = maxSpeed;
     this.split = split;
+    this.bounce = bounce;
     this.time = 0;
     this.dead = false;
   }
@@ -172,6 +184,12 @@ export class EnemyBullet {
     }
     this.x += this.vx * dt;
     this.y += this.vy * dt;
+    if (this.bounce > 0 && (this.x < 4 || this.x > GAME_WIDTH - 4)) {
+      // Ricochete na lateral: espelha a velocidade horizontal.
+      this.x = Math.max(4, Math.min(GAME_WIDTH - 4, this.x));
+      this.vx = -this.vx;
+      this.bounce--;
+    }
     if (this.split && this.time >= this.split.at) this.doSplit(scene);
     if (this.life <= 0 || isOutside(this.x, this.y)) this.dead = true;
   }

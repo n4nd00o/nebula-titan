@@ -29,7 +29,7 @@ export class Game {
     this.ctx.imageSmoothingEnabled = false;
 
     this.storage = new Storage(STORAGE_PREFIX);
-    this.input = new Input(window, canvas);
+    this.input = new Input(window, canvas, this.storage);
     this.audio = new AudioEngine(this.storage);
     this.sprites = new SpriteBank();
     this.starfield = new Starfield(GAME_WIDTH, GAME_HEIGHT);
@@ -76,6 +76,12 @@ export class Game {
     } catch {
       // Sem a fonte, usa a fonte monoespaçada de fallback.
     }
+  }
+
+  /** Volta para uma cena que estava aberta (ex.: a luta pausada), sem reiniciá-la. */
+  resumeScene(scene) {
+    this.scene?.exit?.();
+    this.scene = scene;
   }
 
   changeScene(scene) {

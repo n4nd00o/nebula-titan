@@ -6,7 +6,9 @@
  *  - NOVA CAMPANHA: 4 mundos, do Setor 1 ao Leviatã.
  *  - MUNDO < N >: começa direto em um mundo já alcançado, com os buffs dos
  *    mundos anteriores (←/→ escolhe o mundo).
- *  - MAPA DE PROGRESSO: os 4 mundos e as fases de cada um; rejoga fases vencidas.
+ *  - MAPA DE PROGRESSO: os 5 mundos e as fases de cada um; rejoga fases vencidas.
+ *  - MEUS BUFFS: os buffs da campanha salva (v1.5).
+ *  - CONTROLES: troca as teclas de cada ação (v1.5).
  *  - DUELO COM O TITÃ: luta direta contra o Nebula Titan, sem buffs.
  *
  * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA.
@@ -17,6 +19,9 @@ import { Campaign, WORLDS } from '../systems/Campaign.js';
 import { PlayScene, SAVE_KEY, UNLOCK_KEY } from './PlayScene.js';
 import { MapScene } from './MapScene.js';
 import { ProgressScene } from './ProgressScene.js';
+import { BuffsScene } from './BuffsScene.js';
+import { ControlsScene } from './ControlsScene.js';
+import { controlsHelp } from '../core/KeyBindings.js';
 import { canVibrate, vibrationEnabled, toggleVibration } from '../core/Haptics.js';
 
 const BOSS_PREVIEW = [
@@ -24,8 +29,8 @@ const BOSS_PREVIEW = [
   ['hull', 0, 0], ['plate', 0, -3], ['cannon', 0, 45],
 ];
 
-const MENU_Y = 336;
-const MENU_GAP = 30;
+const MENU_Y = 300;
+const MENU_GAP = 27;
 
 /** Abre a campanha no ponto certo: setor linear ou mapa de escolha. */
 export function resumeCampaign(game, campaign) {
@@ -48,9 +53,11 @@ export class TitleScene {
       const w = this.save.world;
       this.options.push({ id: 'continue', label: 'CONTINUAR', detail: `Mundo ${w.number}: ${w.name} · ${this.save.score} pts` });
     }
-    this.options.push({ id: 'new', label: 'NOVA CAMPANHA', detail: `4 mundos, 12 mini-chefes, 4 chefes e o Leviatã · RECORDE ${record}` });
+    this.options.push({ id: 'new', label: 'NOVA CAMPANHA', detail: `5 mundos, 18 mini-chefes, Leviatã e Ômega · RECORDE ${record}` });
     if (this.unlocked > 1) this.options.push({ id: 'world', label: 'MUNDO', detail: '' });
     this.options.push({ id: 'map', label: 'MAPA DE PROGRESSO', detail: 'Veja onde você está e rejogue fases vencidas (treino)' });
+    this.options.push({ id: 'buffs', label: 'MEUS BUFFS', detail: 'Os buffs da campanha salva e de onde vem cada um' });
+    this.options.push({ id: 'controls', label: 'CONTROLES', detail: 'Troque as teclas de cada ação (salvo no navegador)' });
     this.options.push({ id: 'duel', label: 'DUELO COM O TITÃ', detail: `Luta direta contra o Nebula Titan · RECORDE ${storage.get('hiscore', 0)}` });
     this.selected = 0;
   }
@@ -144,6 +151,12 @@ export class TitleScene {
       case 'world':
         resumeCampaign(game, Campaign.startingAt(this.worldChoice));
         break;
+      case 'buffs':
+        game.changeScene(new BuffsScene(game, { buffs: this.save?.buffs ?? new Set(), back: () => new TitleScene(game) }));
+        break;
+      case 'controls':
+        game.changeScene(new ControlsScene(game, { back: () => new TitleScene(game) }));
+        break;
       case 'map':
         game.changeScene(new ProgressScene(game));
         break;
@@ -166,7 +179,7 @@ export class TitleScene {
     const bob = Math.sin(this.time * 2) * 3;
     drawText(ctx, 'NEBULA', W / 2, 90 + bob, { size: 40, align: 'center', color: UI_COLORS.boss, shadow: '#5d275d' });
     drawText(ctx, 'TITAN', W / 2, 140 + bob, { size: 40, align: 'center', color: UI_COLORS.accent, shadow: '#b13e53' });
-    drawText(ctx, 'QUATRO MUNDOS. DEZESSEIS GUARDIÕES. UM LEVIATÃ.', W / 2, 200, { size: 7, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, 'CINCO MUNDOS. VINTE E QUATRO CHEFES. UM ÔMEGA.', W / 2, 200, { size: 7, align: 'center', color: UI_COLORS.muted });
 
     // Menu
     this.options.forEach((opt, i) => {
@@ -191,7 +204,7 @@ export class TitleScene {
     const touch = this.game.input.touchMode;
     const controls = touch
       ? ['ARRASTE o dedo para mover (tiro automático)', 'Botões BOMBA e DASH no canto · 2º dedo = dash']
-      : ['SETAS/WASD mover   ESPAÇO atirar   SHIFT foco', 'C dash   X bomba   P pausa   M som   F tela cheia'];
+      : controlsHelp(this.game.input.bindings);
     controls.forEach((line, i) => {
       drawText(ctx, line, W / 2, 512 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted });
     });

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   Campaign, WORLDS, STAGE_IDS, MINI_BOSS_IDS, REWARDS, BUFFS, PERFECT_RUN_BONUS,
   worldEncounters, worldIndexOf, ALL_MINI_BOSS_IDS,
+  BUFF_HP_SCALE, BUFF_ATTACK_SCALE, WORLD_BOSS_IDS, buffSource,
 } from '../src/systems/Campaign.js';
 import { ENCOUNTERS } from '../src/encounters.js';
 import { PLAYER } from '../src/config.js';
@@ -56,21 +57,29 @@ test('Mundo 1: setores -> mini-chefes (+bomba) -> Titã -> abre o Mundo 2', () =
   assert.ok(c.nextIsStage);
 });
 
-test('são 4 mundos, cada um com 2 setores, 3 mini-chefes e 1 chefe; o Leviatã fecha o último', () => {
-  assert.equal(WORLDS.length, 4);
-  for (const w of WORLDS) {
+// v1.5: 5 mundos (o Mundo 5 tem 6 mini-chefes em 2 círculos e nenhum setor).
+test('são 5 mundos: os 4 primeiros com 2 setores e 3 mini-chefes; o Leviatã fecha o 4º; o Mundo 5 tem 6 mini-chefes', () => {
+  assert.equal(WORLDS.length, 5);
+  for (const w of WORLDS.slice(0, 4)) {
     assert.equal(w.stages.length, 2, `${w.name}: setores`);
     assert.equal(w.minis.length, 3, `${w.name}: mini-chefes`);
+  }
+  const w5 = WORLDS[4];
+  assert.equal(w5.stages.length, 0);
+  assert.equal(w5.minis.length, 6);
+  assert.deepEqual(w5.circles.flat(), w5.minis);
+  assert.equal(w5.boss, 'omega');
+  for (const w of WORLDS) {
     for (const id of worldEncounters(w)) assert.ok(ENCOUNTERS[id], `${id} não existe`);
     assert.ok(BUFFS[w.completionReward], `${w.name}: bônus de mundo`);
   }
   assert.equal(WORLDS[3].finale, 'leviathan');
-  assert.ok(WORLDS.slice(0, 3).every((w) => !w.finale));
+  assert.ok(WORLDS.filter((_, i) => i !== 3).every((w) => !w.finale));
   const all = WORLDS.flatMap(worldEncounters);
   assert.equal(new Set(all).size, all.length, 'um encontro aparece em dois mundos');
 });
 
-test('campanha completa: 4 mundos em sequência até o Leviatã', () => {
+test('campanha completa: 5 mundos em sequência até o Ômega', () => {
   const c = new Campaign();
   for (let i = 0; i < WORLDS.length; i++) {
     assert.equal(c.worldIndex, i);
@@ -78,10 +87,11 @@ test('campanha completa: 4 mundos em sequência até o Leviatã', () => {
   }
   assert.ok(c.complete);
   assert.deepEqual(c.available(), []);
-  assert.equal(c.order.at(-1), 'leviathan');
-  assert.equal(c.order.at(-2), 'archon', 'o Arconte vem antes do Leviatã');
-  // 12 buffs de mini-chefes + 4 bônus de mundo.
-  assert.equal(c.buffs.size, 16);
+  assert.equal(c.order.at(-1), 'omega');
+  assert.ok(c.order.indexOf('archon') < c.order.indexOf('leviathan'), 'o Arconte vem antes do Leviatã');
+  assert.ok(c.order.indexOf('leviathan') < c.order.indexOf('chronos'), 'o Mundo 5 vem depois do Leviatã');
+  // 18 buffs de mini-chefes + 5 bônus de mundo.
+  assert.equal(c.buffs.size, 23);
   assert.ok(Object.keys(BUFFS).every((id) => c.hasBuff(id)));
 });
 
@@ -128,7 +138,7 @@ test('seleção de mundo: começa no mundo escolhido com os buffs dos anteriores
 
 test('a dificuldade cresce a cada mundo', () => {
   const c = new Campaign();
-  const rates = WORLDS.map((w) => c.difficultyFor(w.stages[0]));
+  const rates = WORLDS.map((w) => c.difficultyFor(worldEncounters(w)[0]));
   for (let i = 1; i < rates.length; i++) {
     assert.ok(rates[i].attackRate > rates[i - 1].attackRate, `ataques do mundo ${i + 1}`);
     assert.ok(rates[i].bulletSpeed > rates[i - 1].bulletSpeed, `projéteis do mundo ${i + 1}`);
@@ -194,12 +204,54 @@ test('corrida perfeita depende de não morrer nenhuma vez', () => {
 });
 
 test('todos os mini-chefes dão um buff diferente, e todos os buffs têm descrição', () => {
-  assert.equal(ALL_MINI_BOSS_IDS.length, 12);
+  assert.equal(ALL_MINI_BOSS_IDS.length, 18);
   const rewards = ALL_MINI_BOSS_IDS.map((id) => REWARDS[id]);
-  assert.equal(new Set(rewards).size, 12, 'dois mini-chefes dão o mesmo buff');
+  assert.equal(new Set(rewards).size, 18, 'dois mini-chefes dão o mesmo buff');
   for (const id of rewards) assert.ok(BUFFS[id]?.description, `buff ${id}`);
   for (const w of WORLDS) assert.ok(!rewards.includes(w.completionReward), 'bônus de mundo repetido');
   assert.equal(worldIndexOf('hydra'), 1);
   assert.equal(worldIndexOf('leviathan'), 3);
   assert.deepEqual(STAGE_IDS, ['stage1', 'stage2']);
+});
+
+// ------------------------------------------------------------ v1.5
+test('Mundo 5: abre depois do Leviatã, e o 2º círculo só abre quando o 1º cai inteiro', () => {
+  const c = Campaign.startingAt(3);
+  clearWorld(c, 3);
+  assert.equal(c.worldIndex, 4);
+  assert.ok(c.singularityUnlocked);
+  assert.deepEqual(c.available().sort(), ['chronos', 'mirror', 'parasite'].sort());
+  assert.equal(c.canFight('legion'), false, '2º círculo bloqueado');
+  c.recordVictory('parasite', STATS, 1); // ordem livre dentro do círculo
+  c.recordVictory('chronos', STATS, 1);
+  assert.deepEqual(c.available(), ['mirror']);
+  c.recordVictory('mirror', STATS, 1);
+  assert.deepEqual(c.available().sort(), ['gunner', 'legion', 'phoenix']);
+  for (const id of ['phoenix', 'legion']) c.recordVictory(id, STATS, 1);
+  assert.deepEqual(c.recordVictory('gunner', STATS, 1), ['supercharge', 'ascension'], 'bônus do Mundo 5');
+  assert.deepEqual(c.available(), ['omega']);
+  c.recordVictory('omega', STATS, 1);
+  assert.ok(c.complete);
+  assert.equal(Campaign.circleOf('legion'), 1);
+  assert.equal(Campaign.circleOf('sentinel'), -1);
+});
+
+test('chefes de mundo escalam com os buffs do jogador; mini-chefes não', () => {
+  const c = new Campaign();
+  const base = c.difficultyFor('leviathan');
+  const miniBase = c.difficultyFor('sentinel');
+  for (const id of ['piercing', 'wingman', 'dash', 'bomb', 'spread', 'shockdash', 'carapace', 'bombPlus', 'overdrive', 'wingman2']) c.buffs.add(id);
+  const strong = c.difficultyFor('leviathan');
+  assert.ok(Math.abs(strong.hpScale / base.hpScale - (1 + BUFF_HP_SCALE * 10)) < 1e-9, 'vida +4% por buff');
+  assert.ok(Math.abs(strong.attackRate / base.attackRate - (1 + BUFF_ATTACK_SCALE * 10)) < 1e-9, 'ataque +1,2% por buff');
+  assert.deepEqual(c.difficultyFor('sentinel'), miniBase, 'mini-chefes não escalam com buffs');
+  assert.ok(c.difficultyFor('omega').hpScale > strong.hpScale, 'o Ômega é o mais resistente');
+  assert.ok(WORLD_BOSS_IDS.includes('omega') && WORLD_BOSS_IDS.includes('titan'));
+});
+
+test('cada buff sabe de onde vem (tela de buffs)', () => {
+  assert.deepEqual(buffSource('rebirth'), { kind: 'mini', id: 'phoenix', world: 4 });
+  assert.deepEqual(buffSource('piercing'), { kind: 'mini', id: 'sentinel', world: 0 });
+  assert.deepEqual(buffSource('ascension'), { kind: 'world', id: null, world: 4 });
+  for (const id of Object.keys(BUFFS)) assert.ok(buffSource(id).world >= 0, `buff ${id} sem origem`);
 });

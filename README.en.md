@@ -50,7 +50,7 @@ Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. O
 | **Progress map** *(v1.4)* | Galaxy map with the 4 worlds showing where you are and what is left. Tap a world to see its inner stages (sectors, mini-bosses, boss). Cleared stages can be **replayed as practice** without touching the save. |
 | **Titan Duel** | Straight fight against the final boss, no buffs (the original v1.0 challenge). |
 
-### The four worlds (v1.3)
+### The five worlds (v1.3 → v1.5)
 
 | World | Sectors (new enemy) | Mini-bosses (buff) | Boss | World bonus |
 |:---:|---|---|---|---|
@@ -58,8 +58,11 @@ Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. O
 | **2 · Glacial Belt** | 3-4 (**armored blue**) | Prism (Triple Shot) · Vortex (Shockwave Dash) · Scarab (Carapace) | **Glacial Hydra** | Extra Bomb |
 | **3 · Stellar Forge** | 5-6 (**splitting purple**) | Hammer (Overdrive) · Twins (Second Wingman) · Furnace (Homing Missiles) | **Aegis** | Bomb Recharge |
 | **4 · Abyssal Void** | 7-8 (**kamikaze red**) | Specter (Phantom Dash) · Oracle (Focus Amp) · Echo (Reactive Shield) | **Archon** → **LEVIATHAN** | Nova Bomb |
+| **5 · Singularity** *(v1.5)* | none | Circle 1: Chronos (Bullet Time) · Mirror (Ricochet) · Parasite (Vampirism) · Circle 2: Legion (Orbitals) · Gunner (Supercharge) · Phoenix (Rebirth) | **OMEGA** | Ascension |
 
 Each world speeds up enemy attacks (+5% to +15%) and bullets (+5% to +12%), and world bosses get extra HP to match your growing arsenal. Each world has its own star palette, background and music. New boss mechanics include **gravity that pulls your ship** (Vortex), a **shell that opens and closes** (Scarab), **heads that regrow** and a sweeping **freezing breath** (Hydra), **ground-pound shockwaves** (Hammer), a **lethal beam linking two ships** (Twins), **fire columns and rotating beams** (Furnace), a **rotating armored shield ring** (Aegis), **intangibility** (Specter), **curving bullet flowers** (Oracle), a **dark copy of your own ship** firing from the bottom of the screen (Echo), and an Archon that uses the tech of every guardian.
+
+**v1.5:** World 5 has **6 mini-bosses with unique buffs** in two circles (beat the first three, in any order, to open the next three) and the true final boss **Omega**: 8 phases, each wielding a guardian's weapon, then everything at once. **World bosses now scale with your buffs** (+4% HP and +1.2% attack speed per buff), and the Leviathan grew to **10 phases** (core defenses with rotating beams and a "last breath" phase).
 
 ### World 1 mini-bosses
 
@@ -76,7 +79,7 @@ Earned buffs reshape the remaining fights, so **route order matters**. To compen
 Every world opens with two Galaga-style **formation-wave** sectors: aliens swirl in, form a "breathing" formation and dive at you (missed dives return to their slot). **Green aliens** (1 HP, single shot), **orange aliens** (3 HP, 3-way spread, dive pulling green escorts), **blue aliens** (World 2, 7 HP, crystal shot that splits into a ring), **purple aliens** (World 3, split into two diving drones when destroyed) and **red kamikazes** (World 4, no shots, fast homing dives). All of them also escort the bosses.
 
 ## 🛸 Final boss: LEVIATHAN
-The last encounter of World 4, after the Archon. A ship **bigger than the screen**: you fly **over its hull** while the camera advances through **8 sections** (stern to bow). The hull is **procedurally drawn**. Each section is built around a buff that becomes **more necessary, never mandatory**:
+The last encounter of World 4, after the Archon. A ship **bigger than the screen**: you fly **over its hull** while the camera advances through **8 sections** (stern to bow); since v1.5 the fight has **10 phases**. The hull is **procedurally drawn**. Each section is built around a buff that becomes **more necessary, never mandatory**:
 
 | Section | Threat | Buff that shines |
 |---|---|---|
@@ -87,7 +90,9 @@ The last encounter of World 4, after the Archon. A ship **bigger than the screen
 | 5 Twin Reactors | **Regenerate** when not hit | **Wingman** firepower |
 | 6 Storm | Dense bullet curtain | **Pulse Bomb** |
 | 7 Command Bridge | Armor + lasers + escorts | Piercing + Dash |
-| 8 Core | Everything at once | **All of them** |
+| 8 Core Defenses *(v1.5)* | Rotating beams + kamikazes | Dash + Orbitals |
+| 9 Core | Everything at once + beam cannon | **All of them** |
+| 10 Last Breath *(v1.5)* | The core reignites | **All of them** |
 
 ## 👾 World 1 boss: Nebula Titan (four phases)
 
@@ -108,8 +113,9 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 
 ## ✨ Features
 
-- 🌌 **4 worlds of rising difficulty**, each with sectors, 3 mini-bosses and a boss, plus its own palette, background and music.
-- 🧩 **17 modular bosses** (12 mini-bosses, 4 world bosses and the Leviathan) with destructible parts and 3 damage states per part.
+- 🎒 **My Buffs** screen and ⌨️ **remappable keys** for every action *(v1.5)*.
+- 🌌 **5 worlds of rising difficulty**, each with sectors, 3 mini-bosses and a boss, plus its own palette, background and music.
+- 🧩 **24 modular bosses** (18 mini-bosses, 4 world bosses, the Leviathan and Omega) with destructible parts and 3 damage states per part.
 - 🗺️ **Campaign with player-chosen routes**, a map screen per world, **16 buffs** and continues.
 - 💾 **Saved progress** in the browser and **world select** on the title screen.
 - 🗺️ **Progress map** *(v1.4)* with per-world stage view and a **practice mode**.
@@ -122,7 +128,7 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
-- 🧪 **257 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
+- 🧪 **333 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls
@@ -138,6 +144,8 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 | Pause | `P` / `Esc` | ⏸ button (top right) |
 | Quit to menu (paused) | `Q` | **MENU** button |
 | Toggle sound / vibration / fullscreen | `M` / `V` / `F` | Buttons on the title screen |
+| My buffs | `I` | **MEUS BUFFS** button (pause) |
+| Remap keys | Title → **CONTROLES** | (keyboard needed) |
 
 ## ▶️ Running
 

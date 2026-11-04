@@ -33,7 +33,7 @@ import { fireSpread, aimAtPlayer } from '../boss/patterns.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
 import { circleOverlap, pointSegmentDistance } from '../systems/Collision.js';
 import { computeResults, rulesForParTime, formatTime } from '../systems/Scoring.js';
-import { BUFFS, REWARDS, WORLDS, PERFECT_RUN_BONUS, worldEncounters, worldIndexOf } from '../systems/Campaign.js';
+import { BUFFS, REWARDS, WORLDS, PERFECT_RUN_BONUS, FINAL_BOSS_ID, worldEncounters, worldIndexOf } from '../systems/Campaign.js';
 import { drawText } from '../graphics/text.js';
 import { rand, clamp, removeDead } from '../utils/math.js';
 import { TitleScene } from './TitleScene.js';
@@ -41,13 +41,27 @@ import { MapScene } from './MapScene.js';
 import { ProgressScene } from './ProgressScene.js';
 import { PROGRESS_KEY } from '../systems/Progress.js';
 import { haptic } from '../core/Haptics.js';
+import { keyLabel, controlsHelp } from '../core/KeyBindings.js';
+import { BuffsScene } from './BuffsScene.js';
 
 const MAX_ENEMY_BULLETS = 450;
+
+/** Buffs do Mundo 5 (v1.5). */
+export const BUFF_TUNING = Object.freeze({
+  bulletTimeFactor: 0.65, // Tempo Bala: projéteis inimigos a 65% da velocidade no modo foco
+  ricochetCooldown: 0.2, // Ricochete: no máximo 5 mísseis por segundo
+  orbitalRadius: 30, // Orbitais: distância dos orbes até a nave
+  orbitalSize: 7, // Orbitais: raio de cada orbe
+  superEvery: 5, // Supercarga: segundos entre os raios
+  superDamage: 8, // Supercarga: multiplicador de dano
+  ascension: 1.25, // Ascensão: +25% de dano em todos os tiros
+});
 
 /** Botões da tela de pausa (toque e clique). */
 const PAUSE_BUTTONS = Object.freeze([
   { id: 'resume', x: W / 2 - 110, y: 222, w: 220, h: 34 },
-  { id: 'menu', x: W / 2 - 110, y: 266, w: 220, h: 34 },
+  { id: 'buffs', x: W / 2 - 110, y: 266, w: 220, h: 34 },
+  { id: 'menu', x: W / 2 - 110, y: 310, w: 220, h: 34 },
 ]);
 
 /** Qual botão da pausa foi tocado (ou null). */
@@ -136,12 +150,58 @@ export class PlayScene {
     this.newRecord = false;
     this.showHitboxes = DEBUG;
     this.stats = { time: 0, shots: 0, hits: 0, damageTaken: 0 };
+    // Buffs do Mundo 5
+    this.ricochetTimer = 0;
+    this.superTimer = 0;
+    this.rebirthUsed = false;
   }
 
   /** Esta luta encerra o modo atual? (Leviatã na campanha; Titã no duelo) */
   get isFinalEncounter() {
     if (this.practice) return false;
-    return this.campaign ? this.def.id === 'leviathan' : true;
+    return this.campaign ? this.def.id === FINAL_BOSS_ID : true;
+  }
+
+  /** Posição dos dois orbes do buff ORBITAIS. */
+  orbitalPositions() {
+    const p = this.player;
+    if (!p.buffs.has('orbitals') || !p.alive) return [];
+    const a = this.stats.time * 3.2;
+    return [0, Math.PI].map((o) => ({ x: p.x + Math.cos(a + o) * BUFF_TUNING.orbitalRadius, y: p.y + Math.sin(a + o) * BUFF_TUNING.orbitalRadius }));
+  }
+
+  /** Multiplicador de dano de todos os tiros (buff ASCENSÃO). */
+  get damageFactor() {
+    return this.player.buffs.has('ascension') ? BUFF_TUNING.ascension : 1;
+  }
+
+  /** RENASCER: chamado pelo Player quando ele "morreria" (uma vez por luta). */
+  onRebirth(player) {
+    this.rebirthUsed = true;
+    haptic(this.storage, [60, 40, 160]);
+    this.clearEnemyBullets(true);
+    this.hazards.length = 0;
+    this.particles.ring(player.x, player.y, '#ef7d57', 120, 0.6);
+    this.particles.ring(player.x, player.y, '#ffcd75', 200, 0.8);
+    this.flash(0.6);
+    this.popup('RENASCER!', player.x, player.y - 40, '#ef7d57');
+    this.audio.play('buff');
+  }
+
+  /** VAMPIRISMO: cada parte de chefe destruída restaura o escudo. */
+  onPartDestroyed() {
+    const p = this.player;
+    if (p.buffs.has('vampire') && p.alive && !p.shield) {
+      p.shield = true;
+      this.popup('ESCUDO DRENADO', p.x, p.y - 34, '#b13e53');
+    }
+  }
+
+  /** Abre a tela de buffs por cima da luta (a luta continua pausada). */
+  openBuffs() {
+    this.audio.play('select');
+    this.game.changeScene(new BuffsScene(this.game, { buffs: this.player.buffs, returnTo: this }));
+    this.audio.suspend(); // a luta continua pausada (exit() tinha retomado o som)
   }
 
   /** ESC/MENU nas telas de pausa e de fim: o treino volta ao mapa; o resto, ao título. */
@@ -306,8 +366,17 @@ export class PlayScene {
     const piercing = buffs.has('piercing');
     // Foco Amplificado: no modo foco, cada tiro causa +60% de dano.
     const focus = buffs.has('focus') && player.focused;
-    const base = piercing ? PLAYER.piercingDamage : PLAYER.bulletDamage;
+    const base = (piercing ? PLAYER.piercingDamage : PLAYER.bulletDamage) * this.damageFactor;
     const damage = focus ? base * PLAYER.focusDamage : base;
+    if (buffs.has('supercharge') && this.superTimer >= BUFF_TUNING.superEvery) {
+      // SUPERCARGA: um raio perfurante grosso que causa 8x o dano.
+      this.superTimer = 0;
+      const beam = new PlayerBullet(player.x, player.y - 22, { piercing: true, damage: base * BUFF_TUNING.superDamage });
+      beam.super = true;
+      beam.radius = 5;
+      this.playerBullets.push(beam);
+      this.audio.play('laserFire');
+    }
     const offsets = player.double ? [-9, 9] : [0];
     for (const o of offsets) this.playerBullets.push(new PlayerBullet(player.x + o, player.y - 18, { piercing, damage, focus }));
     let shots = offsets.length;
@@ -323,7 +392,7 @@ export class PlayScene {
     }
     for (const w of this.wingmen) {
       if (!w.visible) continue;
-      this.playerBullets.push(new PlayerBullet(w.x, w.y - 14, { piercing }));
+      this.playerBullets.push(new PlayerBullet(w.x, w.y - 14, { piercing, damage: (piercing ? PLAYER.piercingDamage : PLAYER.bulletDamage) * this.damageFactor }));
       shots++;
     }
     this.stats.shots += shots;
@@ -337,7 +406,7 @@ export class PlayScene {
     this.missileTimer -= dt;
     if (this.missileTimer > 0 || this.missileTargets.length === 0) return;
     this.missileTimer = PLAYER.missileEvery;
-    for (const side of [-1, 1]) this.playerBullets.push(new PlayerMissile(player.x + side * 12, player.y, side));
+    for (const side of [-1, 1]) this.playerBullets.push(new PlayerMissile(player.x + side * 12, player.y, side, { damage: PLAYER.missileDamage * this.damageFactor }));
     this.stats.shots += 2;
   }
 
@@ -504,6 +573,8 @@ export class PlayScene {
       const button = input.tap ? pauseButtonAt(input.tap) : null;
       if (button === 'menu' || input.wasPressed('quit')) {
         this.exitToMenu();
+      } else if (button === 'buffs' || input.wasPressed('buffs')) {
+        this.openBuffs();
       } else if (button === 'resume' || (!input.tap && (input.wasPressed('pause') || input.wasPressed('confirm'))) || (input.tap && input.wasPressed('pause'))) {
         this.state = 'playing';
         this.audio.resume();
@@ -604,7 +675,13 @@ export class PlayScene {
     this.collectMissileTargets();
     if (active) this.fireMissiles(dt);
     for (const b of this.playerBullets) b.update(dt, this);
-    for (const b of this.enemyBullets) b.update(dt, this);
+    // TEMPO BALA: no modo foco, os projéteis inimigos ficam mais lentos.
+    const slow = this.player.buffs.has('bulletTime') && this.player.focused && this.player.alive ? BUFF_TUNING.bulletTimeFactor : 1;
+    for (const b of this.enemyBullets) b.update(dt * slow, this);
+    if (active) {
+      this.ricochetTimer = Math.max(0, this.ricochetTimer - dt);
+      if (this.boss.state === 'fight') this.superTimer += dt;
+    }
     for (const m of this.minions) m.update(dt, this);
     for (const p of this.powerUps) p.update(dt);
     for (const h of this.hazards) h.update(dt);
@@ -675,6 +752,11 @@ export class PlayScene {
           particles.hitSpark(hit.x, hit.y, '#94b0c2');
           this.audio.play('tink');
         }
+        // RICOCHETE: tiro que bate em blindagem vira um míssil teleguiado.
+        if ((!hit.vulnerable || hit.part.armor > 0) && !b.missile && this.player.buffs.has('ricochet') && this.ricochetTimer <= 0) {
+          this.ricochetTimer = BUFF_TUNING.ricochetCooldown;
+          this.playerBullets.push(new PlayerMissile(hit.x, hit.y + 6, Math.random() < 0.5 ? -1 : 1, { damage: PLAYER.missileDamage * this.damageFactor }));
+        }
         continue;
       }
       for (const m of this.minions) {
@@ -692,8 +774,19 @@ export class PlayScene {
 
     if (!player.alive) return;
 
+    // ORBITAIS: os orbes apagam projéteis inimigos.
+    for (const o of this.orbitalPositions()) {
+      for (const e of this.enemyBullets) {
+        if (!e.dead && circleOverlap(o.x, o.y, BUFF_TUNING.orbitalSize, e.x, e.y, e.radius)) {
+          e.dead = true;
+          particles.hitSpark(e.x, e.y, '#73eff7');
+        }
+      }
+    }
+
     // Tiros inimigos x jogador
     for (const e of this.enemyBullets) {
+      if (e.dead) continue;
       if (circleOverlap(player.x, player.y, player.hitRadius, e.x, e.y, e.radius)) {
         e.dead = true;
         player.hit(this);
@@ -857,6 +950,16 @@ export class PlayScene {
     for (const b of this.playerBullets) b.draw(ctx);
     for (const w of this.wingmen) w.draw(ctx, this.sprites);
     this.player.draw(ctx, this.sprites);
+    for (const o of this.orbitalPositions()) {
+      ctx.fillStyle = 'rgba(115, 239, 247, 0.35)';
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, BUFF_TUNING.orbitalSize + 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#73eff7';
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, BUFF_TUNING.orbitalSize - 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
     for (const b of this.enemyBullets) b.draw(ctx);
     for (const h of this.hazards) h.draw(ctx);
     this.particles.draw(ctx);
@@ -992,6 +1095,11 @@ export class PlayScene {
     if (player.double) tags.push({ text: '2X', color: '#41a6f6' });
     if (player.rapidTime > 0) tags.push({ text: `RÁPIDO ${Math.ceil(player.rapidTime)}`, color: '#ef7d57' });
     if (player.shield) tags.push({ text: 'ESCUDO', color: '#38b764' });
+    if (player.buffs.has('supercharge')) {
+      const ready = this.superTimer >= BUFF_TUNING.superEvery;
+      tags.push({ text: ready ? 'SUPER OK' : `SUPER ${Math.ceil(BUFF_TUNING.superEvery - this.superTimer)}`, color: ready ? '#a7f070' : '#566c86' });
+    }
+    if (player.buffs.has('rebirth')) tags.push({ text: this.rebirthUsed ? 'RENASCER USADO' : 'RENASCER', color: this.rebirthUsed ? '#566c86' : '#ef7d57' });
     tags.forEach((tag, i) => {
       drawText(ctx, tag.text, W - 12, H - 76 - i * 12, { size: 7, align: 'right', color: tag.color });
     });
@@ -1046,24 +1154,15 @@ export class PlayScene {
       ctx.strokeStyle = b.id === 'resume' ? UI_COLORS.accent : '#566c86';
       ctx.lineWidth = 2;
       ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
-      const label = b.id === 'resume' ? 'CONTINUAR  (P)' : this.practice ? 'MAPA  (Q)' : 'MENU  (Q)';
+      const pauseKey = keyLabel(this.input.bindings.pause[0]);
+      const label = { resume: `CONTINUAR  (${pauseKey})`, buffs: 'MEUS BUFFS  (I)', menu: this.practice ? 'MAPA  (Q)' : 'MENU  (Q)' }[b.id];
       drawText(ctx, label, W / 2, b.y + b.h / 2, { size: 8, align: 'center', baseline: 'middle' });
     }
-    drawText(ctx, 'M  ligar/desligar som', W / 2, 330, { size: 7, align: 'center', color: UI_COLORS.muted });
-    drawText(ctx, 'SETAS/WASD mover  ESPAÇO atirar', W / 2, 360, { size: 7, align: 'center', color: UI_COLORS.muted });
-    drawText(ctx, 'SHIFT modo foco (lento + hitbox)', W / 2, 376, { size: 7, align: 'center', color: UI_COLORS.muted });
-    if (this.player.buffs.has('dash')) drawText(ctx, 'C  dash', W / 2, 392, { size: 7, align: 'center', color: UI_COLORS.muted });
-    if (this.player.buffs.has('bomb')) drawText(ctx, 'X  bomba de pulso', W / 2, 408, { size: 7, align: 'center', color: UI_COLORS.muted });
-
-    // Lista dos buffs conquistados (4 por linha).
-    const owned = [...this.player.buffs];
-    if (owned.length) {
-      drawText(ctx, 'BUFFS CONQUISTADOS', W / 2, 440, { size: 7, align: 'center', color: UI_COLORS.accent });
-      for (let row = 0; row * 4 < owned.length; row++) {
-        const text = owned.slice(row * 4, row * 4 + 4).map((id) => BUFFS[id].short).join('  ');
-        drawText(ctx, text, W / 2, 458 + row * 14, { size: 6, align: 'center' });
-      }
-    }
+    // Controles atuais (as teclas podem ser trocadas em CONTROLES, no título).
+    controlsHelp(this.input.bindings).forEach((line, i) => {
+      drawText(ctx, line, W / 2, 372 + i * 16, { size: 6, align: 'center', color: UI_COLORS.muted });
+    });
+    drawText(ctx, `BUFFS CONQUISTADOS: ${this.player.buffs.size}/${Object.keys(BUFFS).length}`, W / 2, 420, { size: 7, align: 'center', color: UI_COLORS.accent });
   }
 
   drawGameOver(ctx) {
@@ -1185,7 +1284,7 @@ export class PlayScene {
       const route = c.order.filter((id) => w.minis.includes(id)).map((id) => ENCOUNTERS[id].name).join(' > ');
       drawText(ctx, `${w.number}: ${route || '(seleção de mundo)'}`, W / 2, 362 + i * 13, { size: 6, align: 'center' });
     });
-    drawText(ctx, `PARTES DO LEVIATÃ DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, `PARTES DE ${this.def.name} DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
     this.drawPrompt(ctx, 'ENTER  menu principal');
   }
 

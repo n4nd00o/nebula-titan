@@ -18,18 +18,34 @@ function clearPhase(boss) {
   tick(boss, boss.timing.transition + 0.1);
 }
 
-test('Leviatã tem 8 fases e a câmera avança uma seção por fase', () => {
+// v1.5: 10 fases (eram 8). As fases 8-10 acontecem na seção do núcleo.
+test('Leviatã tem 10 fases; a câmera avança uma seção por fase até o núcleo e depois para', () => {
   const { boss } = fight();
-  assert.equal(boss.phaseCount, 8);
+  assert.equal(boss.phaseCount, 10);
   const ys = [boss.y];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 9; i++) {
     clearPhase(boss);
     tick(boss, 1);
     ys.push(boss.y);
   }
   for (let i = 1; i < ys.length; i++) {
-    assert.ok(Math.abs(ys[i] - ys[i - 1] - 240) < 2, `seção ${i}: avanço de ${ys[i] - ys[i - 1]}px`);
+    const expected = i <= 7 ? 240 : 0;
+    assert.ok(Math.abs(ys[i] - ys[i - 1] - expected) < 2, `fase ${i + 1}: avanço de ${ys[i] - ys[i - 1]}px (esperado ${expected})`);
   }
+  assert.deepEqual(boss.phases.slice(7).map((p) => p.id), ['pylons', 'core', 'lastBreath']);
+});
+
+test('Leviatã (v1.5): raios giratórios nos pilares e núcleo que reacende', () => {
+  const { boss } = fight();
+  for (let i = 0; i < 7; i++) clearPhase(boss);
+  assert.equal(boss.phase.id, 'pylons');
+  tick(boss, 2.5); // passa do aviso
+  assert.ok(boss.lethalSegments().length >= 2, 'os raios giratórios deveriam estar ativos');
+  clearPhase(boss);
+  assert.equal(boss.phase.id, 'core');
+  clearPhase(boss);
+  assert.equal(boss.phase.id, 'lastBreath');
+  assert.ok(boss.isPartVisible(boss.parts.lastCore) && boss.isPartVulnerable(boss.parts.lastCore));
 });
 
 test('blindagem: tiro comum causa bem menos dano que o perfurante', () => {

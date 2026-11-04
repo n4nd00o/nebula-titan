@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { SPRITES, flipH } from '../src/graphics/spriteData.js';
 import { PALETTE, TRANSPARENT } from '../src/graphics/palette.js';
 import { SYMMETRIC_WORLD_SPRITES } from '../src/graphics/spriteDataWorlds.js';
+import { SYMMETRIC_FINAL_SPRITES } from '../src/graphics/spriteDataFinal.js';
 import { BOSSES } from '../src/boss/bosses/index.js';
 import { ALIEN_TYPES } from '../src/entities/alienTypes.js';
 
@@ -34,7 +35,7 @@ test('sprites simétricos são de fato simétricos', () => {
   for (const name of ['player', 'hull', 'plate', 'core', 'cannon', 'sentinel', 'pod', 'barrier', 'hive', 'nest', 'hiveCore', 'reaper', 'wingman', 'alienOrange', 'turret', 'hangar', 'bunker', 'reactor', 'storm', 'bridge', 'levCore']) {
     assert.deepEqual(SPRITES[name].rows, flipH(SPRITES[name].rows), `"${name}" deveria ser simétrico`);
   }
-  for (const name of SYMMETRIC_WORLD_SPRITES) {
+  for (const name of [...SYMMETRIC_WORLD_SPRITES, ...SYMMETRIC_FINAL_SPRITES]) {
     assert.deepEqual(SPRITES[name].rows, flipH(SPRITES[name].rows), `"${name}" deveria ser simétrico`);
   }
 });

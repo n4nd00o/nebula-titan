@@ -22,25 +22,39 @@ import { clamp, easeOutCubic } from '../utils/math.js';
 import { iconFor, MapScene } from './MapScene.js';
 import { PlayScene, SAVE_KEY, UNLOCK_KEY } from './PlayScene.js';
 import { TitleScene } from './TitleScene.js';
+import { BuffsScene } from './BuffsScene.js';
 
 /** Posições dos planetas na tela da galáxia (rota em zigue-zague, de baixo para cima). */
 export const PLANETS = Object.freeze([
-  { x: 130, y: 456 }, { x: 350, y: 358 }, { x: 130, y: 260 }, { x: 350, y: 162 },
+  { x: 120, y: 468 }, { x: 360, y: 390 }, { x: 120, y: 312 }, { x: 360, y: 234 }, { x: 240, y: 150 },
 ]);
-const PLANET_R = 36;
+const PLANET_R = 32;
 
 /** Posição da nave "VOCÊ ESTÁ AQUI": ao lado do planeta, no lado de fora da tela. */
 const shipSpot = (p) => ({ x: p.x < W / 2 ? p.x - PLANET_R - 30 : p.x + PLANET_R + 30, y: p.y });
 
 /** Sprite de alienígena que representa os setores de cada mundo. */
-const STAGE_ICONS = ['minion', 'alienBlue', 'alienPurple', 'alienRed'];
+const STAGE_ICONS = ['minion', 'alienBlue', 'alienPurple', 'alienRed', 'alienRed'];
 const STAGE_ICONS_W1 = { stage1: 'minion', stage2: 'alienOrange' };
 
 /** Botão "voltar" no canto superior esquerdo. */
 const BACK = Object.freeze({ x: 8, y: 8, w: 96, h: 30 });
+/** Botão "MEUS BUFFS" no canto superior direito (v1.5). */
+const BUFFS_BUTTON = Object.freeze({ x: W - 104, y: 8, w: 96, h: 30 });
 
 /** Layout das fases internas de um mundo (y cresce para baixo). */
 export function worldNodes(world) {
+  if (world.circles) {
+    // Mundo 5: dois círculos de 3 mini-chefes e o Ômega.
+    const xs = [88, W / 2, W - 88];
+    const nodes = [
+      ...world.circles[0].map((id, i) => ({ id, x: xs[i], y: 476, r: 30 })),
+      ...world.circles[1].map((id, i) => ({ id, x: xs[i], y: 356, r: 30 })),
+      { id: world.boss, x: W / 2, y: 222, r: 40 },
+    ];
+    const links = [[0, 3], [1, 4], [2, 5], [3, 6], [4, 6], [5, 6]];
+    return { nodes, links };
+  }
   const [s1, s2] = world.stages;
   const [a, b, c] = world.minis;
   const bossY = world.finale ? 262 : 236;
@@ -138,6 +152,11 @@ export class ProgressScene {
       this.goBack();
       return;
     }
+    if (input.wasPressed('buffs') || inside(input.tap, BUFFS_BUTTON)) {
+      this.game.audio.play('select');
+      this.game.changeScene(new BuffsScene(this.game, { buffs: this.save?.buffs ?? new Set(), returnTo: this }));
+      return;
+    }
     if (this.view === 'galaxy') this.updateGalaxy(input);
     else this.updateWorld(input);
   }
@@ -232,6 +251,13 @@ export class ProgressScene {
     ctx.strokeRect(BACK.x + 0.5, BACK.y + 0.5, BACK.w - 1, BACK.h - 1);
     const label = this.view === 'world' ? '< MUNDOS' : this.back === 'route' && this.save ? '< ROTA' : '< MENU';
     drawText(ctx, label, BACK.x + BACK.w / 2, BACK.y + BACK.h / 2, { size: 7, align: 'center', baseline: 'middle' });
+
+    const b = BUFFS_BUTTON;
+    ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeStyle = '#566c86';
+    ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+    drawText(ctx, 'BUFFS (I)', b.x + b.w / 2, b.y + b.h / 2, { size: 7, align: 'center', baseline: 'middle' });
   }
 
   // ---------------------------------------------------- tela da galáxia
@@ -457,7 +483,7 @@ export class ProgressScene {
     const y = H - 78;
     const color = { done: '#38b764', available: '#ffcd75', locked: '#566c86' }[enc.status];
     this.drawPanel(ctx, y, 70, color);
-    const kind = { stage: 'SETOR', mini: 'MINI-CHEFE', boss: 'CHEFE DO MUNDO', finale: 'CHEFE FINAL' }[enc.kind];
+    const kind = { stage: 'SETOR', mini: 'MINI-CHEFE', boss: this.worldInfo.world.circles ? 'CHEFE FINAL' : 'CHEFE DO MUNDO', finale: 'CHEFE FINAL' }[enc.kind];
     drawText(ctx, `${kind} · ${def.name}`, W / 2, y + 10, { size: 8, align: 'center', color: UI_COLORS.boss });
     drawText(ctx, def.description, W / 2, y + 28, { size: 6, align: 'center' });
     const action = {

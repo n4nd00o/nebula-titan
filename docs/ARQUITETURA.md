@@ -161,6 +161,16 @@ O estado da campanha (chefes derrotados, buffs, rota, pontuação e estatística
 
 As **vidas** vivem na campanha (`campaign.lives`, máx. 5) e passam de fase em fase; a **vida extra por pontuação** usa `campaign.nextLifeAt`, que persiste entre as fases e é reiniciado no *continue*.
 
+### 4.1b Mundo 5, escala por buffs e telas novas (v1.5)
+
+- **`WORLDS[4].circles`**: `available()` devolve os mini-chefes do primeiro círculo com algum chefe vivo. Assim o 2º círculo abre sozinho quando o 1º cai. `Campaign.circleOf(id)` diz o círculo de cada um (usado pelos mapas).
+- **Escala por buffs:** `difficultyFor(id)` multiplica `hpScale` por `1 + 0,04 × buffs` e `attackRate` por `1 + 0,012 × buffs` para os ids em `WORLD_BOSS_IDS`.
+- **`FINAL_BOSS_ID = 'omega'`**: é a vitória que encerra a campanha (tela de campanha concluída).
+- **`sweepers.js`**: ponteiros-raio (`updateHands`/`handSegments`/`drawHands`), canhões de raio com aviso (`updateCannonBeam`/`cannonSegment`) e chuva de brasas. Tudo entra pelo gancho `segments` que já existia. A colisão continua na cena.
+- **Buffs únicos** na `PlayScene` (constantes em `BUFF_TUNING`): Tempo Bala multiplica o `dt` dos projéteis inimigos; Ricochete cria um `PlayerMissile` no ponto do ricochete; Vampirismo usa o gancho `onPartDestroyed`; Orbitais apagam projéteis em `handleCollisions`; Supercarga cria um `PlayerBullet` perfurante especial; Renascer é tratado em `Player.hit` via `scene.onRebirth`; Ascensão é `damageFactor`.
+- **`BuffsScene`** abre por cima da luta pausada e volta com `Game.resumeScene` (sem `enter()`, a luta não reinicia).
+- **`KeyBindings.js`** (lógica pura): ações remapeáveis com 2 teclas cada, `assignKey` (conflitos), `loadBindings` (validação), `buildKeyMap` (tecla → ação) e `controlsHelp` (textos). O `Input` lê e salva as teclas no `Storage` e tem um modo de **captura** (`input.capture`) usado pela `ControlsScene`.
+
 ### 4.2 Mapa de progresso e treino (v1.4)
 
 Arquivos: [`src/systems/Progress.js`](../src/systems/Progress.js) (lógica pura) e [`src/scenes/ProgressScene.js`](../src/scenes/ProgressScene.js) (tela).

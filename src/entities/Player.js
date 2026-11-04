@@ -138,6 +138,12 @@ export class Player {
       scene.onShieldBreak(this);
       return false;
     }
+    if (this.buffs.has('rebirth') && !scene.rebirthUsed) {
+      // RENASCER: uma vez por luta, não perde a vida.
+      this.invuln = 2.5;
+      scene.onRebirth?.(this);
+      return false;
+    }
     this.alive = false;
     this.lives--;
     this.double = false;

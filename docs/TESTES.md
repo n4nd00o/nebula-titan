@@ -23,20 +23,23 @@ A integração contínua (GitHub Actions, [`.github/workflows/ci.yml`](../.githu
 | 1.1-1.2 | 80 | Mini-chefes, campanha, setores, Leviatã |
 | 1.3 | 172 | 4 mundos, 12 chefes novos, save, mecânicas novas |
 | 1.4.0 | 256 | Garantia contra chefes imortais, hitboxes, mapa de progresso, celular, documentação |
-| **1.4.1** | **257** | **Janela de tiro mínima na garantia (pegou a Hidra) + regressão da Hidra** |
+| 1.4.1 | 257 | Janela de tiro mínima na garantia (pegou a Hidra) + regressão da Hidra |
+| **1.5.0** | **333** | **Mundo 5 (7 chefes novos entram nos testes genéricos e na garantia), buffs únicos, teclas configuráveis, escala por buffs, Leviatã com 10 fases** |
 
 ## 3. Catálogo por arquivo
 
 | Arquivo | Testes | O que garante |
 |---|---|---|
+| [`buffs.test.js`](../tests/buffs.test.js) | 8 | Buffs únicos do Mundo 5 com a **PlayScene real** e um jogo falso: Orbitais apagam projéteis, Tempo Bala desacelera no foco, Supercarga (8x, perfurante, a cada 5 s), Ascensão (+25%), Renascer (uma vez por luta), Vampirismo e Ricochete; a tela Meus Buffs cobre todos os buffs |
+| [`controls.test.js`](../tests/controls.test.js) | 8 | **Teclas configuráveis**: todas as ações remapeáveis, conflito transfere a tecla sem deixar ação vazia, teclas reservadas, apagar alternativa, dados salvos inválidos, o `Input` real respondendo à nova tecla e salvando, ESC sempre pausa, textos de ajuda |
 | [`boss.test.js`](../tests/boss.test.js) | 15 | Nebula Titan: entrada invulnerável, alvos de cada fase, inclinação ao perder asa, quebra antecipada, fase pulada, fluxo completo, ricochete × dano, **colisão por pixel** e 3 testes de regressão de hitbox |
-| [`minibosses.test.js`](../tests/minibosses.test.js) | 73 | **Testes genéricos** para cada chefe registrado (definição válida, alvo atingível no centro, fluxo até a derrota, 20 s de luta sem quebrar) + mecânicas da Sentinela, Colmeia e Ceifador |
-| [`reachability.test.js`](../tests/reachability.test.js) | 71 | **Garantia "nenhum chefe imortal"** e **hitboxes** (ver seção 4) |
+| [`minibosses.test.js`](../tests/minibosses.test.js) | 101 | **Testes genéricos** para cada chefe registrado (definição válida, alvo atingível no centro, fluxo até a derrota, 20 s de luta sem quebrar) + mecânicas da Sentinela, Colmeia e Ceifador |
+| [`reachability.test.js`](../tests/reachability.test.js) | 99 | **Garantia "nenhum chefe imortal"** e **hitboxes** (ver seção 4) |
 | [`worlds.test.js`](../tests/worlds.test.js) | 19 | Mundos 2-4: projéteis que se dividem/fazem curva/aceleram, mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo (Hidra, Escaravelho, Vórtice, Gêmeos, Fornalha, Martelo, Égide, Espectro, Eco, Arconte) |
-| [`campaign.test.js`](../tests/campaign.test.js) | 16 | Ordem obrigatória (setores → mini-chefes → chefe), buffs em qualquer ordem, bônus de mundo, Leviatã só após o Arconte, dificuldade crescente, seleção de mundo, **salvar/carregar** (e saves inválidos), vidas, *continue*, corrida perfeita |
+| [`campaign.test.js`](../tests/campaign.test.js) | 19 | **5 mundos**, os dois círculos do Mundo 5, chefes de mundo que **escalam com os buffs** (e mini-chefes que não), origem de cada buff, ordem obrigatória (setores → mini-chefes → chefe), buffs em qualquer ordem, bônus de mundo, Leviatã só após o Arconte, dificuldade crescente, seleção de mundo, **salvar/carregar** (e saves inválidos), vidas, *continue*, corrida perfeita |
 | [`progress.test.js`](../tests/progress.test.js) | 11 | **Mapa de progresso**: status das fases e mundos, histórico que sobrevive ao fim da campanha, saves antigos, layout sem sobreposição. **Celular**: zonas de toque, botões da pausa, vibração (inclusive sem suporte) |
 | [`stages.test.js`](../tests/stages.test.js) | 22 | Setores: ondas cabem na formação, vagas únicas, inimigos entram/formam/mergulham/atiram, cada mundo traz um alienígena novo, setores mais agressivos a cada mundo |
-| [`leviathan.test.js`](../tests/leviathan.test.js) | 6 | Leviatã: 8 fases com câmera por seção, blindagem × perfurante, regeneração, sem dano por contato, paredes de laser |
+| [`leviathan.test.js`](../tests/leviathan.test.js) | 7 | Leviatã: **10 fases** (câmera por seção até o núcleo, depois fixa), raios giratórios dos pilares, núcleo que reacende, blindagem × perfurante, regeneração, sem dano por contato, paredes de laser |
 | [`leviathanHull.test.js`](../tests/leviathanHull.test.js) | 1 | Regressão v1.2.1: o casco do Leviatã é recortado com **uma** operação `destination-in` (antes ficava invisível) |
 | [`sprites.test.js`](../tests/sprites.test.js) | 5 | Integridade da arte: linhas com a mesma largura, cores da paleta, espelhamento e simetria, todo sprite usado existe |
 | [`collision.test.js`](../tests/collision.test.js) | 4 | AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento |
@@ -77,6 +80,7 @@ Ele vale **automaticamente** para todo chefe registrado em `src/boss/bosses/inde
 | 1.4 | **Vórtice imortal** na fase 2 (anel envolvendo o Olho) | `reachability.test.js` |
 | 1.4 | **Oráculo imortal** na fase 2 (mandala envolvendo o Olho) | `reachability.test.js` |
 | 1.4 | Hitbox dos alienígenas menor que o sprite | `reachability.test.js` (raio × sprite) |
+| 1.5.0 | Véu do Ômega intangível justamente no início da fase (o ciclo usava o relógio global do chefe) | `minibosses.test.js` (alvo atingível no início da fase) |
 | 1.4.1 | **Hidra imortal** na fase 3: o corpo bloqueava as escamas de cima depois que as de baixo caíam (o teste antigo aceitava uma fresta de 3 px) | `reachability.test.js` (janela mínima + regressão da Hidra) |
 
 ## 6. Verificação além dos testes automatizados

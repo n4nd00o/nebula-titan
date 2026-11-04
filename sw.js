@@ -8,7 +8,7 @@
  * Na instalação, já guarda os arquivos essenciais para a 1ª visita offline.
  * Trocar CACHE_VERSION descarta caches antigos.
  */
-const CACHE_VERSION = 'nebula-titan-v1.4.0';
+const CACHE_VERSION = 'nebula-titan-v1.5.0';
 const CORE = [
   './',
   './index.html',
