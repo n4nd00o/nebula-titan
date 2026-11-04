@@ -18,7 +18,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
   - **PWA**: `manifest.webmanifest`, ícones e service worker (`sw.js`, rede primeiro com cache de reserva) para instalar e jogar **offline**;
   - sem menu de contexto, zoom por toque duplo ou "puxar para atualizar".
 - **Testes de garantia** (`tests/reachability.test.js`): cada chefe é vencido só com tiros retos vindos de baixo (como o jogador atira), fase por fase; hitbox = sprite; nenhum acerto fora do desenho; raio dos alienígenas compatível com o sprite.
-- 81 testes novos (total: 253), incluindo `tests/progress.test.js`.
+- 84 testes novos (total: 256), incluindo `tests/progress.test.js` e `tests/docs.test.js` (a documentação precisa acompanhar o código).
+- **Documentação dos testes** ([docs/TESTES.md](docs/TESTES.md)): catálogo por arquivo, garantia contra chefes imortais e bugs que viraram teste.
+- **Relatórios de entrega** ([docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)): o relatório de cada versão na íntegra, como registro permanente do progresso.
 
 ### Corrigido
 - **Vórtice imortal na fase 2**: o anel do casco envolvia o Olho do Furacão por completo e todo tiro ricocheteava nele. O anel deixa de bloquear tiros na fase do Olho (`solidUntilPhase: 1`).

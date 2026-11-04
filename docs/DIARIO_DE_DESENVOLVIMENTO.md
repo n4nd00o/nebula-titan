@@ -32,6 +32,7 @@ No teste de jogo, o **Vórtice** (mini-chefe do Mundo 2) ficou **imortal**. Pedi
 - Teste de "acerta no centro" não é teste de jogabilidade: o teste precisa **jogar do jeito que o jogador joga** (de onde o tiro vem, por onde ele passa).
 - Um teste genérico bom acha bugs que ninguém reportou ainda (o Oráculo).
 - No celular, todo comando de teclado precisa de um equivalente tocável (sair da pausa, voltar ao menu, ligar o som).
+- **Decisão de processo:** nada que registra o progresso é apagado. Os relatórios de cada versão ficam arquivados na íntegra em [RELATORIOS_DE_ENTREGA.md](RELATORIOS_DE_ENTREGA.md), os testes têm catálogo próprio em [TESTES.md](TESTES.md) e um teste (`docs.test.js`) falha se a documentação ficar para trás.
 
 ---
 
