@@ -5,7 +5,8 @@
  *   só uma, ela RENASCE depois de 9 s: é preciso derrubar as duas em sequência.
  * Fase 2 (Cabeça Central): a cabeça do meio carrega um SOPRO CONGELANTE
  *   (raio letal com aviso) que varre a tela em direção à nave.
- * Fase 3 (Escamas de Gelo): quatro escamas BLINDADAS protegem o peito.
+ * Fase 3 (Escamas de Gelo): quatro escamas BLINDADAS protegem o peito. As de baixo
+ *   cobrem as de cima: derrube as de baixo primeiro (o corpo não bloqueia tiros nesta fase).
  * Fase 4 (Coração): o coração fica exposto e regenera; a Hidra enfurece.
  */
 import { GAME_WIDTH } from '../../config.js';
@@ -38,7 +39,9 @@ const scaleDef = (id, ox, oy, drop) => ({
 });
 
 const PARTS = [
-  { id: 'body', name: 'Corpo da Hidra', sprite: 'hydraBody', ox: 0, oy: 0, look: 'none', solidUntilPhase: 3 },
+  // O corpo deixa de bloquear tiros na fase das escamas: senão, quando as escamas de baixo
+  // caem, ele fica entre o tiro e as escamas de cima (bug da v1.4.0: Hidra imortal na fase 3).
+  { id: 'body', name: 'Corpo da Hidra', sprite: 'hydraBody', ox: 0, oy: 0, look: 'none', solidUntilPhase: 2 },
   {
     id: 'heart', name: 'Coração Glacial', sprite: 'hydraHeart', ox: 0, oy: -2, hp: 150, regen: 3, regenDelay: 1.5,
     phase: 3, visibleFromPhase: 3, look: 'remove', points: 15000, pulse: true, explosionScale: 3,

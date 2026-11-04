@@ -6,6 +6,30 @@
 
 ---
 
+## [1.4.1] - 2026-11-04
+
+**Pedido:** "A Hidra Glacial, chefe do setor 2, não tem como destruir os pontos fracos de cima na fase 3."
+
+A **v1.4.1** corrige a Hidra Glacial. Os 257 testes passam.
+
+#### O problema
+Na fase 3, as escamas de baixo ficam logo abaixo das de cima. Quando elas caíam, o que sobrava embaixo das escamas de cima era o **corpo** da Hidra, que é sólido e indestrutível. O tiro batia no corpo e ricocheteava. Só uma fresta de 3 px na borda de uma escama deixava o tiro passar.
+
+#### Por que o teste de garantia não pegou
+Ele aceitava **uma única coluna** de acerto como prova de que dava para atingir o alvo. A fresta de 3 px bastava para o teste, mas ninguém consegue mirar nela jogando.
+
+#### O que mudou
+- **Teste mais rígido primeiro:** um ponto fraco só conta como alcançável se houver uma **janela de tiro de pelo menos 12 px**. Com essa regra o teste passou a falhar na Hidra, e em nenhum outro chefe. Isso prova que agora ele enxerga esse tipo de problema em todos os 17.
+- **Correção:** o corpo deixa de bloquear tiros a partir da fase das escamas. As escamas de cima ficaram com uma janela de cerca de 33 px cada. Continua valendo a ordem: derrube as de baixo primeiro.
+- **Teste de regressão** específico da Hidra.
+
+A documentação (CHANGELOG, diário, `docs/TESTES.md` e READMEs) está atualizada, e este relatório também foi arquivado em `docs/RELATORIOS_DE_ENTREGA.md`.
+
+#### O que fica com você
+- Jogar a fase 3 da Hidra de novo para confirmar.
+
+---
+
 ## [1.4.0] - 2026-11-04
 
 **Pedido:** corrigir o Vórtice imortal, criar testes de garantia para que nenhum outro chefe fique assim, garantir as hitboxes, fazer um mapa de progresso dos 4 mundos com as fases internas e melhorar o jogo para celular.

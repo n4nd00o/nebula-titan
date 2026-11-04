@@ -9,6 +9,11 @@
  * Esse teste pegou o bug do Vórtice (v1.3.0): o anel do casco envolvia o Olho
  * do Furacão por completo, e todo tiro vindo de baixo ricocheteava no anel.
  *
+ * v1.4.1: o alvo precisa de uma JANELA DE TIRO de pelo menos MIN_OPEN_WIDTH px
+ * (colunas vizinhas que chegam a ele). Antes bastava UMA coluna, e a Hidra
+ * passava no teste com uma fresta de 3 px na borda de uma escama, impossível
+ * de acertar jogando de verdade.
+ *
  * Vale automaticamente para TODOS os chefes registrados, inclusive futuros.
  */
 import { test } from 'node:test';
@@ -23,20 +28,45 @@ const SCAN_EVERY = 6; // varre a tela a cada 0,1 s
 const DAMAGE_PER_SCAN = 2; // ~20 de dano/s (bem acima do jogador real: o teste mede ALCANCE, não balanço)
 const PHASE_LIMIT = 120; // segundos máximos por fase antes de declarar "imortal"
 const BULLET_RADIUS = 3; // raio do tiro do jogador (src/entities/projectiles.js)
+const SCAN_STEP = 2; // distância entre as colunas de tiro testadas (px)
+export const MIN_OPEN_WIDTH = 12; // largura mínima da janela de tiro para um alvo contar como alcançável (px)
 
 /**
- * Varre colunas da tela com tiros retos para cima (de y = 630 até o topo).
- * Retorna o primeiro acerto em um ponto fraco ainda vivo (ou null).
+ * Varre colunas da tela com tiros retos para cima (de y = 630 até o topo) e mede,
+ * para cada ponto fraco, a MAIOR janela contínua de colunas que chegam até ele.
+ * @returns {Map<string, {part, width:number}>}
  */
-function scanShots(boss, prefer) {
-  let fallback = null;
-  for (let x = 12; x <= GAME_WIDTH - 12; x += 4) {
+export function openWindows(boss) {
+  const windows = new Map();
+  let run = null;
+  const close = () => {
+    if (!run) return;
+    const prev = windows.get(run.part.id);
+    if (!prev || run.width > prev.width) windows.set(run.part.id, run);
+    run = null;
+  };
+  for (let x = 12; x <= GAME_WIDTH - 12; x += SCAN_STEP) {
     const hit = boss.hitTestPath(x, GAME_HEIGHT - 10, x, -10, BULLET_RADIUS);
-    if (!hit || !hit.vulnerable) continue;
-    if (prefer.has(hit.part.id)) return hit;
-    fallback ??= hit;
+    const part = hit && hit.vulnerable ? hit.part : null;
+    if (part && run && run.part === part) run.width += SCAN_STEP;
+    else {
+      close();
+      if (part) run = { part, width: SCAN_STEP };
+    }
   }
-  return fallback;
+  close();
+  return windows;
+}
+
+/** Escolhe um alvo da fase com janela de tiro jogável (ou null). */
+function scanShots(boss, prefer) {
+  let best = null;
+  for (const w of openWindows(boss).values()) {
+    if (w.width < MIN_OPEN_WIDTH) continue;
+    const score = (prefer.has(w.part.id) ? 1000 : 0) + w.width;
+    if (!best || score > best.score) best = { ...w, score };
+  }
+  return best;
 }
 
 /** Joga a luta inteira atirando só de baixo. Retorna o relatório por fase. */
@@ -144,5 +174,23 @@ test('Alienígenas: hitbox circular cobre o corpo do sprite (nem menor, nem maio
     const halfH = (rows.length * PIXEL_SIZE) / 2;
     assert.ok(info.radius >= halfH, `${type}: raio ${info.radius} menor que meia altura ${halfH}`);
     assert.ok(info.radius <= halfW, `${type}: raio ${info.radius} maior que meia largura ${halfW}`);
+  }
+});
+
+test('Hidra (regressão v1.4.0): as escamas de cima ficam alcançáveis depois que as de baixo caem', async () => {
+  const { tick } = await import('./helpers.js');
+  const boss = new Boss(createFakeWorld(), BOSSES.hydra);
+  tickUntilFight(boss);
+  boss.passive = true;
+  for (let i = 0; i < 2; i++) {
+    for (const id of boss.phase.targets) boss.applyDamage(boss.parts[id], 9999);
+    tick(boss, boss.timing.transition + 0.2);
+  }
+  assert.equal(boss.phase.id, 'scales');
+  for (const id of ['scaleC', 'scaleD']) boss.applyDamage(boss.parts[id], 9999);
+  const windows = openWindows(boss);
+  for (const id of ['scaleA', 'scaleB']) {
+    const w = windows.get(id)?.width ?? 0;
+    assert.ok(w >= MIN_OPEN_WIDTH, `${id}: janela de tiro de ${w} px (mínimo ${MIN_OPEN_WIDTH})`);
   }
 });

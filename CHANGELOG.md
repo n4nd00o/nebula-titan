@@ -3,6 +3,15 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.4.1] - 2026-11-04
+
+### Corrigido
+- **Hidra Glacial imortal na fase 3 (Escamas de Gelo):** depois que as duas escamas de baixo caíam, o **corpo** (sólido e indestrutível) ficava entre o tiro e as escamas de cima. Sobrava só uma fresta de 3 px na borda de uma escama. O corpo agora deixa de bloquear tiros a partir da fase das escamas (`solidUntilPhase: 2`).
+
+### Alterado
+- **Teste de garantia mais rígido:** um ponto fraco só conta como alcançável se tiver uma **janela de tiro de pelo menos 12 px** (colunas vizinhas que chegam até ele), medida a cada 2 px. Antes bastava uma coluna, e a Hidra passava no teste com a fresta de 3 px. Com a regra nova, o teste acusa a Hidra e mais nenhum chefe.
+- Teste de regressão da Hidra (total: 257 testes).
+
 ## [1.4.0] - 2026-11-04
 
 ### Adicionado

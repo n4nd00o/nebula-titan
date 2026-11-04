@@ -5,6 +5,27 @@
 
 ---
 
+## 04/11/2026: Versão 1.4.1 (Hidra imortal na fase 3)
+
+### Motivação
+No teste de jogo, as **escamas de cima** da Hidra Glacial (chefe do Mundo 2) não podiam ser destruídas na fase 3.
+
+### Causa
+As escamas de baixo ficam logo abaixo das de cima. Quando elas caem, quem aparece embaixo das escamas de cima é o **corpo** da Hidra, que é sólido e indestrutível até a fase 4. O tiro sobe, bate no corpo e ricocheteia. Sobrava só uma fresta de 3 px na borda de uma escama.
+
+### Por que o teste de garantia não pegou
+Ele aceitava **uma única coluna** de acerto como prova de que o alvo era alcançável, e a fresta de 3 px bastou. Um teste pode passar e mesmo assim não refletir o jogo: "alcançável" precisa significar "dá para mirar".
+
+### Solução
+1. O teste passou a exigir uma **janela de tiro de pelo menos 12 px** (`openWindows`). Com isso, ele falhou na Hidra, e em mais nenhum chefe.
+2. O corpo da Hidra deixou de bloquear tiros a partir da fase das escamas (`solidUntilPhase: 2`). As escamas de cima ficaram com janelas de ~33 px.
+3. Um teste de regressão específico mede a janela das escamas de cima depois que as de baixo caem.
+
+### Aprendizado
+Primeiro o teste foi deixado **mais rígido até reproduzir o bug** e só depois veio a correção. Assim fica provado que o teste agora enxerga esse tipo de problema em qualquer chefe.
+
+---
+
 ## 04/11/2026: Versão 1.4 (mapa de progresso, celular e garantia contra chefes imortais)
 
 ### Motivação

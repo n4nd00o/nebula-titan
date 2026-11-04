@@ -22,7 +22,8 @@ A integração contínua (GitHub Actions, [`.github/workflows/ci.yml`](../.githu
 | 1.0 | 61 | Motor, chefe Nebula Titan, colisão, pontuação, sprites |
 | 1.1-1.2 | 80 | Mini-chefes, campanha, setores, Leviatã |
 | 1.3 | 172 | 4 mundos, 12 chefes novos, save, mecânicas novas |
-| **1.4** | **256** | **Garantia contra chefes imortais, hitboxes, mapa de progresso, celular** |
+| 1.4.0 | 256 | Garantia contra chefes imortais, hitboxes, mapa de progresso, celular, documentação |
+| **1.4.1** | **257** | **Janela de tiro mínima na garantia (pegou a Hidra) + regressão da Hidra** |
 
 ## 3. Catálogo por arquivo
 
@@ -30,7 +31,7 @@ A integração contínua (GitHub Actions, [`.github/workflows/ci.yml`](../.githu
 |---|---|---|
 | [`boss.test.js`](../tests/boss.test.js) | 15 | Nebula Titan: entrada invulnerável, alvos de cada fase, inclinação ao perder asa, quebra antecipada, fase pulada, fluxo completo, ricochete × dano, **colisão por pixel** e 3 testes de regressão de hitbox |
 | [`minibosses.test.js`](../tests/minibosses.test.js) | 73 | **Testes genéricos** para cada chefe registrado (definição válida, alvo atingível no centro, fluxo até a derrota, 20 s de luta sem quebrar) + mecânicas da Sentinela, Colmeia e Ceifador |
-| [`reachability.test.js`](../tests/reachability.test.js) | 70 | **Garantia "nenhum chefe imortal"** e **hitboxes** (ver seção 4) |
+| [`reachability.test.js`](../tests/reachability.test.js) | 71 | **Garantia "nenhum chefe imortal"** e **hitboxes** (ver seção 4) |
 | [`worlds.test.js`](../tests/worlds.test.js) | 19 | Mundos 2-4: projéteis que se dividem/fazem curva/aceleram, mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo (Hidra, Escaravelho, Vórtice, Gêmeos, Fornalha, Martelo, Égide, Espectro, Eco, Arconte) |
 | [`campaign.test.js`](../tests/campaign.test.js) | 16 | Ordem obrigatória (setores → mini-chefes → chefe), buffs em qualquer ordem, bônus de mundo, Leviatã só após o Arconte, dificuldade crescente, seleção de mundo, **salvar/carregar** (e saves inválidos), vidas, *continue*, corrida perfeita |
 | [`progress.test.js`](../tests/progress.test.js) | 11 | **Mapa de progresso**: status das fases e mundos, histórico que sobrevive ao fim da campanha, saves antigos, layout sem sobreposição. **Celular**: zonas de toque, botões da pausa, vibração (inclusive sem suporte) |
@@ -52,10 +53,12 @@ Utilitário compartilhado: [`helpers.js`](../tests/helpers.js) cria um **mundo f
 **Como funciona** (`playByShooting` em `reachability.test.js`):
 1. Cria o chefe com o mundo falso e espera o combate começar.
 2. A cada 0,1 s de luta, varre a tela inteira com **tiros retos que sobem do fundo**, usando o mesmo `hitTestPath` da cena de jogo.
-3. Só causa dano quando o tiro chega a um ponto fraco **sem bater em outra peça antes**.
+3. Só causa dano quando o tiro chega a um ponto fraco **sem bater em outra peça antes**, e só se houver uma **janela de tiro** de pelo menos **12 px** (colunas vizinhas, testadas a cada 2 px, que chegam ao mesmo alvo). Uma fresta menor não conta: na prática ninguém consegue mirar nela com o chefe se movendo.
 4. Se uma fase passa de **120 s** sem terminar, o teste falha e diz qual alvo nunca foi alcançado.
 
 Ele vale **automaticamente** para todo chefe registrado em `src/boss/bosses/index.js`. Na primeira execução, encontrou também o **Oráculo**, com o mesmo defeito, antes de qualquer jogador.
+
+**Lição da v1.4.1:** a primeira versão aceitava uma única coluna de acerto. A **Hidra Glacial** passou assim, por uma fresta de 3 px na borda de uma escama, mas no jogo real as escamas de cima eram impossíveis de destruir (o corpo bloqueava o resto). A regra da janela mínima fecha essa brecha, e `openWindows(boss)` (exportada pelo teste) mede a janela de cada alvo.
 
 **Hitboxes** (mesmo arquivo):
 - máscara de colisão = sprite (linhas retangulares, pixels visíveis, caixa dos marcadores do tamanho do sprite);
@@ -74,6 +77,7 @@ Ele vale **automaticamente** para todo chefe registrado em `src/boss/bosses/inde
 | 1.4 | **Vórtice imortal** na fase 2 (anel envolvendo o Olho) | `reachability.test.js` |
 | 1.4 | **Oráculo imortal** na fase 2 (mandala envolvendo o Olho) | `reachability.test.js` |
 | 1.4 | Hitbox dos alienígenas menor que o sprite | `reachability.test.js` (raio × sprite) |
+| 1.4.1 | **Hidra imortal** na fase 3: o corpo bloqueava as escamas de cima depois que as de baixo caíam (o teste antigo aceitava uma fresta de 3 px) | `reachability.test.js` (janela mínima + regressão da Hidra) |
 
 ## 6. Verificação além dos testes automatizados
 

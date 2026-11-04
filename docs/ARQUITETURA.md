@@ -422,7 +422,7 @@ flowchart LR
 | Unitário | `node:test` | Matemática, colisão, pontuação, integridade dos sprites |
 | Lógica de domínio | `node:test` + mundo falso (`Proxy`) | Todas as fases e transições do Titã, quebra antecipada, hit test por pixel |
 | Testes genéricos | Laço sobre `BOSSES` | Para **cada chefe registrado**: definição válida, alvos atingíveis, fluxo completo, estabilidade em 20 s de luta |
-| Garantia de jogabilidade (v1.4) | `tests/reachability.test.js` | Para **cada chefe**: vence a luta só com tiros retos vindos de baixo, passando pelo `hitTestPath` real (nenhuma fase imortal); hitbox = sprite; sem acerto fantasma; raio dos alienígenas compatível com o sprite |
+| Garantia de jogabilidade (v1.4) | `tests/reachability.test.js` | Para **cada chefe**: vence a luta só com tiros retos vindos de baixo, passando pelo `hitTestPath` real e exigindo uma janela de tiro de 12 px ou mais (nenhuma fase imortal); hitbox = sprite; sem acerto fantasma; raio dos alienígenas compatível com o sprite |
 | Documentação (v1.4) | `tests/docs.test.js` | Catálogo de testes completo e relatório de entrega para cada versão (ver [TESTES.md](TESTES.md)) |
 | Progresso e celular (v1.4) | `tests/progress.test.js` | Status das fases e mundos, histórico, saves antigos, layout do mapa sem sobreposição, zonas de toque, botões da pausa e vibração |
 | Campanha | `node:test` | 4 mundos em sequência, setores obrigatórios, buffs e bônus de mundo, Leviatã após o Arconte, dificuldade crescente, seleção de mundo, salvar/carregar, vidas, continue, corrida perfeita |
