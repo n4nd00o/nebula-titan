@@ -70,7 +70,7 @@ export class FormationEnemy {
     this.state = 'waiting';
     this.t = 0;
     this.hp = this.info.hp;
-    this.radius = 12;
+    this.radius = this.info.radius ?? 12;
     this.x = -100;
     this.y = -100;
     this.vx = 0;

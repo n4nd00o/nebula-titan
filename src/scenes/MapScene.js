@@ -11,8 +11,14 @@ import { ENCOUNTERS } from '../encounters.js';
 import { BUFFS, REWARDS } from '../systems/Campaign.js';
 import { PlayScene } from './PlayScene.js';
 import { TitleScene } from './TitleScene.js';
+import { ProgressScene } from './ProgressScene.js';
 
 const NODE_RADIUS = 40;
+
+/** Botões de toque no topo: voltar ao menu e abrir o Mapa de Progresso. */
+const MENU_BUTTON = Object.freeze({ x: 8, y: 8, w: 76, h: 26 });
+const MAP_BUTTON = Object.freeze({ x: W - 84, y: 8, w: 76, h: 26 });
+const inside = (p, r) => p && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 
 /** Ícones dos chefes do Mundo 1 (os chefes novos declaram `icon` na definição). */
 const LEGACY_ICONS = {
@@ -23,7 +29,7 @@ const LEGACY_ICONS = {
   leviathan: { sprite: 'bridge', scale: 0.75 },
 };
 
-const iconFor = (id) => ENCOUNTERS[id].icon ?? LEGACY_ICONS[id] ?? { sprite: 'minion', scale: 1 };
+export const iconFor = (id) => ENCOUNTERS[id].icon ?? LEGACY_ICONS[id] ?? { sprite: 'minion', scale: 1 };
 
 /** Monta os nós do mapa para um mundo. */
 export function buildNodes(world) {
@@ -84,6 +90,16 @@ export class MapScene {
     if (input.wasPressed('left') || input.wasPressed('up')) this.moveSelection(options, pos - 1);
     if (input.wasPressed('right') || input.wasPressed('down')) this.moveSelection(options, pos + 1);
 
+    if (input.wasPressed('map') || inside(input.tap, MAP_BUTTON)) {
+      this.game.audio.play('select');
+      this.game.changeScene(new ProgressScene(this.game, { campaign: this.campaign, focusWorld: this.campaign.worldIndex, back: 'route' }));
+      return;
+    }
+    if (inside(input.tap, MENU_BUTTON)) {
+      this.game.changeScene(new TitleScene(this.game));
+      return;
+    }
+
     // Toque/clique: escolher e iniciar o nó tocado.
     if (input.tap) {
       const hit = this.nodes.findIndex((n) => Math.hypot(n.x - input.tap.x, n.y - input.tap.y) < NODE_RADIUS);
@@ -94,7 +110,7 @@ export class MapScene {
       }
     }
 
-    if (input.wasPressed('confirm') || input.wasPressed('fire')) this.start();
+    if (!input.tap && (input.wasPressed('confirm') || input.wasPressed('fire'))) this.start();
     else if (input.wasPressed('pause') || input.wasPressed('quit')) this.game.changeScene(new TitleScene(this.game));
   }
 
@@ -115,6 +131,14 @@ export class MapScene {
     const { campaign, world } = this;
     const sprites = this.game.sprites;
 
+    for (const [b, label] of [[MENU_BUTTON, '< MENU'], [MAP_BUTTON, 'MAPA (TAB)']]) {
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.strokeStyle = '#566c86';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      drawText(ctx, label, b.x + b.w / 2, b.y + b.h / 2, { size: 6, align: 'center', baseline: 'middle', color: UI_COLORS.muted });
+    }
     drawText(ctx, `MUNDO ${world.number}: ${world.name}`, W / 2, 16, { size: 8, align: 'center', color: world.theme.accent });
     drawText(ctx, 'ROTA DE ATAQUE', W / 2, 32, { size: 16, align: 'center', color: UI_COLORS.accent });
     drawText(ctx, 'Escolha o próximo alvo. A ordem importa!', W / 2, 56, { size: 6, align: 'center', color: UI_COLORS.muted });
@@ -143,7 +167,7 @@ export class MapScene {
 
     // Setores do mundo já vencidos
     const sectors = world.stages.map((id) => `${ENCOUNTERS[id].name} OK`).join('   ');
-    drawText(ctx, sectors, W / 2, 437, { size: 6, align: 'center', color: '#38b764' });
+    drawText(ctx, sectors, W / 2, 112, { size: 6, align: 'center', color: '#38b764' });
 
     this.nodes.forEach((node, i) => this.drawNode(ctx, sprites, node, i === this.selected));
     this.drawInfo(ctx);
@@ -164,7 +188,7 @@ export class MapScene {
       drawText(ctx, 'A FORTALEZA ESTELAR. OITO SEÇÕES.', W / 2, 226, { size: 7, align: 'center', alpha });
     }
 
-    drawText(ctx, '< > escolher   ENTER lutar   ESC menu', W / 2, H - 22, { size: 6, align: 'center', color: '#566c86' });
+    drawText(ctx, this.game.input.touchMode ? 'Toque em um alvo para lutar' : '< > escolher   ENTER lutar   TAB mapa   ESC menu', W / 2, H - 22, { size: 6, align: 'center', color: '#566c86' });
   }
 
   drawNode(ctx, sprites, node, selected) {

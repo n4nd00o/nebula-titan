@@ -15,6 +15,7 @@
 export const ALIEN_TYPES = Object.freeze({
   green: {
     sprite: 'minion',
+    radius: 14, // hitbox circular ~ tamanho do sprite (33x27)
     tier: 'bottom',
     hp: 1,
     escortHp: 2, // quando invocado por um chefe (sem formação), aguenta mais
@@ -26,6 +27,7 @@ export const ALIEN_TYPES = Object.freeze({
   },
   orange: {
     sprite: 'alienOrange',
+    radius: 16, // hitbox circular ~ tamanho do sprite (39x27)
     tier: 'top',
     hp: 3,
     escortHp: 3,
@@ -38,6 +40,7 @@ export const ALIEN_TYPES = Object.freeze({
   },
   blue: {
     sprite: 'alienBlue',
+    radius: 16, // hitbox circular ~ tamanho do sprite (39x27)
     tier: 'top',
     hp: 7,
     escortHp: 6,
@@ -53,6 +56,7 @@ export const ALIEN_TYPES = Object.freeze({
   },
   purple: {
     sprite: 'alienPurple',
+    radius: 16, // hitbox circular ~ tamanho do sprite (39x27)
     tier: 'bottom',
     hp: 2,
     escortHp: 2,
@@ -65,6 +69,7 @@ export const ALIEN_TYPES = Object.freeze({
   },
   red: {
     sprite: 'alienRed',
+    radius: 16, // hitbox circular ~ tamanho do sprite (39x27)
     tier: 'bottom',
     hp: 1,
     escortHp: 2,

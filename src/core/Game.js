@@ -18,6 +18,7 @@ import { SpriteBank } from '../graphics/SpriteBank.js';
 import { Starfield } from '../systems/Starfield.js';
 import { drawText } from '../graphics/text.js';
 import { TitleScene } from '../scenes/TitleScene.js';
+import { toggleVibration } from './Haptics.js';
 
 export class Game {
   constructor(canvas) {
@@ -42,6 +43,9 @@ export class Game {
     this.loop = this.loop.bind(this);
 
     window.addEventListener('resize', () => this.resize());
+    window.visualViewport?.addEventListener('resize', () => this.resize());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 200));
+    document.addEventListener('fullscreenchange', () => this.resize());
     this.resize();
 
     // Áudio só pode iniciar após interação do usuário (política dos navegadores).
@@ -97,6 +101,8 @@ export class Game {
 
   update(dt) {
     if (this.input.wasPressed('mute')) this.audio.toggleMute();
+    if (this.input.wasPressed('vibration')) toggleVibration(this.storage);
+    if (this.input.wasPressed('fullscreen')) this.toggleFullscreen();
     this.starfield.update(dt);
     this.scene.update(dt);
     this.input.endStep();
@@ -122,9 +128,39 @@ export class Game {
     }
   }
 
-  /** Escala o canvas para caber na janela mantendo a proporção. */
+  // ------------------------------------------------------------ tela cheia
+  get fullscreenSupported() {
+    return Boolean(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  }
+
+  get isFullscreen() {
+    return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  /** Liga/desliga a tela cheia e, no celular, trava em modo retrato. */
+  async toggleFullscreen() {
+    try {
+      if (this.isFullscreen) {
+        await (document.exitFullscreen ?? document.webkitExitFullscreen)?.call(document);
+        return;
+      }
+      const el = document.documentElement;
+      await (el.requestFullscreen ?? el.webkitRequestFullscreen)?.call(el, { navigationUI: 'hide' });
+      await screen.orientation?.lock?.('portrait').catch(() => {});
+    } catch {
+      // Navegador recusou (ex.: iPhone sem suporte): o jogo segue normal.
+    }
+  }
+
+  /**
+   * Escala o canvas para caber na área visível mantendo a proporção.
+   * Usa o tamanho do #app (que já desconta as áreas seguras/notch via CSS).
+   */
   resize() {
-    const scale = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
+    const box = this.canvas.parentElement;
+    const availW = box?.clientWidth || window.innerWidth;
+    const availH = box?.clientHeight || window.innerHeight;
+    const scale = Math.min(availW / GAME_WIDTH, availH / GAME_HEIGHT);
     this.canvas.style.width = `${Math.floor(GAME_WIDTH * scale)}px`;
     this.canvas.style.height = `${Math.floor(GAME_HEIGHT * scale)}px`;
   }

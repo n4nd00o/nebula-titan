@@ -97,6 +97,20 @@ Nova ideia após a v1.2:
 
 **Implementação:** a estrutura de mundo virou dado (`WORLDS`), o motor de chefes ganhou ganchos genéricos (raios letais, gravidade, intangibilidade) e cada mundo apresenta um alienígena novo e uma família de mecânicas (Mundo 2: projéteis que se dividem e gravidade; Mundo 3: raios e fogo; Mundo 4: intangibilidade, *bullet hell* e imitação do jogador).
 
+### 2.6c Evolução na versão 1.4: mapa de progresso e celular
+
+Pedido após o teste de jogo da v1.3:
+
+> *"No mini chefe do setor 2, o chefe Vórtice está ficando imortal, portanto gostaria que fizesse testes de garantia para que nenhum outro fique assim e que garantisse que as hitbox estejam todas certas. Quanto à gameplay, gostaria de fazer um mapa de progresso entre fases completo, mostrando a fase em que está, ou seja, as 4 fases que temos em um mapinha, e clicando por exemplo na fase 2 aparecem as fases internas a ela, além de fazer melhorias para que seja jogado no celular."*
+
+| Pergunta | Decisão | Motivo |
+|---|---|---|
+| O mapa só mostra ou também joga? | **Mostra e permite rejogar fases vencidas como treino** | Praticar um chefe difícil sem arriscar o save |
+| Onde o mapa aparece | **No título e ao concluir um mundo** (e pela Rota de Ataque) | O jogador vê o avanço na hora em que ele acontece |
+| Melhorias para celular | **Botões na tela, tela cheia/retrato, vibração e PWA offline** | Jogar no celular como um app de verdade |
+
+**Implementação:** teste de garantia que joga cada chefe com tiros vindos de baixo (achou o Vórtice e também o Oráculo), `Progress.js` de lógica pura + `ProgressScene`, modo `practice` na `PlayScene` e uma camada de toque centralizada (`touchZone`).
+
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.

@@ -5,6 +5,36 @@
 
 ---
 
+## 04/11/2026: Versão 1.4 (mapa de progresso, celular e garantia contra chefes imortais)
+
+### Motivação
+No teste de jogo, o **Vórtice** (mini-chefe do Mundo 2) ficou **imortal**. Pedidos: corrigir, criar **testes que garantam que nenhum outro chefe fique assim**, conferir **todas as hitboxes**, fazer um **mapa de progresso** com os 4 mundos (tocando em um mundo, aparecem as fases internas) e melhorar o jogo **no celular**. Decisões tomadas antes de começar: o mapa **mostra o progresso e permite rejogar fases vencidas como treino**; aparece **no título e após concluir um mundo**; no celular, **botões na tela, tela cheia/retrato, vibração e PWA offline**.
+
+### O que foi feito
+1. **Causa do Vórtice:** o anel do casco (peça indestrutível e sólida) é um aro fechado que envolve o Olho do Furacão. O tiro do jogador sobe e encosta no aro **antes** de chegar ao Olho, então sempre ricocheteava. O teste genérico de "alvo atingível" passava, porque testava um tiro parado **no centro** da peça.
+2. **Teste de garantia novo:** o teste joga a luta inteira como o jogador: a cada 0,1 s, varre a tela com tiros retos subindo do fundo (`hitTestPath`, o mesmo usado pela cena) e só causa dano quando o tiro chega a um ponto fraco. Se uma fase passa de 120 s sem terminar, o chefe é declarado imortal. Rodando nos 17 chefes, ele achou **um segundo caso, o Oráculo** (a mandala envolvia o Olho do mesmo jeito).
+3. **Hitboxes:** testes de máscara = sprite e de "acerto fantasma". O teste de raio dos alienígenas mostrou que o círculo de colisão (raio 12) era menor que os sprites (33-39 px).
+4. **Mapa de progresso** (`ProgressScene` + `Progress.js` de lógica pura) e **modo treino** na `PlayScene`.
+5. **Celular:** zonas de toque centralizadas em `touchZone()`, botões desenhados no HUD, pausa tocável, tela cheia, vibração e PWA.
+
+### Problemas encontrados e soluções
+| Problema | Solução |
+|---|---|
+| Vórtice e Oráculo imortais na fase 2 (aro sólido envolvendo o ponto fraco). | `solidUntilPhase: 1`: o aro deixa de bloquear tiros quando o Olho vira o alvo. |
+| O teste antigo de "alvo atingível" não pegou o bug (tiro testado no centro, sem trajeto). | Teste novo que simula o **trajeto real** do tiro vindo de baixo, durante a luta inteira. |
+| Alienígenas com hitbox menor que o desenho. | Raio por tipo (`ALIEN_TYPES[type].radius`); o contato com o jogador continua limitado a 12 para não ficar mais punitivo. |
+| O save é apagado ao zerar a campanha, então o mapa "esqueceria" tudo. | Histórico separado (`progressDefeated`) + leitura de saves antigos por `worldsUnlocked`. |
+| No primeiro layout da galáxia, as rotas cruzavam os nomes dos mundos (visto nas capturas). | Nomes embaixo dos planetas; a rota sai do topo de um planeta e entra pela lateral do próximo; a nave fica ao lado. |
+| Qualquer toque em área vazia de um menu contava como ENTER e iniciava a opção selecionada. | Toque só aciona o que está embaixo do dedo; ENTER do teclado continua igual. |
+| O Edge headless não abre janelas com menos de ~500 px, então a captura "de celular" sai cortada. | A escala foi conferida pela lógica (`#app` desconta as áreas seguras) e pelas capturas em 480x640. |
+
+### Aprendizados
+- Teste de "acerta no centro" não é teste de jogabilidade: o teste precisa **jogar do jeito que o jogador joga** (de onde o tiro vem, por onde ele passa).
+- Um teste genérico bom acha bugs que ninguém reportou ainda (o Oráculo).
+- No celular, todo comando de teclado precisa de um equivalente tocável (sair da pausa, voltar ao menu, ligar o som).
+
+---
+
 ## 03/11/2026: Versão 1.3 (quatro mundos)
 
 ### Motivação

@@ -111,6 +111,9 @@ O teto `MAX_FRAME_TIME` (0,25 s) impede que, após a aba ficar em segundo plano,
 stateDiagram-v2
     [*] --> Titulo
     Titulo --> Mapa: CAMPANHA (nova Campaign)
+    Titulo --> Progresso: MAPA DE PROGRESSO
+    Mapa --> Progresso: MAPA / Tab
+    Progresso --> Jogando: fase disponível (campanha) ou vencida (treino)
     Titulo --> Jogando: DUELO
     Mapa --> Jogando: escolher alvo disponível
     state PlayScene {
@@ -120,6 +123,7 @@ stateDiagram-v2
         Jogando --> Vitoria: chefe destruído
     }
     Vitoria --> Mapa: campanha (mini-chefe) · recebe buff
+    Vitoria --> Progresso: mundo concluído · treino
     Vitoria --> Titulo: campanha concluída
     Vitoria --> Jogando: duelo (jogar de novo)
     GameOver --> Jogando: ENTER (campanha: continue com pontuação zerada)
@@ -157,7 +161,22 @@ O estado da campanha (chefes derrotados, buffs, rota, pontuação e estatística
 
 As **vidas** vivem na campanha (`campaign.lives`, máx. 5) e passam de fase em fase; a **vida extra por pontuação** usa `campaign.nextLifeAt`, que persiste entre as fases e é reiniciado no *continue*.
 
-A `PlayScene` recebe `{ bossId, campaign }`. Os buffs são lidos de `campaign.buffs` e aplicados à nave (`Player.buffs`), à criação das `Wingman` (uma ou duas) e às cargas de bomba. A dificuldade do mundo vira `hpScale` e `attackRate` no `Boss`/`WaveStage` e um multiplicador de velocidade em `spawnEnemyBullet`. Depois de cada vitória a cena salva a campanha (`campaignSave`) e o número de mundos liberados (`worldsUnlocked`).
+### 4.2 Mapa de progresso e treino (v1.4)
+
+Arquivos: [`src/systems/Progress.js`](../src/systems/Progress.js) (lógica pura) e [`src/scenes/ProgressScene.js`](../src/scenes/ProgressScene.js) (tela).
+
+- `mergeDefeated()` junta três fontes: o histórico permanente (`progressDefeated`, gravado em `saveProgress`), o save atual e `worldsUnlocked` (saves anteriores à v1.4).
+- `buildProgress()` dá a cada fase o status `done` / `available` / `locked` e a cada mundo `current` / `done` / `visited` / `locked`. A campanha salva tem prioridade: o que ela libera agora é `available`, mesmo que já tenha sido vencido em outra campanha.
+- **Treino:** a cena cria uma **cópia** da campanha (`Campaign.fromJSON(save.toJSON())`) e abre `PlayScene` com `practice: true`. Nesse modo a cena não chama `recordVictory` nem `saveProgress` e não grava recorde. Assim o treino nunca altera o progresso, por construção.
+
+### 4.3 Celular (v1.4)
+
+- `touchZone(x, y)` (em `Input.js`) é a fonte única das áreas de toque (pausa, bomba, dash); o HUD desenha os botões nos mesmos lugares. `input.touchMode` liga os botões após o primeiro toque.
+- `Game.toggleFullscreen()` pede tela cheia e trava em retrato (quando o navegador permite); `resize()` usa o tamanho do `#app`, que já desconta as áreas seguras (`env(safe-area-inset-*)`).
+- `Haptics.js` encapsula `navigator.vibrate` com o ajuste salvo; sem suporte, não faz nada.
+- **PWA:** `manifest.webmanifest` + `sw.js` com estratégia **rede primeiro, cache de reserva**. Online, cada deploy aparece na hora; offline, o jogo sai do cache. O service worker fica desligado no `?debug`.
+
+A `PlayScene` recebe `{ bossId, campaign, practice }`. Os buffs são lidos de `campaign.buffs` e aplicados à nave (`Player.buffs`), à criação das `Wingman` (uma ou duas) e às cargas de bomba. A dificuldade do mundo vira `hpScale` e `attackRate` no `Boss`/`WaveStage` e um multiplicador de velocidade em `spawnEnemyBullet`. Depois de cada vitória a cena salva a campanha (`campaignSave`) e o número de mundos liberados (`worldsUnlocked`).
 
 ## 5. O motor de chefes
 
@@ -403,6 +422,8 @@ flowchart LR
 | Unitário | `node:test` | Matemática, colisão, pontuação, integridade dos sprites |
 | Lógica de domínio | `node:test` + mundo falso (`Proxy`) | Todas as fases e transições do Titã, quebra antecipada, hit test por pixel |
 | Testes genéricos | Laço sobre `BOSSES` | Para **cada chefe registrado**: definição válida, alvos atingíveis, fluxo completo, estabilidade em 20 s de luta |
+| Garantia de jogabilidade (v1.4) | `tests/reachability.test.js` | Para **cada chefe**: vence a luta só com tiros retos vindos de baixo, passando pelo `hitTestPath` real (nenhuma fase imortal); hitbox = sprite; sem acerto fantasma; raio dos alienígenas compatível com o sprite |
+| Progresso e celular (v1.4) | `tests/progress.test.js` | Status das fases e mundos, histórico, saves antigos, layout do mapa sem sobreposição, zonas de toque, botões da pausa e vibração |
 | Campanha | `node:test` | 4 mundos em sequência, setores obrigatórios, buffs e bônus de mundo, Leviatã após o Arconte, dificuldade crescente, seleção de mundo, salvar/carregar, vidas, continue, corrida perfeita |
 | Mundos novos | `node:test` (`tests/worlds.test.js`) | Projéteis (divisão, curva, aceleração), mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo |
 | Setores | `node:test` + mundo falso que atualiza os inimigos | Formação válida, vagas únicas, ondas completas, mergulhos e tiros |

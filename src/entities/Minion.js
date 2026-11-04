@@ -30,7 +30,7 @@ export class Minion {
     this.state = 'waiting'; // waiting -> entering -> diving
     this.t = 0;
     this.hp = this.info.escortHp;
-    this.radius = 12;
+    this.radius = this.info.radius ?? 12;
     this.vx = 0;
     this.vy = 0;
     this.flash = 0;

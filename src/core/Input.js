@@ -35,6 +35,9 @@ export const KEY_BINDINGS = Object.freeze({
   Escape: 'pause',
   KeyQ: 'quit',
   KeyM: 'mute',
+  KeyV: 'vibration',
+  KeyF: 'fullscreen',
+  Tab: 'map',
   // Atalhos de depuração (só funcionam com ?debug na URL)
   KeyT: 'debugKill',
   KeyB: 'debugBuffs',
@@ -42,12 +45,27 @@ export const KEY_BINDINGS = Object.freeze({
   KeyH: 'debugHitbox',
 });
 
+/**
+ * Zonas de toque da tela de jogo (coordenadas lógicas 480x640).
+ * Os botões são desenhados pelo HUD nos mesmos lugares.
+ *  - canto superior direito: PAUSA (MENU nas telas de fim)
+ *  - canto inferior direito: BOMBA, e logo acima dela: DASH
+ * @returns {'pause'|'bomb'|'dash'|null}
+ */
+export function touchZone(x, y) {
+  if (x > GAME_WIDTH - 72 && y < 44) return 'pause';
+  if (x > GAME_WIDTH - 64 && y > GAME_HEIGHT - 64) return 'bomb';
+  if (x > GAME_WIDTH - 64 && y > GAME_HEIGHT - 124 && y <= GAME_HEIGHT - 64) return 'dash';
+  return null;
+}
+
 export class Input {
   constructor(target, canvas = null) {
     this.down = new Set();
     this.pressed = new Set();
     this.pointer = { active: false, x: 0, y: 0, id: null };
     this.tap = null; // posição do último toque/clique neste passo (para menus)
+    this.touchMode = false; // true após o primeiro toque: mostra os botões na tela
     this.canvas = canvas;
 
     target.addEventListener('keydown', (e) => {
@@ -78,14 +96,11 @@ export class Input {
     canvas.addEventListener('pointerdown', (e) => {
       const pos = toGame(e);
       this.tap = pos;
-      // Canto superior direito = botão de pausa no celular.
-      if (pos.x > GAME_WIDTH - 48 && pos.y < 48) {
-        this.pressed.add('pause');
-        return;
-      }
-      // Canto inferior direito = botão de bomba.
-      if (pos.x > GAME_WIDTH - 64 && pos.y > GAME_HEIGHT - 64) {
-        this.pressed.add('bomb');
+      if (e.pointerType !== 'mouse') this.touchMode = true;
+      // Botões de toque: pausa, bomba e dash (desenhados pelo HUD).
+      const zone = touchZone(pos.x, pos.y);
+      if (zone) {
+        this.pressed.add(zone);
         return;
       }
       // Segundo dedo enquanto o primeiro move a nave = dash.
@@ -115,6 +130,8 @@ export class Input {
       }
     };
     canvas.addEventListener('pointerup', release);
+    // Sem menu de contexto / seleção ao segurar o dedo na tela.
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('pointercancel', release);
   }
 

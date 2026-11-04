@@ -16,6 +16,14 @@ game.start().catch((error) => {
   }
 });
 
+// PWA: registra o service worker (instalar na tela inicial + jogar offline).
+// Fica desligado no modo ?debug para não atrapalhar o desenvolvimento.
+if ('serviceWorker' in navigator && !DEBUG) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((error) => console.warn('Service worker não registrado:', error));
+  });
+}
+
 if (DEBUG) {
   // Expõe o jogo no console para inspeção durante o desenvolvimento.
   window.game = game;

@@ -313,6 +313,12 @@ Os setores também ficam mais agressivos (mergulhos de 2,2 s no Setor 1 até 0,8
 - O progresso é salvo no `localStorage` **após cada vitória**. **CONTINUAR** retoma no setor ou no mapa certo. O save é apagado ao zerar a campanha.
 - **MUNDO < N >** (mundos já alcançados) começa no mundo escolhido com os buffs dos mundos anteriores, pontuação zerada e 3 vidas.
 
+### Mapa de progresso e treino (v1.4)
+
+- **Galáxia:** os 4 mundos como planetas ligados por uma rota. Cada planeta mostra o estado (**VOCÊ ESTÁ AQUI**, **CONCLUÍDO**, **JÁ VISITADO**, **BLOQUEADO**) e quantas fases foram vencidas. Ao concluir um mundo, a nave viaja até o próximo planeta.
+- **Mundo:** tocar em um planeta abre as fases internas na ordem do mundo (2 setores → 3 mini-chefes → chefe → Leviatã). Verde = vencida, amarelo pulsante = disponível, cinza com "?" = bloqueada.
+- **Treino:** uma fase vencida pode ser rejogada com os buffs atuais e 3 vidas. Nada é salvo (save, recorde e estatísticas não mudam). Objetivo: praticar um chefe difícil sem arriscar a campanha.
+
 ## 7. Inimigos menores: alienígenas de escolta
 
 | Atributo | Valor |
@@ -401,3 +407,9 @@ A barra do chefe é **segmentada por fase**: segmentos já vencidos ficam vazios
 ## 14. Controles
 
 Ver a [tabela de controles no README](../README.md#️-como-jogar).
+
+### Celular (v1.4)
+- A nave segue o dedo (um pouco acima dele, para o dedo não cobrir a nave) e atira sozinha.
+- Botões na tela: **DASH** e **BOMBA** no canto inferior direito, **PAUSA** no canto superior direito. Eles só aparecem depois do primeiro toque, para não poluir a tela de quem joga no teclado.
+- Todos os menus funcionam só com toque. Nos mapas, o primeiro toque seleciona e o segundo confirma, para evitar começar uma luta sem querer.
+- Vibração curta ao quebrar o escudo, média na bomba, dupla ao perder uma vida e longa na vitória.

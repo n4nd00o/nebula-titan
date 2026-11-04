@@ -47,6 +47,7 @@ Scope grew deliberately: **v1.0** shipped a single, polished final-boss fight. O
 | **Campaign** | **4 worlds**, each with **2 sectors** (mandatory) → **3 mini-bosses in any order** (each grants a **permanent buff**) → **world boss**. World 4 ends with the **LEVIATHAN** (final boss). Lives **carry over** (max 5); extra life every 50,000 points. Game over = retry the current stage with 3 lives, keeping buffs, score reset. Finishing with **zero deaths** grants **+100,000**. |
 | **Continue** | Resumes the saved campaign (the game saves after every victory). |
 | **World < N >** | Starts directly in a world you have reached, with the buffs from the previous worlds. |
+| **Progress map** *(v1.4)* | Galaxy map with the 4 worlds showing where you are and what is left. Tap a world to see its inner stages (sectors, mini-bosses, boss). Cleared stages can be **replayed as practice** without touching the save. |
 | **Titan Duel** | Straight fight against the final boss, no buffs (the original v1.0 challenge). |
 
 ### The four worlds (v1.3)
@@ -111,16 +112,17 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 🧩 **17 modular bosses** (12 mini-bosses, 4 world bosses and the Leviathan) with destructible parts and 3 damage states per part.
 - 🗺️ **Campaign with player-chosen routes**, a map screen per world, **16 buffs** and continues.
 - 💾 **Saved progress** in the browser and **world select** on the title screen.
+- 🗺️ **Progress map** *(v1.4)* with per-world stage view and a **practice mode**.
 - 🎨 **Procedurally generated pixel art** (with optional hand-drawn PNG overrides that never affect gameplay).
 - 🔊 **Fully synthesized audio** (SFX + music sequencer), no audio files at all.
 - 💥 Modern **game feel**: hit-stop, screen shake, flashes, particles, shockwaves, physics debris.
 - 🎯 **Fair design**: tiny hitbox, telegraphed attacks, focus mode, screen clear on death.
 - 🏆 Scoring with time/accuracy/no-damage bonuses, **S/A/B/C rank** and persistent high score.
-- 📱 Responsive and **touch-enabled**.
+- 📱 **Mobile-ready** *(v1.4)*: on-screen **bomb/dash/pause** buttons, fully touch-driven menus, **fullscreen** portrait mode, rotate-device hint, notch-safe layout, **vibration**, and **installable PWA that works offline**.
 - 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
-- 🧪 **172 automated tests** + CI (generic tests run automatically for every registered boss).
+- 🧪 **253 automated tests** + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls
@@ -130,11 +132,12 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 | Move | `Arrows` / `WASD` | Drag |
 | Shoot | `Space` / `Z` / `J` (hold) | Automatic while touching |
 | Focus mode (slow + visible hitbox) | `Shift` | — |
-| Dash *(Reaper buff)* | `C` / `L` | Tap with a **second finger** |
-| Pulse Bomb *(after all mini-bosses)* | `X` / `K` | Bomb button (bottom right) |
+| Dash *(Reaper buff)* | `C` / `L` | **DASH** button or a **second finger** |
+| Pulse Bomb *(after all mini-bosses)* | `X` / `K` | **BOMB** button (bottom right) |
+| Progress map (from the route screen) | `Tab` | **MAPA** button |
 | Pause | `P` / `Esc` | ⏸ button (top right) |
-| Quit to menu (paused) | `Q` | — |
-| Toggle sound | `M` | — |
+| Quit to menu (paused) | `Q` | **MENU** button |
+| Toggle sound / vibration / fullscreen | `M` / `V` / `F` | Buttons on the title screen |
 
 ## ▶️ Running
 

@@ -13,6 +13,8 @@
  *  - duel:     luta direta contra o Nebula Titan (sem buffs);
  *  - campaign: 4 mundos (setores, mini-chefes e chefes) até o Leviatã;
  *              usa e concede buffs e salva o progresso após cada vitória.
+ *  - practice: TREINO pelo Mapa de Progresso — rejoga uma fase já vencida
+ *              com os buffs atuais, sem alterar o save nem o recorde.
  *
  * Sub-estados: playing | paused | gameover | victory
  */
@@ -36,8 +38,23 @@ import { drawText } from '../graphics/text.js';
 import { rand, clamp, removeDead } from '../utils/math.js';
 import { TitleScene } from './TitleScene.js';
 import { MapScene } from './MapScene.js';
+import { ProgressScene } from './ProgressScene.js';
+import { PROGRESS_KEY } from '../systems/Progress.js';
+import { haptic } from '../core/Haptics.js';
 
 const MAX_ENEMY_BULLETS = 450;
+
+/** Botões da tela de pausa (toque e clique). */
+const PAUSE_BUTTONS = Object.freeze([
+  { id: 'resume', x: W / 2 - 110, y: 222, w: 220, h: 34 },
+  { id: 'menu', x: W / 2 - 110, y: 266, w: 220, h: 34 },
+]);
+
+/** Qual botão da pausa foi tocado (ou null). */
+export function pauseButtonAt({ x, y }) {
+  const b = PAUSE_BUTTONS.find((p) => x >= p.x && x <= p.x + p.w && y >= p.y && y <= p.y + p.h);
+  return b ? b.id : null;
+}
 /** Tempo-par da campanha inteira (soma dos tempos-par de todas as fases de todos os mundos). */
 const CAMPAIGN_PAR_TIME = WORLDS.flatMap(worldEncounters).reduce((sum, id) => sum + ENCOUNTERS[id].parTime, 0);
 export const SAVE_KEY = 'campaignSave';
@@ -46,16 +63,18 @@ export const UNLOCK_KEY = 'worldsUnlocked';
 export class PlayScene {
   /**
    * @param {object} game
-   * @param {{bossId?: string, campaign?: import('../systems/Campaign.js').Campaign}} options
+   * @param {{bossId?: string, campaign?: import('../systems/Campaign.js').Campaign, practice?: boolean}} options
+   *        practice = true: treino (a campanha recebida é uma CÓPIA e nada é salvo)
    */
-  constructor(game, { bossId = 'titan', campaign = null } = {}) {
+  constructor(game, { bossId = 'titan', campaign = null, practice = false } = {}) {
     this.game = game;
     this.input = game.input;
     this.audio = game.audio;
     this.sprites = game.sprites;
     this.storage = game.storage;
     this.campaign = campaign;
-    this.mode = campaign ? 'campaign' : 'duel';
+    this.practice = Boolean(practice && campaign);
+    this.mode = this.practice ? 'practice' : campaign ? 'campaign' : 'duel';
     this.def = ENCOUNTERS[bossId];
 
     // Mundo e dificuldade (no Duelo vale o Mundo 1).
@@ -97,8 +116,8 @@ export class PlayScene {
     this.nextLifeAt = campaign ? campaign.nextLifeAt : PLAYER.extraLifeEvery;
 
     this.score = campaign ? campaign.score : 0;
-    this.hiscoreKey = campaign ? 'hiscoreCampaign' : 'hiscore';
-    this.hiscore = this.storage.get(this.hiscoreKey, 0);
+    this.hiscoreKey = this.practice ? null : campaign ? 'hiscoreCampaign' : 'hiscore';
+    this.hiscore = this.hiscoreKey ? this.storage.get(this.hiscoreKey, 0) : 0;
     this.state = 'playing';
     this.stateTime = 0;
     this.shakeTime = 0;
@@ -121,7 +140,14 @@ export class PlayScene {
 
   /** Esta luta encerra o modo atual? (Leviatã na campanha; Titã no duelo) */
   get isFinalEncounter() {
+    if (this.practice) return false;
     return this.campaign ? this.def.id === 'leviathan' : true;
+  }
+
+  /** ESC/MENU nas telas de pausa e de fim: o treino volta ao mapa; o resto, ao título. */
+  exitToMenu() {
+    if (this.practice) this.game.changeScene(new ProgressScene(this.game, { focusWorld: this.worldIndex, openWorld: true }));
+    else this.game.changeScene(new TitleScene(this.game));
   }
 
   enter() {
@@ -369,6 +395,7 @@ export class PlayScene {
   }
 
   onShieldBreak(player) {
+    haptic(this.storage, 40);
     this.particles.ring(player.x, player.y, '#38b764', 40, 0.4);
     this.audio.play('shieldBreak');
     this.shake(4, 0.2);
@@ -385,6 +412,7 @@ export class PlayScene {
   }
 
   onPlayerDeath(player) {
+    haptic(this.storage, [120, 50, 120]);
     this.stats.damageTaken++;
     this.carapaceTimer = 0;
     this.campaign?.recordDeath();
@@ -411,6 +439,7 @@ export class PlayScene {
     const player = this.player;
     if (this.bombs <= 0 || !player.alive) return;
     this.bombs--;
+    haptic(this.storage, 80);
     this.clearEnemyBullets(true);
     this.hazards.length = 0;
     for (const m of this.minions) if (m.active && !m.dead) {
@@ -472,11 +501,12 @@ export class PlayScene {
     const input = this.input;
 
     if (this.state === 'paused') {
-      if (input.wasPressed('pause') || input.wasPressed('confirm')) {
+      const button = input.tap ? pauseButtonAt(input.tap) : null;
+      if (button === 'menu' || input.wasPressed('quit')) {
+        this.exitToMenu();
+      } else if (button === 'resume' || (!input.tap && (input.wasPressed('pause') || input.wasPressed('confirm'))) || (input.tap && input.wasPressed('pause'))) {
         this.state = 'playing';
         this.audio.resume();
-      } else if (input.wasPressed('quit')) {
-        this.game.changeScene(new TitleScene(this.game));
       }
       return;
     }
@@ -485,8 +515,8 @@ export class PlayScene {
       this.stateTime += dt;
       this.updateWorld(dt, false);
       if (this.stateTime > 1.2) {
-        if (input.wasPressed('confirm')) this.continueAfterEnd();
-        else if (input.wasPressed('pause') || input.wasPressed('quit')) this.game.changeScene(new TitleScene(this.game));
+        if (input.wasPressed('pause') || input.wasPressed('quit')) this.exitToMenu();
+        else if (input.wasPressed('confirm')) this.continueAfterEnd();
       }
       return;
     }
@@ -545,11 +575,18 @@ export class PlayScene {
     const { game, campaign } = this;
     if (!campaign) {
       game.changeScene(new PlayScene(game));
+    } else if (this.practice) {
+      // Treino: derrota = tenta de novo; vitória = volta ao mapa do mundo.
+      if (this.state === 'gameover') game.changeScene(new PlayScene(game, { bossId: this.def.id, campaign, practice: true }));
+      else this.exitToMenu();
     } else if (this.state === 'gameover') {
       campaign.recordContinue();
       game.changeScene(new PlayScene(game, { bossId: this.def.id, campaign }));
     } else if (campaign.complete) {
       game.changeScene(new TitleScene(game));
+    } else if (this.worldCleared) {
+      // Mundo concluído: o Mapa de Progresso mostra o avanço até o próximo mundo.
+      game.changeScene(new ProgressScene(game, { campaign, focusWorld: this.worldCleared, celebrate: this.worldCleared }));
     } else if (campaign.nextIsStage) {
       game.changeScene(new PlayScene(game, { bossId: campaign.available()[0], campaign }));
     } else {
@@ -688,7 +725,7 @@ export class PlayScene {
 
     // Colisão corpo a corpo com alienígenas
     for (const m of this.minions) {
-      if (player.alive && m.active && !m.dead && circleOverlap(player.x, player.y, player.hitRadius + 4, m.x, m.y, m.radius - 2)) {
+      if (player.alive && m.active && !m.dead && circleOverlap(player.x, player.y, player.hitRadius + 4, m.x, m.y, Math.min(m.radius, 12) - 2)) {
         if (player.hit(this) || player.invuln > 0) {
           m.dead = true;
           particles.explosion(m.x, m.y, 0.8);
@@ -740,7 +777,7 @@ export class PlayScene {
       this.score = this.results.total;
       this.audio.play('victory');
       this.game.starfield.setSpeed(3);
-      if (this.campaign) {
+      if (this.campaign && !this.practice) {
         const worldBefore = this.campaign.worldIndex;
         this.gainedBuffs = this.campaign.recordVictory(this.def.id, this.stats, this.score, this.player.lives);
         if (this.gainedBuffs.length) setTimeout(() => this.audio.play('buff'), 900);
@@ -764,7 +801,8 @@ export class PlayScene {
       this.audio.stopMusic();
       this.audio.play('gameOver');
     }
-    if (this.score > this.hiscore) {
+    if (kind === 'victory') haptic(this.storage, [40, 60, 120]);
+    if (this.hiscoreKey && this.score > this.hiscore) {
       this.newRecord = true;
       this.hiscore = this.score;
       this.storage.set(this.hiscoreKey, this.score);
@@ -778,6 +816,10 @@ export class PlayScene {
     this.storage.set(SAVE_KEY, c.complete ? null : c.toJSON());
     const unlocked = c.complete ? WORLDS.length : c.worldIndex + 1;
     this.storage.set(UNLOCK_KEY, Math.max(this.storage.get(UNLOCK_KEY, 1), unlocked));
+    // Histórico permanente para o Mapa de Progresso (sobrevive ao fim da campanha).
+    const history = new Set(this.storage.get(PROGRESS_KEY, []));
+    c.defeated.forEach((id) => history.add(id));
+    this.storage.set(PROGRESS_KEY, [...history]);
   }
 
   handleDebugInput() {
@@ -835,6 +877,16 @@ export class PlayScene {
     if (this.state === 'paused') this.drawPause(ctx);
     else if (this.state === 'gameover') this.drawGameOver(ctx);
     else if (this.state === 'victory') this.drawVictory(ctx);
+
+    // No celular, o canto superior direito vira o botão MENU nas telas de fim.
+    if ((this.state === 'gameover' || this.state === 'victory') && this.stateTime > 1.2 && this.input.touchMode) {
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
+      ctx.fillRect(W - 70, 6, 64, 30);
+      ctx.strokeStyle = '#566c86';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(W - 69, 7, 62, 28);
+      drawText(ctx, this.practice ? 'MAPA' : 'MENU', W - 38, 21, { size: 7, align: 'center', baseline: 'middle' });
+    }
   }
 
   drawHud(ctx) {
@@ -847,6 +899,24 @@ export class PlayScene {
     ctx.fillStyle = 'rgba(148, 176, 194, 0.5)';
     ctx.fillRect(W - 30, 10, 5, 16);
     ctx.fillRect(W - 21, 10, 5, 16);
+
+    // Botão de DASH na tela (só no celular; o 2º dedo também funciona)
+    const touch = this.input.touchMode;
+    if (touch && this.player.buffs.has('dash')) {
+      const ready = this.player.dashCooldown <= 0;
+      const cx = W - 34;
+      const cy = H - 96;
+      ctx.fillStyle = ready ? 'rgba(255, 205, 117, 0.3)' : 'rgba(86, 108, 134, 0.25)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = ready ? '#ffcd75' : '#566c86';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      drawText(ctx, '>>', cx, cy - 1, { size: 8, align: 'center', baseline: 'middle', color: ready ? '#ffffff' : '#566c86' });
+      drawText(ctx, 'DASH', cx, cy + 23, { size: 5, align: 'center', color: UI_COLORS.muted, baseline: 'top' });
+    }
+    if (this.practice) drawText(ctx, 'TREINO', W - 40, 19, { size: 7, align: 'right', color: UI_COLORS.info });
 
     const boss = this.boss;
     if (boss.state !== 'entering' && boss.state !== 'dead') {
@@ -968,10 +1038,18 @@ export class PlayScene {
 
   drawPause(ctx) {
     this.drawOverlay(ctx);
-    drawText(ctx, 'PAUSADO', W / 2, 200, { size: 22, align: 'center', color: UI_COLORS.accent });
-    drawText(ctx, 'P / ESC  continuar', W / 2, 260, { size: 8, align: 'center' });
-    drawText(ctx, 'Q  voltar ao menu', W / 2, 280, { size: 8, align: 'center' });
-    drawText(ctx, 'M  ligar/desligar som', W / 2, 300, { size: 8, align: 'center' });
+    drawText(ctx, 'PAUSADO', W / 2, 180, { size: 22, align: 'center', color: UI_COLORS.accent });
+    // Botões grandes (funcionam com toque e mostram as teclas equivalentes).
+    for (const b of PAUSE_BUTTONS) {
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.strokeStyle = b.id === 'resume' ? UI_COLORS.accent : '#566c86';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      const label = b.id === 'resume' ? 'CONTINUAR  (P)' : this.practice ? 'MAPA  (Q)' : 'MENU  (Q)';
+      drawText(ctx, label, W / 2, b.y + b.h / 2, { size: 8, align: 'center', baseline: 'middle' });
+    }
+    drawText(ctx, 'M  ligar/desligar som', W / 2, 330, { size: 7, align: 'center', color: UI_COLORS.muted });
     drawText(ctx, 'SETAS/WASD mover  ESPAÇO atirar', W / 2, 360, { size: 7, align: 'center', color: UI_COLORS.muted });
     drawText(ctx, 'SHIFT modo foco (lento + hitbox)', W / 2, 376, { size: 7, align: 'center', color: UI_COLORS.muted });
     if (this.player.buffs.has('dash')) drawText(ctx, 'C  dash', W / 2, 392, { size: 7, align: 'center', color: UI_COLORS.muted });
@@ -996,15 +1074,16 @@ export class PlayScene {
     drawText(ctx, `PONTOS ${this.score}`, W / 2, 270, { size: 10, align: 'center', color: UI_COLORS.accent });
     if (this.newRecord) drawText(ctx, 'NOVO RECORDE!', W / 2, 292, { size: 9, align: 'center', color: '#a7f070' });
     if (this.stateTime > 1.2) {
-      const retry = this.campaign ? 'ENTER  continuar (pontos zerados)' : 'ENTER  tentar de novo';
+      const retry = this.campaign && !this.practice ? 'ENTER  continuar (pontos zerados)' : 'ENTER  tentar de novo';
       if (Math.floor(this.stateTime * 2) % 2 === 0) drawText(ctx, retry, W / 2, 360, { size: 8, align: 'center' });
-      if (this.campaign) drawText(ctx, 'Você mantém os buffs e volta com 3 vidas', W / 2, 378, { size: 6, align: 'center', color: UI_COLORS.muted });
-      drawText(ctx, 'ESC  menu', W / 2, 398, { size: 8, align: 'center', color: UI_COLORS.muted });
+      if (this.campaign && !this.practice) drawText(ctx, 'Você mantém os buffs e volta com 3 vidas', W / 2, 378, { size: 6, align: 'center', color: UI_COLORS.muted });
+      drawText(ctx, this.practice ? 'ESC  voltar ao mapa' : 'ESC  menu', W / 2, 398, { size: 8, align: 'center', color: UI_COLORS.muted });
     }
   }
 
   drawVictory(ctx) {
-    if (!this.campaign) this.drawDuelVictory(ctx);
+    if (this.practice) this.drawPracticeVictory(ctx);
+    else if (!this.campaign) this.drawDuelVictory(ctx);
     else if (this.isFinalEncounter) this.drawCampaignVictory(ctx);
     else this.drawMiniVictory(ctx);
   }
@@ -1108,6 +1187,24 @@ export class PlayScene {
     });
     drawText(ctx, `PARTES DO LEVIATÃ DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
     this.drawPrompt(ctx, 'ENTER  menu principal');
+  }
+
+  /** Vitória no TREINO: só estatísticas; nada muda no save. */
+  drawPracticeVictory(ctx) {
+    const r = this.results;
+    this.drawOverlay(ctx, Math.min(0.75, this.stateTime));
+    drawText(ctx, 'TREINO', W / 2, 80, { size: 10, align: 'center', color: UI_COLORS.info });
+    drawText(ctx, this.def.name, W / 2, 104, { size: 18, align: 'center', color: '#a7f070' });
+    drawText(ctx, this.def.kind === 'waves' ? 'LIMPO!' : 'DERROTADO!', W / 2, 132, { size: 12, align: 'center', color: '#a7f070' });
+    this.drawStatLines(ctx, [
+      ['TEMPO', formatTime(this.stats.time)],
+      ['PRECISÃO', `${Math.round(r.accuracy * 100)}%`],
+      ['DANO SOFRIDO', String(this.stats.damageTaken)],
+      ['PONTOS', String(r.total)],
+      ['RANK DA LUTA', r.rank],
+    ], 170);
+    drawText(ctx, 'O progresso da campanha não muda no treino.', W / 2, 270, { size: 6, align: 'center', color: UI_COLORS.muted });
+    this.drawPrompt(ctx, 'ENTER  voltar ao mapa');
   }
 
   /** Vitória no modo Duelo (luta direta contra o Titã). */

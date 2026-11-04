@@ -3,6 +3,33 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.4.0] - 2026-11-04
+
+### Adicionado
+- **Mapa de progresso** (`ProgressScene`): galáxia com os 4 mundos ligados por uma rota, marcando o mundo atual ("VOCÊ ESTÁ AQUI"), os concluídos e os bloqueados. Tocar em um mundo abre as **fases internas** (2 setores → 3 mini-chefes → chefe → Leviatã).
+  - Fases vencidas podem ser **rejogadas como treino** (modo `practice` da `PlayScene`): usa os buffs atuais e não altera save, recorde nem estatísticas.
+  - Acesso pelo título (**MAPA DE PROGRESSO**), pela Rota de Ataque (botão **MAPA** / `Tab`) e automaticamente ao concluir um mundo, com a nave viajando até o próximo planeta.
+  - Histórico permanente de fases vencidas (`progressDefeated`), que sobrevive ao fim da campanha. Lógica pura em `src/systems/Progress.js`.
+- **Celular**:
+  - botões de **DASH**, **BOMBA** e **PAUSA** desenhados na tela (aparecem após o primeiro toque);
+  - pausa com botões **CONTINUAR** e **MENU**; botão **MENU/MAPA** nas telas de fim;
+  - **tela cheia** com trava em retrato (`F` ou botão no título), aviso "gire o celular" em paisagem, áreas seguras (*notch*) e altura `100dvh`;
+  - **vibração** ao levar dano, quebrar o escudo, usar bomba e vencer (`src/core/Haptics.js`; liga/desliga com `V` ou botão no título);
+  - **PWA**: `manifest.webmanifest`, ícones e service worker (`sw.js`, rede primeiro com cache de reserva) para instalar e jogar **offline**;
+  - sem menu de contexto, zoom por toque duplo ou "puxar para atualizar".
+- **Testes de garantia** (`tests/reachability.test.js`): cada chefe é vencido só com tiros retos vindos de baixo (como o jogador atira), fase por fase; hitbox = sprite; nenhum acerto fora do desenho; raio dos alienígenas compatível com o sprite.
+- 81 testes novos (total: 253), incluindo `tests/progress.test.js`.
+
+### Corrigido
+- **Vórtice imortal na fase 2**: o anel do casco envolvia o Olho do Furacão por completo e todo tiro ricocheteava nele. O anel deixa de bloquear tiros na fase do Olho (`solidUntilPhase: 1`).
+- **Oráculo imortal na fase 2**: mesmo problema (a mandala envolvia o Olho). Encontrado pelo teste de garantia novo antes de chegar ao jogador.
+- **Hitbox dos alienígenas** menor que o sprite (raio 12 para sprites de 33-39 px): tiros nas pontas das asas atravessavam. Agora o raio acompanha o sprite (14 e 16); o dano por contato no jogador continua o mesmo.
+- Toques em áreas vazias dos menus não iniciam mais a opção selecionada por engano.
+
+### Alterado
+- Texto de controles do título e da Rota de Ataque muda para instruções de toque no celular.
+- Linha "SETOR OK" da Rota de Ataque foi para o topo (sobrepunha o nome do mini-chefe do meio).
+
 ## [1.3.0] - 2026-11-03
 
 ### Adicionado

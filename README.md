@@ -70,6 +70,7 @@ O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entre
 | **Campanha** | **4 mundos**, cada um com **2 setores** (obrigatórios) → **3 mini-chefes na ordem que quiser** (cada um dá um **buff permanente**) → **chefe do mundo**. O Mundo 4 termina no **LEVIATÃ** (chefe final). As vidas **acumulam** entre as fases (máximo 5). Se perder todas, você **recomeça a fase atual** com 3 vidas e os buffs mantidos, mas a pontuação é zerada. Zerar o jogo **sem nenhuma morte** vale **+100.000 pontos**. |
 | **Continuar** | Retoma a campanha salva (o jogo salva após cada vitória). |
 | **Mundo < N >** | Começa direto em um mundo já alcançado, com os buffs dos mundos anteriores. |
+| **Mapa de progresso** *(v1.4)* | Mapa da galáxia com os 4 mundos: mostra onde você está, o que já venceu e o que falta. Tocar em um mundo abre as fases internas dele (setores, mini-chefes, chefe). Fases vencidas podem ser **rejogadas como treino**, sem alterar o save. |
 | **Duelo com o Titã** | Luta direta contra o chefe final, sem buffs: o desafio puro da versão 1.0. |
 
 ### Os quatro mundos (v1.3)
@@ -171,6 +172,7 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - ⚙️ **Mecânicas de chefe variadas**: gravidade que puxa a nave, chefes intangíveis, carapaças que abrem e fecham, cabeças que renascem, raios letais com aviso, projéteis que se dividem e fazem curva, e ataques que vêm do fundo da tela.
 - 🗺️ **Campanha com rota à escolha**, mapa de seleção por mundo, **16 buffs** (tiro perfurante e triplo, duas naves aliadas, dash com onda de choque, mísseis teleguiados, carapaça, bombas e mais) e sistema de *continue*.
 - 💾 **Progresso salvo** no navegador e **seleção de mundo** no menu.
+- 🗺️ **Mapa de progresso** *(v1.4)*: galáxia com os 4 mundos, as fases internas de cada um e **modo treino** para rejogar fases vencidas.
 - 👽 **Setores com alienígenas em formação** (5 tipos: verde, laranja, azul blindado, roxo divisor e vermelho kamikaze) no estilo clássico do Galaga: entrada em curvas, formação que "respira" e mergulhos com escolta.
 - 🛸 **Chefe final de 8 fases maior que a tela**, com câmera que avança seção por seção e casco gerado por código; blindagem, regeneração e paredes de laser.
 - ❤️ **Vidas acumuladas** (máximo 5), vida extra a cada 50.000 pontos e bônus de **corrida perfeita** (sem mortes).
@@ -179,8 +181,8 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 💥 **Game feel moderno**: *hit-stop*, tremor de tela, flashes, partículas, ondas de choque e destroços com física.
 - 🎯 **Design justo**: hitbox reduzida, ataques telegrafados, modo foco (movimento preciso) e limpeza de tela ao morrer.
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
-- 📱 **Responsivo**: escala para qualquer tela e aceita controle por toque no celular.
-- 🧪 **172 testes automatizados**: todos os chefes e setores, a campanha de 4 mundos, salvar/carregar, as mecânicas novas, colisões, pontuação e integridade dos sprites.
+- 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
+- 🧪 **253 testes automatizados**: todos os chefes e setores, a campanha de 4 mundos, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
@@ -190,12 +192,15 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 | Mover | `Setas` ou `W A S D` | Arrastar o dedo |
 | Atirar | `Espaço`, `Z` ou `J` (segure) | Automático ao tocar |
 | Modo foco (lento + hitbox visível) | `Shift` | — |
-| Dash *(buff do Ceifador)* | `C` ou `L` | Tocar com um **segundo dedo** |
-| Bomba de Pulso *(após os 3 mini-chefes)* | `X` ou `K` | Botão de bomba no canto inferior direito |
-| Navegar nos menus/mapa | `Setas` + `Enter` | Tocar na opção |
+| Dash *(buff do Ceifador)* | `C` ou `L` | Botão **DASH** (acima da bomba) ou um **segundo dedo** |
+| Bomba de Pulso *(após os 3 mini-chefes)* | `X` ou `K` | Botão **BOMBA** no canto inferior direito |
+| Navegar nos menus/mapas | `Setas` + `Enter` | Tocar na opção (no mapa: tocar de novo para jogar) |
+| Mapa de progresso (na Rota de Ataque) | `Tab` | Botão **MAPA** |
 | Pausar | `P` ou `Esc` | Botão ⏸ no canto superior direito |
-| Voltar ao menu (pausado) | `Q` | — |
-| Ligar/desligar som | `M` | — |
+| Voltar ao menu (pausado) | `Q` | Botão **MENU** da pausa |
+| Ligar/desligar som | `M` | Botão **SOM** no título |
+| Ligar/desligar vibração | `V` | Botão **VIBRA** no título |
+| Tela cheia | `F` | Botão **TELA CHEIA** no título |
 
 **Dica:** a nave só é atingida no **pontinho central** (ative o modo foco para vê-lo). Use os colchetes amarelos para saber onde atirar.
 
@@ -204,6 +209,8 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 ### 🎮 Jogar online
 
 > **[▶ Jogar agora: nebula-titan.vercel.app](https://nebula-titan.vercel.app)**, hospedado na Vercel e publicado automaticamente a cada *push* na branch `main`.
+
+**No celular:** abra o link e use **"Adicionar à tela inicial"** (Android: menu do Chrome → *Instalar app*; iPhone: Safari → Compartilhar → *Adicionar à Tela de Início*). O jogo abre em tela cheia, como um app, e funciona **sem internet** depois da primeira visita.
 
 ### 💻 Localmente
 
@@ -300,11 +307,13 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (172 testes) cobre:
+A suíte (253 testes) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).
 - **Todos os chefes (testes genéricos)**: cada chefe registrado tem a definição validada, cada alvo é verificado como atingível na sua fase e o fluxo completo até a derrota é simulado. Um chefe novo ganha esses testes **automaticamente**.
+- **Garantia "nenhum chefe imortal"** *(v1.4, `tests/reachability.test.js`)*: o teste joga cada chefe **como o jogador**, varrendo a tela com tiros retos que sobem do fundo, e só conta o dano quando o tiro chega ao ponto fraco sem bater em outra peça antes. Cada fase precisa ser vencida dentro do limite de tempo. O mesmo arquivo confere as **hitboxes**: máscara de colisão = sprite, nenhum "acerto fantasma" fora do desenho e raio dos alienígenas compatível com o tamanho do sprite.
+- **Mapa de progresso e celular**: estados das fases (vencida/disponível/bloqueada), histórico que sobrevive ao fim da campanha, saves antigos, layout sem sobreposição, zonas de toque, botões da pausa e vibração (inclusive em aparelhos sem suporte).
 - **Mecânicas dos mini-chefes**: rotação acelerada das cápsulas, barreiras bloqueando tiros, produção de drones por ninho e o ciclo aviso → investida → retorno do Ceifador.
 - **Setores**: as ondas cabem na formação, as vagas são únicas, os inimigos entram, formam, mergulham e atiram, e o setor termina quando todos caem.
 - **Leviatã**: câmera avançando exatamente uma seção por fase, blindagem × perfurante, regeneração dos reatores, ausência de dano por contato e paredes de laser (brecha e aviso).
@@ -344,21 +353,24 @@ Além dos testes unitários, **os 25 encontros da campanha** (8 setores, 12 mini
 ```
 nebula-titan/
 ├── index.html               # Página do jogo
-├── css/style.css            # Layout e escala do canvas
+├── manifest.webmanifest     # PWA: nome, ícones, tela cheia em retrato
+├── sw.js                    # Service worker (instalar e jogar offline)
+├── css/style.css            # Layout, escala do canvas, áreas seguras e aviso de girar
 ├── src/
 │   ├── main.js              # Ponto de entrada
 │   ├── config.js            # Constantes e parâmetros de balanceamento
-│   ├── core/                # Motor: loop, entrada, áudio, armazenamento
+│   ├── core/                # Motor: loop, entrada (teclado/toque), áudio, vibração, armazenamento
 │   ├── graphics/            # Paleta, sprites em texto, SpriteBank, texto
-│   ├── systems/             # Partículas, colisão, fundo, pontuação, campanha
+│   ├── systems/             # Partículas, colisão, fundo, pontuação, campanha, progresso
 │   ├── entities/            # Jogador, nave aliada, projéteis, alienígenas, power-ups, lasers
 │   ├── boss/                # Motor de chefes: partes, laser, padrões de tiro
 │   │   └── bosses/          # 17 definições de chefe (4 mundos + Leviatã)
 │   ├── stages/              # Setores de ondas: diretor (WaveStage) e dados das ondas
 │   ├── encounters.js        # Registro de todos os encontros (setores + chefes)
-│   ├── scenes/              # Título (menu), mapa da campanha e batalha
+│   ├── scenes/              # Título, mapa de progresso, rota de ataque e batalha
 │   └── utils/               # Funções matemáticas puras
 ├── assets/sprites/          # PNGs opcionais (substituem a arte gerada)
+├── assets/icons/            # Ícones do app (PWA)
 ├── tests/                   # Testes automatizados (node:test)
 ├── scripts/serve.mjs        # Servidor estático de desenvolvimento
 ├── docs/                    # GDD, arquitetura, planejamento, guias e diário
@@ -388,6 +400,7 @@ nebula-titan/
 - [x] Motor de chefes genérico (novos chefes = novos arquivos de dados)
 - [x] Setores de ondas em formação + chefe final de 8 fases maior que a tela (v1.2)
 - [x] Progressão em 4 mundos, 12 chefes novos, 3 alienígenas novos, 12 buffs novos, save e seleção de mundo (v1.3)
+- [x] Mapa de progresso com modo treino, testes de garantia contra chefes imortais e versão para celular: botões, tela cheia, vibração e PWA offline (v1.4)
 - [ ] Sprites desenhados à mão (modo misto)
 - [ ] Menu de opções (volume, reduzir tremor de tela, dificuldade)
 - [ ] Suporte a gamepad (Gamepad API)

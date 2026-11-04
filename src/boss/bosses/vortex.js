@@ -21,7 +21,8 @@ const SPIRAL = { kind: 'needle', color: '#41a6f6', radius: 3, spin: 0.55 };
 const NEEDLE = { kind: 'needle', color: '#f4f4f4', radius: 3 };
 
 const PARTS = [
-  { id: 'ring', name: 'Anel', sprite: 'vortex', ox: 0, oy: 0, look: 'none' },
+  // O anel envolve o Olho: deixa de bloquear tiros na fase 2 (senão o Olho fica imortal).
+  { id: 'ring', name: 'Anel', sprite: 'vortex', ox: 0, oy: 0, look: 'none', solidUntilPhase: 1 },
   {
     id: 'turbineL', name: 'Turbina Esquerda', sprite: 'turbine', ox: -50, oy: 6, hp: 55, phase: 0,
     look: 'husk', points: 2500, debrisColors: ICE, sparksAt: { x: -50, y: 6 },

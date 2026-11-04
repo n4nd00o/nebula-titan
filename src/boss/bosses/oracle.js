@@ -30,7 +30,8 @@ const petalDef = (id, drop) => ({
 });
 
 const PARTS = [
-  { id: 'mandala', name: 'Mandala', sprite: 'oracle', ox: 0, oy: 0, look: 'none' },
+  // A mandala envolve o Olho: deixa de bloquear tiros na fase 2 (senão o Olho fica imortal).
+  { id: 'mandala', name: 'Mandala', sprite: 'oracle', ox: 0, oy: 0, look: 'none', solidUntilPhase: 1 },
   {
     id: 'eye', name: 'Olho do Oráculo', sprite: 'oracleEye', ox: 0, oy: 0, hp: 230, phase: 1,
     look: 'remove', points: 10000, pulse: true, explosionScale: 2.8, debrisColors: VOID,

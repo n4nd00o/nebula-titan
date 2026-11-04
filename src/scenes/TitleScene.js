@@ -6,20 +6,25 @@
  *  - NOVA CAMPANHA: 4 mundos, do Setor 1 ao Leviatã.
  *  - MUNDO < N >: começa direto em um mundo já alcançado, com os buffs dos
  *    mundos anteriores (←/→ escolhe o mundo).
+ *  - MAPA DE PROGRESSO: os 4 mundos e as fases de cada um; rejoga fases vencidas.
  *  - DUELO COM O TITÃ: luta direta contra o Nebula Titan, sem buffs.
+ *
+ * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA.
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, UI_COLORS } from '../config.js';
 import { drawText } from '../graphics/text.js';
 import { Campaign, WORLDS } from '../systems/Campaign.js';
 import { PlayScene, SAVE_KEY, UNLOCK_KEY } from './PlayScene.js';
 import { MapScene } from './MapScene.js';
+import { ProgressScene } from './ProgressScene.js';
+import { canVibrate, vibrationEnabled, toggleVibration } from '../core/Haptics.js';
 
 const BOSS_PREVIEW = [
   ['wingL', -66, -8], ['wingR', 66, -8],
   ['hull', 0, 0], ['plate', 0, -3], ['cannon', 0, 45],
 ];
 
-const MENU_Y = 360;
+const MENU_Y = 336;
 const MENU_GAP = 30;
 
 /** Abre a campanha no ponto certo: setor linear ou mapa de escolha. */
@@ -45,6 +50,7 @@ export class TitleScene {
     }
     this.options.push({ id: 'new', label: 'NOVA CAMPANHA', detail: `4 mundos, 12 mini-chefes, 4 chefes e o Leviatã · RECORDE ${record}` });
     if (this.unlocked > 1) this.options.push({ id: 'world', label: 'MUNDO', detail: '' });
+    this.options.push({ id: 'map', label: 'MAPA DE PROGRESSO', detail: 'Veja onde você está e rejogue fases vencidas (treino)' });
     this.options.push({ id: 'duel', label: 'DUELO COM O TITÃ', detail: `Luta direta contra o Nebula Titan · RECORDE ${storage.get('hiscore', 0)}` });
     this.selected = 0;
   }
@@ -69,6 +75,13 @@ export class TitleScene {
       if (input.wasPressed('left')) this.changeWorld(-1);
       if (input.wasPressed('right')) this.changeWorld(1);
     }
+    // Botões do topo (som, vibração, tela cheia)
+    const top = input.tap ? this.topButtons().find((b) => input.tap.x >= b.x && input.tap.x <= b.x + b.w && input.tap.y >= b.y && input.tap.y <= b.y + b.h) : null;
+    if (top) {
+      top.action();
+      this.game.audio.play('select');
+      return;
+    }
     // Toque/clique em uma opção do menu (no seletor de mundo: bordas trocam o mundo).
     if (input.tap) {
       const index = Math.floor((input.tap.y - MENU_Y + 12) / MENU_GAP);
@@ -80,7 +93,27 @@ export class TitleScene {
         return;
       }
     }
-    if (input.wasPressed('confirm') || input.wasPressed('fire')) this.start();
+    if (!input.tap && (input.wasPressed('confirm') || input.wasPressed('fire'))) this.start();
+  }
+
+  /** Botões de toque no topo da tela (da direita para a esquerda). */
+  topButtons() {
+    const game = this.game;
+    const buttons = [{ id: 'sound', label: game.audio.muted ? 'SOM OFF' : 'SOM ON', action: () => game.audio.toggleMute() }];
+    if (canVibrate()) {
+      buttons.push({ id: 'vibe', label: vibrationEnabled(game.storage) ? 'VIBRA ON' : 'VIBRA OFF', action: () => toggleVibration(game.storage) });
+    }
+    if (game.fullscreenSupported) {
+      buttons.push({ id: 'full', label: game.isFullscreen ? 'SAIR TELA' : 'TELA CHEIA', action: () => game.toggleFullscreen() });
+    }
+    let x = W - 8;
+    return buttons.map((b) => {
+      const w = b.label.length * 6 + 16;
+      x -= w;
+      const rect = { ...b, x, y: 8, w, h: 24 };
+      x -= 6;
+      return rect;
+    });
   }
 
   move(delta) {
@@ -110,6 +143,9 @@ export class TitleScene {
       }
       case 'world':
         resumeCampaign(game, Campaign.startingAt(this.worldChoice));
+        break;
+      case 'map':
+        game.changeScene(new ProgressScene(game));
         break;
       default:
         game.changeScene(new PlayScene(game));
@@ -151,16 +187,26 @@ export class TitleScene {
       if (active) drawText(ctx, detail, W / 2 - 110, y + 15, { size: 5, color: UI_COLORS.muted });
     });
 
-    const controls = [
-      'SETAS/WASD mover   ESPAÇO atirar   SHIFT foco',
-      'C dash   X bomba   P pausa   M som',
-    ];
+    // Controles: texto de teclado ou de toque, conforme o aparelho.
+    const touch = this.game.input.touchMode;
+    const controls = touch
+      ? ['ARRASTE o dedo para mover (tiro automático)', 'Botões BOMBA e DASH no canto · 2º dedo = dash']
+      : ['SETAS/WASD mover   ESPAÇO atirar   SHIFT foco', 'C dash   X bomba   P pausa   M som   F tela cheia'];
     controls.forEach((line, i) => {
-      drawText(ctx, line, W / 2, 506 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted });
+      drawText(ctx, line, W / 2, 512 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted });
     });
-    drawText(ctx, '(dash e bomba são liberados na campanha)', W / 2, 536, { size: 5, align: 'center', color: '#566c86' });
+    drawText(ctx, '(dash e bomba são liberados na campanha)', W / 2, 542, { size: 5, align: 'center', color: '#566c86' });
 
-    drawText(ctx, '^ v escolher   ENTER confirmar', W / 2, 564, { size: 6, align: 'center', color: '#566c86' });
+    drawText(ctx, touch ? 'Toque em uma opção' : '^ v escolher   ENTER confirmar', W / 2, 566, { size: 6, align: 'center', color: '#566c86' });
+
+    for (const b of this.topButtons()) {
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.strokeStyle = '#566c86';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+      drawText(ctx, b.label, b.x + b.w / 2, b.y + b.h / 2, { size: 6, align: 'center', baseline: 'middle', color: UI_COLORS.muted });
+    }
     drawText(ctx, 'Inspirado nos clássicos arcade dos anos 80', W / 2, H - 28, { size: 6, align: 'center', color: '#566c86' });
   }
 }
