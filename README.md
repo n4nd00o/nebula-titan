@@ -441,7 +441,7 @@ nebula-titan/
 ## 👤 Autor
 
 **Luiz Fernando Santana**
-Estudante de [CURSO] na [INSTITUIÇÃO]
+Estudante de Engenharia de Software na Universidade São Judas Tadeu(USJT).
 
 - GitHub: [@n4nd00o](https://github.com/n4nd00o)
 - LinkedIn: [linkedin.com/in/luiz-fernando-santana-trindade](https://www.linkedin.com/in/luiz-fernando-santana-trindade/)
