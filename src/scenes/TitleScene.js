@@ -11,7 +11,8 @@
  *  - CONTROLES: troca as teclas de cada ação (v1.5).
  *  - DUELO COM O TITÃ: luta direta contra o Nebula Titan, sem buffs.
  *
- * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA.
+ * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA,
+ * e à esquerda uma lupa de busca.
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, UI_COLORS } from '../config.js';
 import { drawText } from '../graphics/text.js';
@@ -23,6 +24,8 @@ import { BuffsScene } from './BuffsScene.js';
 import { ControlsScene } from './ControlsScene.js';
 import { controlsHelp } from '../core/KeyBindings.js';
 import { canVibrate, vibrationEnabled, toggleVibration } from '../core/Haptics.js';
+import { openSearch, isSearchOpen } from './SearchOverlay.js';
+import { HEART_BOSS } from '../boss/bosses/heart.js';
 
 const BOSS_PREVIEW = [
   ['wingL', -66, -8], ['wingR', 66, -8],
@@ -31,6 +34,7 @@ const BOSS_PREVIEW = [
 
 const MENU_Y = 300;
 const MENU_GAP = 27;
+const SEARCH_BUTTON = Object.freeze({ x: 8, y: 8, w: 28, h: 24 });
 
 /** Abre a campanha no ponto certo: setor linear ou mapa de escolha. */
 export function resumeCampaign(game, campaign) {
@@ -75,12 +79,21 @@ export class TitleScene {
   update(dt) {
     this.time += dt;
     const input = this.game.input;
+    if (isSearchOpen()) return;
     const n = this.options.length;
     if (input.wasPressed('up')) this.move(-1);
     if (input.wasPressed('down')) this.move(1);
     if (this.current.id === 'world') {
       if (input.wasPressed('left')) this.changeWorld(-1);
       if (input.wasPressed('right')) this.changeWorld(1);
+    }
+    // Lupa (canto superior esquerdo)
+    const s = SEARCH_BUTTON;
+    if (input.tap && input.tap.x >= s.x && input.tap.x <= s.x + s.w && input.tap.y >= s.y && input.tap.y <= s.y + s.h) {
+      this.game.audio.unlock();
+      this.game.audio.play('select');
+      openSearch({ onSecret: () => this.startSecret() });
+      return;
     }
     // Botões do topo (som, vibração, tela cheia)
     const top = input.tap ? this.topButtons().find((b) => input.tap.x >= b.x && input.tap.x <= b.x + b.w && input.tap.y >= b.y && input.tap.y <= b.y + b.h) : null;
@@ -121,6 +134,14 @@ export class TitleScene {
       x -= 6;
       return rect;
     });
+  }
+
+  startSecret() {
+    const game = this.game;
+    if (game.scene !== this) return;
+    game.audio.unlock();
+    game.audio.play('buff');
+    game.changeScene(new PlayScene(game, { encounter: HEART_BOSS }));
   }
 
   move(delta) {
@@ -220,6 +241,26 @@ export class TitleScene {
       ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
       drawText(ctx, b.label, b.x + b.w / 2, b.y + b.h / 2, { size: 6, align: 'center', baseline: 'middle', color: UI_COLORS.muted });
     }
+    this.drawSearchButton(ctx);
     drawText(ctx, 'Inspirado nos clássicos arcade dos anos 80', W / 2, H - 28, { size: 6, align: 'center', color: '#566c86' });
+  }
+
+  /** Lupa no canto superior esquerdo. */
+  drawSearchButton(ctx) {
+    const b = SEARCH_BUTTON;
+    ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeStyle = '#566c86';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+    const cx = b.x + 12;
+    const cy = b.y + 10;
+    ctx.strokeStyle = '#94b0c2';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.moveTo(cx + 4, cy + 4);
+    ctx.lineTo(cx + 9, cy + 9);
+    ctx.stroke();
   }
 }

@@ -95,3 +95,94 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rotate-phone { animation: none; }
 }
+
+/* Caixa de busca da lupa do menu (SearchOverlay.js). */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18vh 16px 0;
+  background: rgba(5, 5, 13, 0.7);
+  font-family: "Press Start 2P", "Courier New", monospace;
+}
+
+.search-box {
+  width: min(360px, 100%);
+  padding: 18px;
+  background: #1a1c2c;
+  border: 2px solid #566c86;
+  box-shadow: 0 0 0 4px #05050d;
+  color: #f4f4f4;
+}
+
+.search-title {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: #ffcd75;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #333c57;
+  background: #05050d;
+  color: #f4f4f4;
+  font: 16px "Press Start 2P", "Courier New", monospace; /* 16px evita o zoom automático do iPhone */
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: manipulation;
+}
+
+.search-input:focus {
+  border-color: #73eff7;
+}
+
+.search-result {
+  min-height: 12px;
+  margin: 12px 0;
+  font-size: 8px;
+  color: #94b0c2;
+}
+
+.search-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-actions button {
+  flex: 1;
+  padding: 10px 0;
+  border: 2px solid #566c86;
+  background: #333c57;
+  color: #f4f4f4;
+  font: 9px "Press Start 2P", "Courier New", monospace;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.search-actions button:hover,
+.search-actions button:focus-visible {
+  border-color: #ffcd75;
+}
+
+.search-box.shake {
+  animation: search-shake 0.35s;
+}
+
+.search-overlay.found .search-box {
+  border-color: #e43b8c;
+}
+
+.search-overlay.found .search-result {
+  font-size: 18px;
+  color: #e43b8c;
+}
+
+@keyframes search-shake {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}

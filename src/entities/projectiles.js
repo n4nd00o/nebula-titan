@@ -260,6 +260,31 @@ export class EnemyBullet {
         this.drawOrb(ctx, x, y, r, this.homing > 0 && Math.floor(this.time * 10) % 2 ? '#ffffff' : this.color);
         break;
       }
+      case 'heart': {
+        // Coração: dois círculos + triângulo, com halo.
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 3, 0, TAU);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(-r * 0.5, -r * 0.25, r * 0.55, 0, TAU);
+        ctx.arc(r * 0.5, -r * 0.25, r * 0.55, 0, TAU);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-r * 1.05, -r * 0.05);
+        ctx.lineTo(r * 1.05, -r * 0.05);
+        ctx.lineTo(0, r * 1.05);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-r * 0.65, -r * 0.5, r * 0.4, r * 0.35);
+        ctx.restore();
+        break;
+      }
       default:
         this.drawOrb(ctx, x, y, r, this.color);
     }

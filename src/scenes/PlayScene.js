@@ -79,8 +79,9 @@ export class PlayScene {
    * @param {object} game
    * @param {{bossId?: string, campaign?: import('../systems/Campaign.js').Campaign, practice?: boolean}} options
    *        practice = true: treino (a campanha recebida é uma CÓPIA e nada é salvo)
+   *        encounter = definição avulsa (fora do registro): sem campanha nem recorde
    */
-  constructor(game, { bossId = 'titan', campaign = null, practice = false } = {}) {
+  constructor(game, { bossId = 'titan', campaign = null, practice = false, encounter = null } = {}) {
     this.game = game;
     this.input = game.input;
     this.audio = game.audio;
@@ -89,7 +90,8 @@ export class PlayScene {
     this.campaign = campaign;
     this.practice = Boolean(practice && campaign);
     this.mode = this.practice ? 'practice' : campaign ? 'campaign' : 'duel';
-    this.def = ENCOUNTERS[bossId];
+    this.def = encounter ?? ENCOUNTERS[bossId];
+    this.custom = Boolean(encounter);
 
     // Mundo e dificuldade (no Duelo vale o Mundo 1).
     this.worldIndex = campaign ? Math.max(0, worldIndexOf(bossId)) : 0;
@@ -99,7 +101,7 @@ export class PlayScene {
 
     this.particles = new ParticleSystem();
     this.player = new Player();
-    this.player.buffs = campaign ? campaign.buffs : new Set();
+    this.player.buffs = campaign ? campaign.buffs : new Set(this.def.playerBuffs ?? []);
     const buffs = this.player.buffs;
     this.wingmen = [];
     if (buffs.has('wingman')) this.wingmen.push(new Wingman(this.player, -1));
@@ -130,7 +132,7 @@ export class PlayScene {
     this.nextLifeAt = campaign ? campaign.nextLifeAt : PLAYER.extraLifeEvery;
 
     this.score = campaign ? campaign.score : 0;
-    this.hiscoreKey = this.practice ? null : campaign ? 'hiscoreCampaign' : 'hiscore';
+    this.hiscoreKey = this.practice || this.custom ? null : campaign ? 'hiscoreCampaign' : 'hiscore';
     this.hiscore = this.hiscoreKey ? this.storage.get(this.hiscoreKey, 0) : 0;
     this.state = 'playing';
     this.stateTime = 0;
@@ -213,7 +215,7 @@ export class PlayScene {
   enter() {
     const world = this.world;
     this.game.starfield.setSpeed(1);
-    this.game.starfield.setTheme?.(world.theme);
+    this.game.starfield.setTheme?.(this.def.theme ?? world.theme);
     this.audio.setTempo(1);
     const isBoss = this.def.id === world.boss || this.def.id === 'leviathan' || this.def.id === 'titan';
     this.audio.playMusic(this.def.music ?? (isBoss ? world.music.boss : world.music.mini));
@@ -644,7 +646,11 @@ export class PlayScene {
   /** O que acontece ao apertar ENTER na tela de vitória/derrota. */
   continueAfterEnd() {
     const { game, campaign } = this;
-    if (!campaign) {
+    if (this.def.onConfirmEnd?.(this)) return;
+    if (this.custom) {
+      if (this.state === 'gameover') game.changeScene(new PlayScene(game, { encounter: this.def }));
+      else game.changeScene(new TitleScene(game));
+    } else if (!campaign) {
       game.changeScene(new PlayScene(game));
     } else if (this.practice) {
       // Treino: derrota = tenta de novo; vitória = volta ao mapa do mundo.
@@ -1181,7 +1187,8 @@ export class PlayScene {
   }
 
   drawVictory(ctx) {
-    if (this.practice) this.drawPracticeVictory(ctx);
+    if (this.def.drawVictory) this.def.drawVictory(ctx, this);
+    else if (this.practice) this.drawPracticeVictory(ctx);
     else if (!this.campaign) this.drawDuelVictory(ctx);
     else if (this.isFinalEncounter) this.drawCampaignVictory(ctx);
     else this.drawMiniVictory(ctx);

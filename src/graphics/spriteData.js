@@ -14,6 +14,7 @@
  */
 import { WORLD_SPRITES } from './spriteDataWorlds.js';
 import { FINAL_SPRITES } from './spriteDataFinal.js';
+import { HEART_SPRITES } from './spriteDataHeart.js';
 
 /** Espelha cada linha (largura par): "abc" -> "abccba". */
 const mirrorEven = (rows) => rows.map((r) => r + [...r].reverse().join(''));
@@ -448,4 +449,5 @@ export const SPRITES = Object.freeze({
   minion: { rows: MINION, description: 'Drone inimigo' },
   ...WORLD_SPRITES,
   ...FINAL_SPRITES,
+  ...HEART_SPRITES,
 });

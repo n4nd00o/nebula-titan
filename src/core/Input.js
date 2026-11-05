@@ -47,6 +47,8 @@ export class Input {
     this.canvas = canvas;
 
     target.addEventListener('keydown', (e) => {
+      // Digitando em um campo de texto (caixa de busca): as teclas não viram ações.
+      if (e.target?.tagName === 'INPUT') return;
       if (this.capture) {
         // Tela de controles esperando uma tecla: ela não vira ação.
         e.preventDefault();
