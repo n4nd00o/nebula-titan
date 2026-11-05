@@ -8,26 +8,19 @@
  *
  *  - isDown(action):     ação mantida pressionada
  *  - wasPressed(action): ação pressionada NESTE passo de simulação
+ *
+ * Toque (v1.6): botões grandes de PAUSA, BOMBA e DASH (TouchControls.js).
+ * Fora deles, no esquema MODERNO o primeiro dedo cria um joystick flutuante
+ * (this.stick); no CLÁSSICO a nave segue o dedo (this.pointer).
  */
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { buildKeyMap, defaultBindings, loadBindings, STORAGE_KEY } from './KeyBindings.js';
+import { touchZone, stickVector, loadTouchSettings, isTouchDevice, SCHEME_KEY } from './TouchControls.js';
+
+export { touchZone };
 
 /** Mapa padrão tecla -> ação (as teclas podem ser trocadas em CONTROLES). */
 export const KEY_BINDINGS = Object.freeze(buildKeyMap(defaultBindings()));
-
-/**
- * Zonas de toque da tela de jogo (coordenadas lógicas 480x640).
- * Os botões são desenhados pelo HUD nos mesmos lugares.
- *  - canto superior direito: PAUSA (MENU nas telas de fim)
- *  - canto inferior direito: BOMBA, e logo acima dela: DASH
- * @returns {'pause'|'bomb'|'dash'|null}
- */
-export function touchZone(x, y) {
-  if (x > GAME_WIDTH - 72 && y < 44) return 'pause';
-  if (x > GAME_WIDTH - 64 && y > GAME_HEIGHT - 64) return 'bomb';
-  if (x > GAME_WIDTH - 64 && y > GAME_HEIGHT - 124 && y <= GAME_HEIGHT - 64) return 'dash';
-  return null;
-}
 
 export class Input {
   /**
@@ -41,9 +34,12 @@ export class Input {
     this.capture = null; // função que recebe a PRÓXIMA tecla (tela de controles)
     this.down = new Set();
     this.pressed = new Set();
-    this.pointer = { active: false, x: 0, y: 0, id: null };
+    this.pointer = { active: false, x: 0, y: 0, id: null }; // CLÁSSICO: dedo que move a nave
+    this.stick = { active: false, id: null, ox: 0, oy: 0, x: 0, y: 0, vec: { x: 0, y: 0, mag: 0 } }; // MODERNO
+    this.touchScheme = loadTouchSettings(storage).scheme;
     this.tap = null; // posição do último toque/clique neste passo (para menus)
-    this.touchMode = false; // true após o primeiro toque: mostra os botões na tela
+    // true em aparelhos de toque (ou após o primeiro toque): mostra os botões na tela
+    this.touchMode = isTouchDevice();
     this.canvas = canvas;
 
     target.addEventListener('keydown', (e) => {
@@ -82,45 +78,77 @@ export class Input {
     };
 
     canvas.addEventListener('pointerdown', (e) => {
-      const pos = toGame(e);
-      this.tap = pos;
-      if (e.pointerType !== 'mouse') this.touchMode = true;
-      // Botões de toque: pausa, bomba e dash (desenhados pelo HUD).
-      const zone = touchZone(pos.x, pos.y);
-      if (zone) {
-        this.pressed.add(zone);
-        return;
-      }
-      // Segundo dedo enquanto o primeiro move a nave = dash.
-      if (this.pointer.active && e.pointerType !== 'mouse') {
-        this.pressed.add('dash');
-        return;
-      }
-      this.pressed.add('confirm');
-      if (e.pointerType !== 'mouse') {
-        this.pointer.active = true;
-        this.pointer.id = e.pointerId;
-        this.pointer.x = pos.x;
-        this.pointer.y = pos.y;
-        canvas.setPointerCapture?.(e.pointerId);
-      }
+      const touch = e.pointerType !== 'mouse';
+      const captured = this.touchStart(toGame(e), { touch, id: e.pointerId });
+      if (captured) canvas.setPointerCapture?.(e.pointerId);
     });
-    canvas.addEventListener('pointermove', (e) => {
-      if (!this.pointer.active || e.pointerId !== this.pointer.id) return;
-      const pos = toGame(e);
-      this.pointer.x = pos.x;
-      this.pointer.y = pos.y;
-    });
-    const release = (e) => {
-      if (e.pointerId === this.pointer.id) {
-        this.pointer.active = false;
-        this.pointer.id = null;
-      }
-    };
+    canvas.addEventListener('pointermove', (e) => this.touchMove(e.pointerId, toGame(e)));
+    const release = (e) => this.touchEnd(e.pointerId);
     canvas.addEventListener('pointerup', release);
     // Sem menu de contexto / seleção ao segurar o dedo na tela.
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('pointercancel', release);
+  }
+
+  /** Esquema moderno (joystick) ativo? Só vale para toque. */
+  get modernTouch() {
+    return this.touchScheme === 'modern';
+  }
+
+  /** Troca o esquema de toque ('modern' | 'classic') e salva. */
+  setTouchScheme(scheme, save = true) {
+    this.touchScheme = scheme;
+    this.touchEnd(this.stick.id);
+    this.touchEnd(this.pointer.id);
+    if (save) this.storage?.set(SCHEME_KEY, scheme);
+  }
+
+  /**
+   * Dedo/clique encostou na tela (coordenadas lógicas).
+   * @returns {boolean} true se este dedo passou a ser acompanhado (joystick ou nave)
+   */
+  touchStart(pos, { touch = true, id = 0 } = {}) {
+    this.tap = pos;
+    if (touch) this.touchMode = true;
+    // Botões de toque: pausa, bomba e dash (desenhados pelo HUD).
+    const zone = touchZone(pos.x, pos.y);
+    if (zone) {
+      this.pressed.add(zone);
+      return false;
+    }
+    if (touch && this.modernTouch) {
+      // MODERNO: o primeiro dedo livre vira o joystick, centrado onde encostou.
+      if (this.stick.active) return false;
+      this.pressed.add('confirm');
+      Object.assign(this.stick, { active: true, id, ox: pos.x, oy: pos.y, x: pos.x, y: pos.y, vec: { x: 0, y: 0, mag: 0 } });
+      return true;
+    }
+    // CLÁSSICO: segundo dedo enquanto o primeiro move a nave = dash.
+    if (this.pointer.active && touch) {
+      this.pressed.add('dash');
+      return false;
+    }
+    this.pressed.add('confirm');
+    if (!touch) return false;
+    Object.assign(this.pointer, { active: true, id, x: pos.x, y: pos.y });
+    return true;
+  }
+
+  touchMove(id, pos) {
+    if (this.stick.active && id === this.stick.id) {
+      this.stick.x = pos.x;
+      this.stick.y = pos.y;
+      this.stick.vec = stickVector(this.stick.ox, this.stick.oy, pos.x, pos.y);
+    } else if (this.pointer.active && id === this.pointer.id) {
+      this.pointer.x = pos.x;
+      this.pointer.y = pos.y;
+    }
+  }
+
+  touchEnd(id) {
+    if (id == null) return;
+    if (id === this.stick.id) Object.assign(this.stick, { active: false, id: null, vec: { x: 0, y: 0, mag: 0 } });
+    if (id === this.pointer.id) Object.assign(this.pointer, { active: false, id: null });
   }
 
   /** Troca as teclas (e salva, se pedido). */

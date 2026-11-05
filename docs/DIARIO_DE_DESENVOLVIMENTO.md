@@ -5,6 +5,32 @@
 
 ---
 
+## 05/11/2026: Versão 1.6 (joystick e ajuda do celular)
+
+### Motivação
+O jogo foi pensado para teclado. No celular, arrastar a nave cobre a tela, os botões eram pequenos e a dificuldade era a mesma do computador. Pedido: botões maiores, um joystick, dois esquemas (o atual como **clássico** e um **moderno** mais simples) e inimigos com menos vida no celular. Decisões tomadas antes de começar: joystick **flutuante**, ajuda **moderada** (-25% de vida, tiros -10%, hitbox 3 px), **automática** em telas de toque, e no moderno só **bomba e dash** como botões (o foco vem do joystick).
+
+### O que foi feito
+1. `TouchControls.js` reúne geometria, joystick, preferências e a ajuda, tudo em funções puras.
+2. O `Input` ganhou `touchStart/touchMove/touchEnd`: os eventos do DOM só traduzem coordenadas e chamam esses métodos, então os testes simulam dedos sem navegador.
+3. `Player`: no moderno, o vetor do joystick define direção e velocidade (foco abaixo de 50% de inclinação) e o tiro é sempre automático.
+4. `PlayScene`: a ajuda entra no `hpScale` do chefe, na velocidade dos projéteis e em `enlist()`, que reduz a vida de todo alienígena criado (no mínimo 1).
+5. HUD com botões redondos maiores e anel de recarga, joystick desenhado (e um "fantasma" no canto mostrando onde tocar), menu principal em botões altos e página TOQUE na tela de controles.
+
+### Problemas encontrados e soluções
+| Problema | Solução |
+|---|---|
+| No celular, a primeira tela aparecia no layout de computador e o primeiro toque caía na opção errada (o layout trocava no meio do toque). | O `Input` detecta tela de toque ao abrir (`pointer: coarse`) e já começa em `touchMode`. |
+| A moldura do botão de pausa encostava no "FASE 1/2" do HUD (visto na captura). | Moldura mais baixa (30 px) e ícone subido. |
+| A pausa mostrava teclas de teclado no celular. | No modo toque, os botões mostram só o nome e a ajuda das teclas some. |
+| Alienígenas de 1 de vida ficariam com 0 ao reduzir 25%. | `Math.max(1, round(hp × 0,75))`. |
+
+### Aprendizados
+- Separar "evento do navegador" de "o que o toque significa" deixa a entrada testável e evita bugs de dedo-fantasma.
+- Facilitar pelos **dados** (multiplicadores) em vez de mudar cada chefe mantém o balanceamento do computador intacto.
+
+---
+
 ## 04/11/2026: Versão 1.5 (Mundo 5, Ômega, buffs, controles)
 
 ### Motivação

@@ -97,10 +97,11 @@ test('Mapa: cada mundo tem um nó por fase, dentro da tela e sem sobreposição'
 });
 
 // ------------------------------------------------------------ Celular
+// (v1.6: botões maiores; a geometria detalhada está em tests/touch.test.js)
 test('Toque: zonas de pausa, bomba e dash nos cantos; o resto da tela move a nave', () => {
   assert.equal(touchZone(W - 20, 20), 'pause');
-  assert.equal(touchZone(W - 30, H - 30), 'bomb');
-  assert.equal(touchZone(W - 30, H - 96), 'dash');
+  assert.equal(touchZone(W - 40, H - 40), 'bomb');
+  assert.equal(touchZone(W - 50, H - 150), 'dash');
   assert.equal(touchZone(W / 2, H - 30), null);
   assert.equal(touchZone(30, H - 96), null);
   assert.equal(touchZone(W / 2, H / 2), null);

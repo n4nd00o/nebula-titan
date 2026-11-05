@@ -52,7 +52,7 @@ O ponto de partida escolhido foi o **Galaga**, um dos *shoot 'em ups* mais icôn
 
 > **A ideia central:** cada parte do chefe que você destrói **muda a aparência e o comportamento dele**. Arrancar a asa direita deixa a nave sem a asa, desequilibrada e inclinada para aquele lado. A asa que sobra passa a atacar com mais fúria e o gerador de escudo escondido atrás dela fica exposto. **A ordem das suas escolhas muda a luta.**
 
-O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A **versão 1.3** transformou a campanha em um **sistema de progressão com 4 mundos**: cada mundo mantém o esquema de setores comuns, mini-chefes e um chefe, com dificuldade crescente, inimigos novos, 9 mini-chefes e 3 chefes inéditos, 12 buffs novos e progresso salvo. A **versão 1.4** trouxe o mapa de progresso, a versão para celular e os testes de garantia contra chefes imortais. A **versão 1.5** acrescentou o **Mundo 5 (Singularidade)**, com **6 mini-chefes de buffs únicos** e o chefe final **Ômega**, além de chefes de mundo que **escalam com os seus buffs**, um Leviatã com **10 fases**, a tela **Meus Buffs** e **teclas configuráveis**. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
+O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A **versão 1.3** transformou a campanha em um **sistema de progressão com 4 mundos**: cada mundo mantém o esquema de setores comuns, mini-chefes e um chefe, com dificuldade crescente, inimigos novos, 9 mini-chefes e 3 chefes inéditos, 12 buffs novos e progresso salvo. A **versão 1.4** trouxe o mapa de progresso, a versão para celular e os testes de garantia contra chefes imortais. A **versão 1.5** acrescentou o **Mundo 5 (Singularidade)**, com **6 mini-chefes de buffs únicos** e o chefe final **Ômega**, além de chefes de mundo que **escalam com os seus buffs**, um Leviatã com **10 fases**, a tela **Meus Buffs** e **teclas configuráveis**. A **versão 1.6** deixou o celular de primeira classe: **joystick flutuante** com tiro automático (esquema **MODERNO**) ou o esquema **CLÁSSICO**, **botões maiores** e uma **ajuda do celular** que tira 25% da vida dos inimigos. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
 
 ## 🧭 Objetivos
 
@@ -71,7 +71,7 @@ O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entre
 | **Continuar** | Retoma a campanha salva (o jogo salva após cada vitória). |
 | **Mundo < N >** | Começa direto em um mundo já alcançado, com os buffs dos mundos anteriores. |
 | **Meus Buffs** *(v1.5)* | Todos os 23 buffs, um mundo por página: os conquistados com efeito e origem, os que faltam como "???". Abre pela pausa (`I`), pelo mapa e pelo título. |
-| **Controles** *(v1.5)* | Troque as teclas de **todas as ações** (mover, atirar, foco, dash, bomba, pausa), com tecla principal e alternativa, aviso de conflito e "restaurar padrão". |
+| **Controles** *(v1.5 · v1.6)* | Troque as teclas de **todas as ações** (mover, atirar, foco, dash, bomba, pausa), com tecla principal e alternativa, aviso de conflito e "restaurar padrão". No celular, a página **TOQUE** escolhe o controle **MODERNO** ou **CLÁSSICO** e a **ajuda do celular**. |
 | **Mapa de progresso** *(v1.4)* | Mapa da galáxia com os 5 mundos: mostra onde você está, o que já venceu e o que falta. Tocar em um mundo abre as fases internas dele (setores, mini-chefes, chefe). Fases vencidas podem ser **rejogadas como treino**, sem alterar o save. |
 | **Duelo com o Titã** | Luta direta contra o chefe final, sem buffs: o desafio puro da versão 1.0. |
 
@@ -197,28 +197,31 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 💥 **Game feel moderno**: *hit-stop*, tremor de tela, flashes, partículas, ondas de choque e destroços com física.
 - 🎯 **Design justo**: hitbox reduzida, ataques telegrafados, modo foco (movimento preciso) e limpeza de tela ao morrer.
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
+- 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo), e **ajuda do celular** (inimigos com 25% menos vida, tiros 10% mais lentos, hitbox menor), automática em telas de toque.
 - 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
-- 🧪 **333 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
+- 🧪 **346 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
 
-| Ação | Teclado | Toque (celular) |
-|---|---|---|
-| Mover | `Setas` ou `W A S D` | Arrastar o dedo |
-| Atirar | `Espaço`, `Z` ou `J` (segure) | Automático ao tocar |
-| Modo foco (lento + hitbox visível) | `Shift` | — |
-| Dash *(buff do Ceifador)* | `C` ou `L` | Botão **DASH** (acima da bomba) ou um **segundo dedo** |
-| Bomba de Pulso *(após os 3 mini-chefes)* | `X` ou `K` | Botão **BOMBA** no canto inferior direito |
-| Ver meus buffs | `I` | Botão **MEUS BUFFS** na pausa / **BUFFS** no mapa |
-| Trocar teclas | Título → **CONTROLES** | (precisa de teclado) |
-| Navegar nos menus/mapas | `Setas` + `Enter` | Tocar na opção (no mapa: tocar de novo para jogar) |
-| Mapa de progresso (na Rota de Ataque) | `Tab` | Botão **MAPA** |
-| Pausar | `P` ou `Esc` | Botão ⏸ no canto superior direito |
-| Voltar ao menu (pausado) | `Q` | Botão **MENU** da pausa |
-| Ligar/desligar som | `M` | Botão **SOM** no título |
-| Ligar/desligar vibração | `V` | Botão **VIBRA** no título |
-| Tela cheia | `F` | Botão **TELA CHEIA** no título |
+| Ação | Teclado | Toque: MODERNO *(padrão, v1.6)* | Toque: CLÁSSICO |
+|---|---|---|---|
+| Mover | `Setas` ou `W A S D` | **Joystick**: toque e arraste em qualquer lugar | Arrastar o dedo |
+| Atirar | `Espaço`, `Z` ou `J` (segure) | Automático, sempre | Automático ao tocar |
+| Modo foco (lento + hitbox visível) | `Shift` | Joystick **pouco inclinado** | — |
+| Dash *(buff do Ceifador)* | `C` ou `L` | Botão **DASH** | Botão **DASH** ou um **segundo dedo** |
+| Bomba de Pulso *(após os 3 mini-chefes)* | `X` ou `K` | Botão **BOMBA** no canto inferior direito | igual |
+| Ver meus buffs | `I` | Botão **MEUS BUFFS** na pausa / **BUFFS** no mapa | igual |
+| Trocar teclas / esquema de toque | Título → **CONTROLES** | **CONTROLES** → página **TOQUE** | igual |
+| Navegar nos menus/mapas | `Setas` + `Enter` | Tocar na opção (no mapa: tocar de novo para jogar) | igual |
+| Mapa de progresso (na Rota de Ataque) | `Tab` | Botão **MAPA** | igual |
+| Pausar | `P` ou `Esc` | Botão ⏸ no canto superior direito | igual |
+| Voltar ao menu (pausado) | `Q` | Botão **MENU** da pausa | igual |
+| Ligar/desligar som | `M` | Botão **SOM** no título | igual |
+| Ligar/desligar vibração | `V` | Botão **VIBRA** no título | igual |
+| Tela cheia | `F` | Botão **TELA CHEIA** no título | igual |
+
+**Ajuda do celular** *(v1.6)*: em telas de toque, chefes e alienígenas têm **25% menos vida**, os tiros inimigos são **10% mais lentos** e a hitbox da nave é menor. Em **CONTROLES → TOQUE** dá para deixar **automática** (padrão), **ligada** ou **desligada**.
 
 **Dica:** a nave só é atingida no **pontinho central** (ative o modo foco para vê-lo). Use os colchetes amarelos para saber onde atirar.
 
@@ -325,13 +328,14 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (333 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
+A suíte (346 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).
 - **Todos os chefes (testes genéricos)**: cada chefe registrado tem a definição validada, cada alvo é verificado como atingível na sua fase e o fluxo completo até a derrota é simulado. Um chefe novo ganha esses testes **automaticamente**.
 - **Garantia "nenhum chefe imortal"** *(v1.4, `tests/reachability.test.js`)*: o teste joga cada chefe **como o jogador**, varrendo a tela com tiros retos que sobem do fundo, e só conta o dano quando o tiro chega ao ponto fraco sem bater em outra peça antes, por uma **janela de tiro de pelo menos 12 px** (uma fresta de 3 px não conta, porque ninguém consegue mirar nela). Cada fase precisa ser vencida dentro do limite de tempo. O mesmo arquivo confere as **hitboxes**: máscara de colisão = sprite, nenhum "acerto fantasma" fora do desenho e raio dos alienígenas compatível com o tamanho do sprite.
 - **Buffs únicos e controles** *(v1.5)*: a cena de jogo real roda com um jogo falso para provar o efeito de cada buff do Mundo 5; as teclas configuráveis são testadas na lógica (conflitos, teclas reservadas, dados salvos inválidos) e no `Input` de verdade.
+- **Celular** *(v1.6, `tests/touch.test.js`)*: botões grandes sem sobreposição, joystick (zona morta, limite e direção), o `Input` nos esquemas moderno e clássico, a nave com foco pelo joystick e tiro automático e a ajuda do celular aplicada na cena de jogo real.
 - **Documentação**: todo arquivo de teste precisa estar no catálogo e toda versão precisa do seu relatório de entrega (`tests/docs.test.js`).
 - **Mapa de progresso e celular**: estados das fases (vencida/disponível/bloqueada), histórico que sobrevive ao fim da campanha, saves antigos, layout sem sobreposição, zonas de toque, botões da pausa e vibração (inclusive em aparelhos sem suporte).
 - **Mecânicas dos mini-chefes**: rotação acelerada das cápsulas, barreiras bloqueando tiros, produção de drones por ninho e o ciclo aviso → investida → retorno do Ceifador.
@@ -379,7 +383,7 @@ nebula-titan/
 ├── src/
 │   ├── main.js              # Ponto de entrada
 │   ├── config.js            # Constantes e parâmetros de balanceamento
-│   ├── core/                # Motor: loop, entrada (teclado/toque), áudio, vibração, armazenamento
+│   ├── core/                # Motor: loop, entrada (teclado/toque/joystick), áudio, vibração, armazenamento
 │   ├── graphics/            # Paleta, sprites em texto, SpriteBank, texto
 │   ├── systems/             # Partículas, colisão, fundo, pontuação, campanha, progresso
 │   ├── entities/            # Jogador, nave aliada, projéteis, alienígenas, power-ups, lasers
@@ -422,6 +426,7 @@ nebula-titan/
 - [x] Motor de chefes genérico (novos chefes = novos arquivos de dados)
 - [x] Setores de ondas em formação + chefe final de 8 fases maior que a tela (v1.2)
 - [x] Progressão em 4 mundos, 12 chefes novos, 3 alienígenas novos, 12 buffs novos, save e seleção de mundo (v1.3)
+- [x] Celular de primeira classe: joystick flutuante (MODERNO) ou CLÁSSICO, botões maiores e ajuda do celular (v1.6)
 - [x] Mundo 5 com 6 mini-chefes de buffs únicos e o chefe final Ômega, chefes que escalam com os buffs, Leviatã com 10 fases, tela de buffs e teclas configuráveis (v1.5)
 - [x] Mapa de progresso com modo treino, testes de garantia contra chefes imortais e versão para celular: botões, tela cheia, vibração e PWA offline (v1.4)
 - [ ] Sprites desenhados à mão (modo misto)

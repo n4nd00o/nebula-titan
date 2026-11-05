@@ -3,6 +3,23 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - 2026-11-05
+
+### Adicionado
+- **Dois jeitos de jogar no celular** (`src/core/TouchControls.js`):
+  - **MODERNO** (padrão): **joystick flutuante** que nasce onde o polegar encosta, **tiro automático** e botões grandes de **BOMBA** e **DASH** à direita. Joystick pouco inclinado (dentro do anel tracejado) = **modo foco**, lento e com a hitbox visível.
+  - **CLÁSSICO**: o esquema original (a nave segue o dedo, segundo dedo = dash).
+- **Ajuda do celular**: inimigos (chefes e alienígenas) com **25% menos vida**, projéteis inimigos **10% mais lentos** e hitbox da nave de **3 px** (4 px no computador). Fica em **AUTOMÁTICA** por padrão (liga sozinha em telas de toque) e pode ser ligada ou desligada.
+- Página **TOQUE** na tela **CONTROLES**, que abre direto no celular: cartões com desenho de cada esquema e o seletor da ajuda. A aba **TECLADO/TOQUE** alterna entre as páginas. As escolhas ficam salvas (`touchScheme`, `mobileAssist`).
+- `tests/touch.test.js` (13 testes): geometria dos botões, joystick (zona morta, limite, direção), `Input` nos dois esquemas, nave no esquema moderno (velocidade, foco, tiro automático) e a ajuda do celular na `PlayScene` real. Total: **346 testes**.
+
+### Alterado
+- **Botões de toque maiores:** bomba com 38 px de raio e dash com 32 px (eram 22 e 20), com anel de recarga; botão de pausa com moldura. O teste de zonas de toque em `progress.test.js` foi atualizado para a geometria nova.
+- **Menu principal no celular:** cada opção vira um botão alto (36 px entre linhas); o rodapé mostra o esquema de toque e se a ajuda está ligada.
+- **Pausa no celular:** sem teclas nos botões; mostra o esquema de toque e a ajuda do celular.
+- O jogo detecta aparelhos de toque ao abrir (`pointer: coarse`), então os botões aparecem já na primeira tela, sem esperar o primeiro toque.
+- `Input`: o tratamento de toque virou os métodos `touchStart`, `touchMove` e `touchEnd`, testáveis sem navegador.
+
 ## [1.5.0] - 2026-11-04
 
 ### Adicionado

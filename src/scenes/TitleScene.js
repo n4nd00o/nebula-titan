@@ -13,6 +13,8 @@
  *
  * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA,
  * e à esquerda uma lupa de busca.
+ *
+ * No celular (v1.6) o menu vira uma coluna de botões mais altos, fáceis de tocar.
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, UI_COLORS } from '../config.js';
 import { drawText } from '../graphics/text.js';
@@ -24,6 +26,7 @@ import { BuffsScene } from './BuffsScene.js';
 import { ControlsScene } from './ControlsScene.js';
 import { controlsHelp } from '../core/KeyBindings.js';
 import { canVibrate, vibrationEnabled, toggleVibration } from '../core/Haptics.js';
+import { SCHEME_LABELS, loadTouchSettings, assistActive } from '../core/TouchControls.js';
 import { openSearch, isSearchOpen } from './SearchOverlay.js';
 import { HEART_BOSS } from '../boss/bosses/heart.js';
 
@@ -34,6 +37,8 @@ const BOSS_PREVIEW = [
 
 const MENU_Y = 300;
 const MENU_GAP = 27;
+/** Menu no celular: começa mais acima e com linhas mais altas. */
+const TOUCH_MENU = Object.freeze({ y: 250, gap: 36, h: 32 });
 const SEARCH_BUTTON = Object.freeze({ x: 8, y: 8, w: 28, h: 24 });
 
 /** Abre a campanha no ponto certo: setor linear ou mapa de escolha. */
@@ -61,7 +66,7 @@ export class TitleScene {
     if (this.unlocked > 1) this.options.push({ id: 'world', label: 'MUNDO', detail: '' });
     this.options.push({ id: 'map', label: 'MAPA DE PROGRESSO', detail: 'Veja onde você está e rejogue fases vencidas (treino)' });
     this.options.push({ id: 'buffs', label: 'MEUS BUFFS', detail: 'Os buffs da campanha salva e de onde vem cada um' });
-    this.options.push({ id: 'controls', label: 'CONTROLES', detail: 'Troque as teclas de cada ação (salvo no navegador)' });
+    this.options.push({ id: 'controls', label: 'CONTROLES', detail: 'Teclas, joystick do celular e ajuda do celular' });
     this.options.push({ id: 'duel', label: 'DUELO COM O TITÃ', detail: `Luta direta contra o Nebula Titan · RECORDE ${storage.get('hiscore', 0)}` });
     this.selected = 0;
   }
@@ -104,7 +109,8 @@ export class TitleScene {
     }
     // Toque/clique em uma opção do menu (no seletor de mundo: bordas trocam o mundo).
     if (input.tap) {
-      const index = Math.floor((input.tap.y - MENU_Y + 12) / MENU_GAP);
+      const m = this.menuLayout;
+      const index = Math.floor((input.tap.y - m.y + m.pad) / m.gap);
       if (index >= 0 && index < n) {
         this.selected = index;
         if (this.current.id === 'world' && input.tap.x < W / 2 - 60) this.changeWorld(-1);
@@ -114,6 +120,13 @@ export class TitleScene {
       }
     }
     if (!input.tap && (input.wasPressed('confirm') || input.wasPressed('fire'))) this.start();
+  }
+
+  /** Posição das linhas do menu (no celular, botões mais altos). */
+  get menuLayout() {
+    return this.game.input.touchMode
+      ? { y: TOUCH_MENU.y, gap: TOUCH_MENU.gap, pad: 10, touch: true }
+      : { y: MENU_Y, gap: MENU_GAP, pad: 12, touch: false };
   }
 
   /** Botões de toque no topo da tela (da direita para a esquerda). */
@@ -203,10 +216,19 @@ export class TitleScene {
     drawText(ctx, 'CINCO MUNDOS. VINTE E QUATRO CHEFES. UM ÔMEGA.', W / 2, 200, { size: 7, align: 'center', color: UI_COLORS.muted });
 
     // Menu
+    const m = this.menuLayout;
     this.options.forEach((opt, i) => {
-      const y = MENU_Y + i * MENU_GAP;
+      const y = m.y + i * m.gap;
       const active = i === this.selected;
-      if (active) {
+      if (m.touch) {
+        // Celular: cada opção é um botão.
+        ctx.fillStyle = active ? 'rgba(59, 93, 201, 0.35)' : 'rgba(26, 28, 44, 0.75)';
+        ctx.fillRect(W / 2 - 150, y - 10, 300, TOUCH_MENU.h);
+        ctx.strokeStyle = active ? UI_COLORS.accent : '#333c57';
+        ctx.lineWidth = active ? 2 : 1;
+        ctx.strokeRect(W / 2 - 149.5, y - 9.5, 299, TOUCH_MENU.h - 1);
+      }
+      if (active && !m.touch) {
         const blink = Math.floor(this.time * 3) % 2 === 0;
         drawText(ctx, '>', W / 2 - 130, y, { size: 12, color: blink ? UI_COLORS.accent : '#b13e53' });
       }
@@ -217,21 +239,34 @@ export class TitleScene {
         label = `MUNDO < ${w.number} >`;
         detail = `${w.name} · começa com os buffs dos mundos anteriores`;
       }
+      if (m.touch) {
+        drawText(ctx, label, W / 2, y - 2, { size: 11, align: 'center', color: active ? UI_COLORS.text : '#94b0c2' });
+        if (active) drawText(ctx, detail, W / 2, y + 12, { size: 5, align: 'center', color: UI_COLORS.muted });
+        return;
+      }
       drawText(ctx, label, W / 2 - 110, y, { size: 12, color: active ? UI_COLORS.text : '#566c86' });
       if (active) drawText(ctx, detail, W / 2 - 110, y + 15, { size: 5, color: UI_COLORS.muted });
     });
 
     // Controles: texto de teclado ou de toque, conforme o aparelho.
     const touch = this.game.input.touchMode;
-    const controls = touch
-      ? ['ARRASTE o dedo para mover (tiro automático)', 'Botões BOMBA e DASH no canto · 2º dedo = dash']
-      : controlsHelp(this.game.input.bindings);
-    controls.forEach((line, i) => {
-      drawText(ctx, line, W / 2, 512 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted });
-    });
-    drawText(ctx, '(dash e bomba são liberados na campanha)', W / 2, 542, { size: 5, align: 'center', color: '#566c86' });
-
-    drawText(ctx, touch ? 'Toque em uma opção' : '^ v escolher   ENTER confirmar', W / 2, 566, { size: 6, align: 'center', color: '#566c86' });
+    if (touch) {
+      const settings = loadTouchSettings(this.game.storage);
+      const modern = this.game.input.touchScheme === 'modern';
+      const lines = modern
+        ? ['JOYSTICK: toque e arraste em qualquer lugar', 'Tiro automático · BOMBA e DASH à direita']
+        : ['ARRASTE o dedo para mover (tiro automático)', 'Botões BOMBA e DASH no canto · 2º dedo = dash'];
+      lines.forEach((line, i) => drawText(ctx, line, W / 2, 516 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted }));
+      const assist = assistActive(settings.assist, true) ? 'AJUDA DO CELULAR LIGADA' : 'AJUDA DO CELULAR DESLIGADA';
+      drawText(ctx, `CONTROLE ${SCHEME_LABELS[this.game.input.touchScheme]} · ${assist}`, W / 2, 548, { size: 5, align: 'center', color: '#38b764' });
+      drawText(ctx, 'Troque em CONTROLES', W / 2, 562, { size: 5, align: 'center', color: '#566c86' });
+    } else {
+      controlsHelp(this.game.input.bindings).forEach((line, i) => {
+        drawText(ctx, line, W / 2, 512 + i * 14, { size: 6, align: 'center', color: UI_COLORS.muted });
+      });
+      drawText(ctx, '(dash e bomba são liberados na campanha)', W / 2, 542, { size: 5, align: 'center', color: '#566c86' });
+      drawText(ctx, '^ v escolher   ENTER confirmar', W / 2, 566, { size: 6, align: 'center', color: '#566c86' });
+    }
 
     for (const b of this.topButtons()) {
       ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';

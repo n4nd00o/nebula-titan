@@ -124,6 +124,19 @@ Pedido após zerar a campanha:
 | Quais teclas remapear | **Todas as ações** | Acessibilidade e preferência pessoal |
 | Estrutura da fase final | **Mundo 5 depois do Leviatã**: 6 mini-chefes em 2 círculos + Ômega, sem setores | Clímax direto, mantendo a escolha de rota |
 
+### 2.6e Evolução na versão 1.6: celular de primeira classe
+
+Pedido:
+
+> *"Eu queria que os botões ficassem melhor para o celular, atualmente o jogo é feito pensando em jogar no computador, gostaria de que se for jogado no celular fique bem mais fácil, tipo inimigos com menos vida um pouco pelo menos, interface mais voltada para mexer pelo celular, gameplay mais acessível para celular, botões maiores e talvez um joystick para jogar, podendo ter dois modos de controlar, sendo o atual "clássico" e o moderno mais simplificado"*
+
+| Pergunta | Decisão | Motivo |
+|---|---|---|
+| Como funciona o joystick | **Flutuante** (nasce onde o polegar encosta) | Padrão dos jogos de celular; serve para qualquer mão |
+| Quanto facilitar | **Moderado**: -25% de vida, tiros -10%, hitbox 3 px | Continua desafiador |
+| Quando a ajuda vale | **Automática em telas de toque**, com opção em CONTROLES | Ninguém precisa procurar; quem quer o desafio desliga |
+| Botões do modo moderno | **Bomba + dash grandes**; foco pelo joystick | Menos botões, mais área livre para o polegar |
+
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.

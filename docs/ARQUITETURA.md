@@ -182,6 +182,7 @@ Arquivos: [`src/systems/Progress.js`](../src/systems/Progress.js) (lógica pura)
 ### 4.3 Celular (v1.4)
 
 - `touchZone(x, y)` (em `Input.js`) é a fonte única das áreas de toque (pausa, bomba, dash); o HUD desenha os botões nos mesmos lugares. `input.touchMode` liga os botões após o primeiro toque.
+- **v1.6:** `src/core/TouchControls.js` é a fonte única do que é específico do celular: geometria dos botões (`TOUCH_BUTTONS`, `touchZone`), joystick (`STICK`, `stickVector`), preferências (`touchScheme`, `mobileAssist`) e o tamanho da ajuda (`MOBILE_ASSIST`). O `Input` trata os dedos em `touchStart/touchMove/touchEnd` (testáveis sem DOM): no esquema moderno o 1º dedo livre vira `input.stick`; no clássico, `input.pointer`. A `PlayScene` aplica a ajuda em três pontos: `hpScale` do chefe, `bulletSpeed` e `enlist()` (vida dos alienígenas). `input.touchMode` já nasce verdadeiro em aparelhos de toque (`pointer: coarse`).
 - `Game.toggleFullscreen()` pede tela cheia e trava em retrato (quando o navegador permite); `resize()` usa o tamanho do `#app`, que já desconta as áreas seguras (`env(safe-area-inset-*)`).
 - `Haptics.js` encapsula `navigator.vibrate` com o ajuste salvo; sem suporte, não faz nada.
 - **PWA:** `manifest.webmanifest` + `sw.js` com estratégia **rede primeiro, cache de reserva**. Online, cada deploy aparece na hora; offline, o jogo sai do cache. O service worker fica desligado no `?debug`.

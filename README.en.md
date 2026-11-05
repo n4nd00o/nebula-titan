@@ -124,28 +124,29 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 💥 Modern **game feel**: hit-stop, screen shake, flashes, particles, shockwaves, physics debris.
 - 🎯 **Fair design**: tiny hitbox, telegraphed attacks, focus mode, screen clear on death.
 - 🏆 Scoring with time/accuracy/no-damage bonuses, **S/A/B/C rank** and persistent high score.
+- 🕹️ **Mobile joystick** *(v1.6)*: **MODERN** scheme (floating joystick, auto-fire, focus by tilting the stick slightly, big bomb/dash buttons) or **CLASSIC** (the ship follows your finger), plus **mobile assist** (enemies with 25% less HP, 10% slower enemy bullets, smaller hitbox), automatic on touch screens.
 - 📱 **Mobile-ready** *(v1.4)*: on-screen **bomb/dash/pause** buttons, fully touch-driven menus, **fullscreen** portrait mode, rotate-device hint, notch-safe layout, **vibration**, and **installable PWA that works offline**.
 - 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
-- 🧪 **333 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
+- 🧪 **346 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls
 
-| Action | Keyboard | Touch |
+| Action | Keyboard | Touch (MODERN, default since v1.6 · CLASSIC) |
 |---|---|---|
-| Move | `Arrows` / `WASD` | Drag |
-| Shoot | `Space` / `Z` / `J` (hold) | Automatic while touching |
-| Focus mode (slow + visible hitbox) | `Shift` | — |
-| Dash *(Reaper buff)* | `C` / `L` | **DASH** button or a **second finger** |
+| Move | `Arrows` / `WASD` | **Joystick**: touch and drag anywhere · CLASSIC: drag the ship |
+| Shoot | `Space` / `Z` / `J` (hold) | Always automatic · CLASSIC: while touching |
+| Focus mode (slow + visible hitbox) | `Shift` | Tilt the joystick slightly · CLASSIC: — |
+| Dash *(Reaper buff)* | `C` / `L` | **DASH** button · CLASSIC: also a **second finger** |
 | Pulse Bomb *(after all mini-bosses)* | `X` / `K` | **BOMB** button (bottom right) |
 | Progress map (from the route screen) | `Tab` | **MAPA** button |
 | Pause | `P` / `Esc` | ⏸ button (top right) |
 | Quit to menu (paused) | `Q` | **MENU** button |
 | Toggle sound / vibration / fullscreen | `M` / `V` / `F` | Buttons on the title screen |
 | My buffs | `I` | **MEUS BUFFS** button (pause) |
-| Remap keys | Title → **CONTROLES** | (keyboard needed) |
+| Remap keys / touch scheme | Title → **CONTROLES** | **CONTROLES** → **TOQUE** page (MODERN/CLASSIC + mobile assist) |
 
 ## ▶️ Running
 

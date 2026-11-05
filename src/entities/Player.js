@@ -6,10 +6,13 @@
  *    o jogador sente que "escapou por pouco" em vez de morrer injustamente;
  *  - modo foco (Shift): movimento lento e hitbox visível para desvios finos;
  *  - movimento em 2 eixos (o Galaga original só movia na horizontal);
- *  - invencibilidade temporária após renascer.
+ *  - invencibilidade temporária após renascer;
+ *  - celular (v1.6): joystick flutuante com tiro automático (MODERNO) ou
+ *    nave que segue o dedo (CLÁSSICO). Ver core/TouchControls.js.
  */
 import { GAME_WIDTH, GAME_HEIGHT, PLAYER } from '../config.js';
 import { clamp, approach } from '../utils/math.js';
+import { STICK } from '../core/TouchControls.js';
 
 export class Player {
   constructor() {
@@ -76,8 +79,22 @@ export class Player {
     let dx = 0;
     let dy = 0;
     this.focused = input.isDown('focus');
+    // Esquema MODERNO no celular: joystick flutuante + tiro automático.
+    const modern = Boolean(input.touchMode && input.touchScheme === 'modern');
+    const stick = input.stick;
 
-    if (input.pointer.active) {
+    if (modern && stick?.active) {
+      // Joystick: direção analógica; pouco inclinado = modo foco (lento, hitbox visível).
+      const v = stick.vec;
+      if (v.mag > 0) {
+        this.focused = v.mag < STICK.focusBelow;
+        const speed = this.focused ? PLAYER.focusSpeed : PLAYER.speed;
+        this.x += (v.x / v.mag) * speed * dt;
+        this.y += (v.y / v.mag) * speed * dt;
+        dx = Math.abs(v.x) > 0.3 ? Math.sign(v.x) : 0;
+        dy = Math.abs(v.y) > 0.3 ? Math.sign(v.y) : 0;
+      }
+    } else if (input.pointer.active) {
       // Toque: a nave segue o dedo (um pouco acima, para o dedo não cobrir a nave).
       const tx = input.pointer.x;
       const ty = input.pointer.y - PLAYER.touchOffset;
@@ -121,7 +138,7 @@ export class Player {
     this.y = clamp(this.y, PLAYER.minY, GAME_HEIGHT - 30);
 
     this.fireTimer -= dt;
-    const wantsFire = input.isDown('fire') || input.pointer.active;
+    const wantsFire = input.isDown('fire') || input.pointer.active || modern;
     if (wantsFire && this.fireTimer <= 0) {
       const base = this.rapidTime > 0 ? PLAYER.rapidCooldown : PLAYER.fireCooldown;
       this.fireTimer = this.buffs.has('overdrive') ? base * PLAYER.overdriveFactor : base;

@@ -16,6 +16,9 @@
  *  - practice: TREINO pelo Mapa de Progresso — rejoga uma fase já vencida
  *              com os buffs atuais, sem alterar o save nem o recorde.
  *
+ * AJUDA DO CELULAR (v1.6): em aparelhos de toque, inimigos têm menos vida,
+ * os tiros inimigos são mais lentos e a hitbox da nave é menor (MOBILE_ASSIST).
+ *
  * Sub-estados: playing | paused | gameover | victory
  */
 import { GAME_WIDTH as W, GAME_HEIGHT as H, PLAYER, DEBUG, UI_COLORS } from '../config.js';
@@ -43,6 +46,9 @@ import { PROGRESS_KEY } from '../systems/Progress.js';
 import { haptic } from '../core/Haptics.js';
 import { keyLabel, controlsHelp } from '../core/KeyBindings.js';
 import { BuffsScene } from './BuffsScene.js';
+import {
+  MOBILE_ASSIST, TOUCH_BUTTONS, STICK, SCHEME_LABELS, loadTouchSettings, assistActive, isTouchDevice,
+} from '../core/TouchControls.js';
 
 const MAX_ENEMY_BULLETS = 450;
 
@@ -97,10 +103,13 @@ export class PlayScene {
     this.worldIndex = campaign ? Math.max(0, worldIndexOf(bossId)) : 0;
     this.world = WORLDS[this.worldIndex];
     const difficulty = campaign ? campaign.difficultyFor(bossId) : { attackRate: 1, bulletSpeed: 1, hpScale: 1 };
-    this.bulletSpeed = difficulty.bulletSpeed;
+    // Ajuda do celular: "automática" liga sozinha em aparelhos de toque.
+    this.assist = assistActive(loadTouchSettings(this.storage).assist, game.input.touchMode || isTouchDevice());
+    this.bulletSpeed = difficulty.bulletSpeed * (this.assist ? MOBILE_ASSIST.bulletSpeed : 1);
 
     this.particles = new ParticleSystem();
     this.player = new Player();
+    if (this.assist) this.player.hitRadius = MOBILE_ASSIST.hitRadius;
     this.player.buffs = campaign ? campaign.buffs : new Set(this.def.playerBuffs ?? []);
     const buffs = this.player.buffs;
     this.wingmen = [];
@@ -122,7 +131,8 @@ export class PlayScene {
 
     // Na campanha, Titã e Leviatã chegam reforçados (o jogador está cheio de buffs)
     // e cada mundo acelera os ataques.
-    const { hpScale, attackRate } = difficulty;
+    const { attackRate } = difficulty;
+    const hpScale = difficulty.hpScale * (this.assist ? MOBILE_ASSIST.hpScale : 1);
     this.boss = this.def.kind === 'waves'
       ? new WaveStage(this, this.def, { attackRate })
       : new Boss(this, this.def, { hpScale, attackRate });
@@ -269,18 +279,24 @@ export class PlayScene {
     const dir = Math.random() < 0.5 ? -1 : 1;
     const baseX = rand(110, W - 110);
     for (let i = 0; i < count; i++) {
-      this.minions.push(new Minion(baseX, i * 0.3, dir, { type: i < orange ? 'orange' : type }));
+      this.minions.push(this.enlist(new Minion(baseX, i * 0.3, dir, { type: i < orange ? 'orange' : type })));
     }
   }
 
   /** Alienígena nascendo de um ponto específico (ninho da Colmeia, hangar do Leviatã). */
   spawnMinion(x, y, { entryTime = 0.7, dir = 1, type = 'green' } = {}) {
-    this.minions.push(new Minion(x, 0, dir, { startY: y, entryTime, type }));
+    this.minions.push(this.enlist(new Minion(x, 0, dir, { startY: y, entryTime, type })));
   }
 
   /** Inimigo já construído (alienígenas de formação das fases de ondas). */
   addEnemy(enemy) {
-    this.minions.push(enemy);
+    this.minions.push(this.enlist(enemy));
+  }
+
+  /** Ajuda do celular: alienígenas com menos vida (no mínimo 1). */
+  enlist(enemy) {
+    if (this.assist) enemy.hp = Math.max(1, Math.round(enemy.hp * MOBILE_ASSIST.hpScale));
+    return enemy;
   }
 
   spawnLaserWall(options) {
@@ -981,6 +997,7 @@ export class PlayScene {
     }
 
     this.drawHud(ctx);
+    this.drawJoystick(ctx);
     this.drawAnnouncement(ctx);
 
     if (this.state === 'paused') this.drawPause(ctx);
@@ -1004,28 +1021,26 @@ export class PlayScene {
     drawText(ctx, 'RECORDE', W / 2, 8, { size: 7, color: UI_COLORS.muted, align: 'center' });
     drawText(ctx, String(Math.max(this.hiscore, this.score)).padStart(7, '0'), W / 2, 19, { size: 10, align: 'center', color: UI_COLORS.accent });
 
-    // Botão de pausa (útil no celular)
-    ctx.fillStyle = 'rgba(148, 176, 194, 0.5)';
-    ctx.fillRect(W - 30, 10, 5, 16);
-    ctx.fillRect(W - 21, 10, 5, 16);
-
-    // Botão de DASH na tela (só no celular; o 2º dedo também funciona)
+    // Botão de pausa (no celular vira um botão grande)
     const touch = this.input.touchMode;
+    if (touch) {
+      ctx.fillStyle = 'rgba(26, 28, 44, 0.6)';
+      ctx.fillRect(W - 54, 3, 46, 30);
+      ctx.strokeStyle = 'rgba(148, 176, 194, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(W - 53, 4, 44, 28);
+    }
+    ctx.fillStyle = 'rgba(148, 176, 194, 0.7)';
+    ctx.fillRect(W - 39, 9, 6, 18);
+    ctx.fillRect(W - 29, 9, 6, 18);
+
+    // Botão de DASH na tela (só no celular), com a recarga desenhada em volta.
     if (touch && this.player.buffs.has('dash')) {
       const ready = this.player.dashCooldown <= 0;
-      const cx = W - 34;
-      const cy = H - 96;
-      ctx.fillStyle = ready ? 'rgba(255, 205, 117, 0.3)' : 'rgba(86, 108, 134, 0.25)';
-      ctx.beginPath();
-      ctx.arc(cx, cy, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = ready ? '#ffcd75' : '#566c86';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      drawText(ctx, '>>', cx, cy - 1, { size: 8, align: 'center', baseline: 'middle', color: ready ? '#ffffff' : '#566c86' });
-      drawText(ctx, 'DASH', cx, cy + 23, { size: 5, align: 'center', color: UI_COLORS.muted, baseline: 'top' });
+      const max = this.player.buffs.has('phantom') ? PLAYER.phantomDashCooldown : PLAYER.dashCooldown;
+      this.drawTouchButton(ctx, TOUCH_BUTTONS.dash, ready, '#ffcd75', 'rgba(255, 205, 117, 0.3)', '>>', 'DASH', ready ? 1 : 1 - this.player.dashCooldown / max);
     }
-    if (this.practice) drawText(ctx, 'TREINO', W - 40, 19, { size: 7, align: 'right', color: UI_COLORS.info });
+    if (this.practice) drawText(ctx, 'TREINO', touch ? W - 62 : W - 40, 19, { size: 7, align: 'right', color: UI_COLORS.info });
 
     const boss = this.boss;
     if (boss.state !== 'entering' && boss.state !== 'dead') {
@@ -1082,7 +1097,9 @@ export class PlayScene {
     }
 
     // Botão/indicador da bomba (canto inferior direito; também é área de toque)
-    if (player.buffs.has('bomb')) {
+    if (player.buffs.has('bomb') && touch) {
+      this.drawTouchButton(ctx, TOUCH_BUTTONS.bomb, this.bombs > 0, '#e43b8c', 'rgba(228, 59, 140, 0.35)', `X${this.bombs}`, 'BOMBA', 1);
+    } else if (player.buffs.has('bomb')) {
       const cx = W - 34;
       const cy = H - 34;
       ctx.fillStyle = this.bombs > 0 ? 'rgba(228, 59, 140, 0.35)' : 'rgba(86, 108, 134, 0.25)';
@@ -1107,7 +1124,8 @@ export class PlayScene {
     }
     if (player.buffs.has('rebirth')) tags.push({ text: this.rebirthUsed ? 'RENASCER USADO' : 'RENASCER', color: this.rebirthUsed ? '#566c86' : '#ef7d57' });
     tags.forEach((tag, i) => {
-      drawText(ctx, tag.text, W - 12, H - 76 - i * 12, { size: 7, align: 'right', color: tag.color });
+      // No celular os botões grandes ocupam o canto: as etiquetas vão para a esquerda deles.
+      drawText(ctx, tag.text, touch ? W - 100 : W - 12, H - 76 - i * 12, { size: 7, align: 'right', color: tag.color });
     });
   }
 
@@ -1161,14 +1179,78 @@ export class PlayScene {
       ctx.lineWidth = 2;
       ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
       const pauseKey = keyLabel(this.input.bindings.pause[0]);
-      const label = { resume: `CONTINUAR  (${pauseKey})`, buffs: 'MEUS BUFFS  (I)', menu: this.practice ? 'MAPA  (Q)' : 'MENU  (Q)' }[b.id];
+      // No celular as teclas não fazem sentido: só o nome do botão.
+      const touch = this.input.touchMode;
+      const label = touch
+        ? { resume: 'CONTINUAR', buffs: 'MEUS BUFFS', menu: this.practice ? 'MAPA' : 'MENU' }[b.id]
+        : { resume: `CONTINUAR  (${pauseKey})`, buffs: 'MEUS BUFFS  (I)', menu: this.practice ? 'MAPA  (Q)' : 'MENU  (Q)' }[b.id];
       drawText(ctx, label, W / 2, b.y + b.h / 2, { size: 8, align: 'center', baseline: 'middle' });
     }
     // Controles atuais (as teclas podem ser trocadas em CONTROLES, no título).
-    controlsHelp(this.input.bindings).forEach((line, i) => {
+    if (!this.input.touchMode) controlsHelp(this.input.bindings).forEach((line, i) => {
       drawText(ctx, line, W / 2, 372 + i * 16, { size: 6, align: 'center', color: UI_COLORS.muted });
     });
     drawText(ctx, `BUFFS CONQUISTADOS: ${this.player.buffs.size}/${Object.keys(BUFFS).length}`, W / 2, 420, { size: 7, align: 'center', color: UI_COLORS.accent });
+    if (this.input.touchMode) {
+      drawText(ctx, `CONTROLE DE TOQUE: ${SCHEME_LABELS[this.input.touchScheme] ?? 'MODERNO'}`, W / 2, 446, { size: 7, align: 'center', color: UI_COLORS.muted });
+    }
+    if (this.assist) {
+      drawText(ctx, 'AJUDA DO CELULAR LIGADA: inimigos -25% vida, tiros mais lentos', W / 2, 464, { size: 5, align: 'center', color: '#38b764' });
+    }
+  }
+
+  /** Botão redondo de toque (bomba/dash) com anel de recarga. */
+  drawTouchButton(ctx, b, ready, color, fill, label, caption, charge) {
+    ctx.fillStyle = ready ? fill : 'rgba(86, 108, 134, 0.22)';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(86, 108, 134, 0.7)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    if (charge > 0) {
+      ctx.strokeStyle = ready ? color : '#94b0c2';
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * charge);
+      ctx.stroke();
+    }
+    drawText(ctx, label, b.x, b.y - 3, { size: 11, align: 'center', baseline: 'middle', color: ready ? '#ffffff' : '#566c86' });
+    drawText(ctx, caption, b.x, b.y + b.r - 16, { size: 5, align: 'center', color: ready ? UI_COLORS.muted : '#566c86', baseline: 'top' });
+  }
+
+  /** Joystick do esquema MODERNO: onde o polegar está (ou um "fantasma" mostrando onde tocar). */
+  drawJoystick(ctx) {
+    const input = this.input;
+    if (!input.touchMode || input.touchScheme !== 'modern' || this.state !== 'playing') return;
+    const s = input.stick;
+    const active = s?.active;
+    const ox = active ? s.ox : STICK.ghost.x;
+    const oy = active ? s.oy : STICK.ghost.y;
+    const v = active ? s.vec : { x: 0, y: 0, mag: 0 };
+    ctx.save();
+    ctx.globalAlpha = active ? 0.55 : 0.22;
+    ctx.strokeStyle = '#94b0c2';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(ox, oy, STICK.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    // Anel interno: com o polegar dentro dele o movimento é lento (modo foco).
+    ctx.globalAlpha *= 0.5;
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(ox, oy, STICK.radius * STICK.focusBelow, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = active ? 0.75 : 0.3;
+    ctx.fillStyle = v.mag > 0 && v.mag < STICK.focusBelow ? '#e43b8c' : '#73eff7';
+    ctx.beginPath();
+    ctx.arc(ox + v.x * STICK.radius, oy + v.y * STICK.radius, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    if (!active && this.stats.time < 8) {
+      drawText(ctx, 'TOQUE E ARRASTE', ox, oy + STICK.radius + 8, { size: 5, align: 'center', color: UI_COLORS.muted });
+    }
   }
 
   drawGameOver(ctx) {

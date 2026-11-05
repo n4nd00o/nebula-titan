@@ -6,6 +6,40 @@
 
 ---
 
+## [1.6.0] - 2026-11-05
+
+**Pedido:** "Eu queria que os botões ficassem melhor para o celular, atualmente o jogo é feito pensando em jogar no computador, gostaria de que se for jogado no celular fique bem mais fácil, tipo inimigos com menos vida um pouco pelo menos, interface mais voltada para mexer pelo celular, gameplay mais acessível para celular, botões maiores e talvez um joystick para jogar, podendo ter dois modos de controlar, sendo o atual "clássico" e o moderno mais simplificado"
+
+A **v1.6.0** está pronta e os 346 testes passam. As telas foram conferidas por captura (simulando toque no Edge); ainda falta testar num celular de verdade.
+
+#### Dois jeitos de controlar (escolha em CONTROLES → página TOQUE)
+| | MODERNO (padrão) | CLÁSSICO |
+|---|---|---|
+| Mover | **Joystick flutuante**: aparece onde o polegar encostar | A nave segue o dedo |
+| Atirar | **Automático, sempre** | Enquanto o dedo encosta |
+| Modo foco | Joystick **pouco inclinado** (anel tracejado) | — |
+| Dash | Botão grande **DASH** | Botão ou 2º dedo |
+| Bomba | Botão grande **BOMBA** | Botão grande **BOMBA** |
+
+#### Mais fácil no celular (Ajuda do celular)
+- Chefes e alienígenas com **25% menos vida**.
+- Tiros inimigos **10% mais lentos**.
+- Hitbox da nave **menor** (3 px em vez de 4).
+- Fica em **AUTOMÁTICA**: liga sozinha no celular e não muda nada no computador. Dá para forçar **LIGADA** ou **DESLIGADA**.
+
+#### Interface para o dedo
+- Botões de bomba e dash **quase do dobro do tamanho**, com anel mostrando a recarga.
+- Menu principal com opções em **botões altos**; a tela de CONTROLES abre direto na página de toque, com um desenho de cada esquema.
+- Pausa sem teclas de teclado no celular; mostra o esquema e a ajuda.
+- Os botões aparecem já na primeira tela (o jogo detecta o celular ao abrir).
+
+#### O que não mudou
+- No computador, tudo continua igual (o mouse nunca cria joystick).
+- Os recordes não separam quem jogou com a ajuda ligada.
+
+
+---
+
 ## [1.5.0] - 2026-11-04
 
 **Pedido:** "O chefe final está muito fácil agora que terminou todos os outros buffs. Quero uma tela que mostre os buffs que tenho, quero poder mudar no computador os botões das habilidades e quero adicionar uma fase final final com um chefe final extremamente difícil e com 6 mini-chefes com buffs únicos."

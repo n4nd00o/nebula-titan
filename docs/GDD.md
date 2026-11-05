@@ -429,6 +429,12 @@ A barra do chefe é **segmentada por fase**: segmentos já vencidos ficam vazios
 
 Ver a [tabela de controles no README](../README.md#️-como-jogar).
 
+### Celular (v1.6): dois esquemas e ajuda do celular
+- **MODERNO** (padrão): o primeiro dedo fora dos botões cria um **joystick flutuante** onde encostou. A direção é analógica; com o polegar dentro do anel tracejado (menos de 50% de inclinação) a nave anda devagar e mostra a hitbox (**modo foco**). O tiro é **sempre automático**. Bomba e dash ficam em **botões grandes** à direita.
+- **CLÁSSICO**: o esquema da v1.4 (abaixo).
+- **Ajuda do celular**: o celular é menos preciso que o teclado, então em telas de toque os inimigos têm **25% menos vida**, os tiros inimigos ficam **10% mais lentos** e a hitbox da nave cai de 4 para **3 px**. Modos: automática (padrão), ligada, desligada.
+- Escolhas na tela **CONTROLES → TOQUE**, salvas no navegador.
+
 ### Celular (v1.4)
 - A nave segue o dedo (um pouco acima dele, para o dedo não cobrir a nave) e atira sozinha.
 - Botões na tela: **DASH** e **BOMBA** no canto inferior direito, **PAUSA** no canto superior direito. Eles só aparecem depois do primeiro toque, para não poluir a tela de quem joga no teclado.
