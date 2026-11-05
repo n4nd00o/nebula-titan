@@ -52,7 +52,7 @@ O ponto de partida escolhido foi o **Galaga**, um dos *shoot 'em ups* mais icôn
 
 > **A ideia central:** cada parte do chefe que você destrói **muda a aparência e o comportamento dele**. Arrancar a asa direita deixa a nave sem a asa, desequilibrada e inclinada para aquele lado. A asa que sobra passa a atacar com mais fúria e o gerador de escudo escondido atrás dela fica exposto. **A ordem das suas escolhas muda a luta.**
 
-O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A **versão 1.3** transformou a campanha em um **sistema de progressão com 4 mundos**: cada mundo mantém o esquema de setores comuns, mini-chefes e um chefe, com dificuldade crescente, inimigos novos, 9 mini-chefes e 3 chefes inéditos, 12 buffs novos e progresso salvo. A **versão 1.4** trouxe o mapa de progresso, a versão para celular e os testes de garantia contra chefes imortais. A **versão 1.5** acrescentou o **Mundo 5 (Singularidade)**, com **6 mini-chefes de buffs únicos** e o chefe final **Ômega**, além de chefes de mundo que **escalam com os seus buffs**, um Leviatã com **10 fases**, a tela **Meus Buffs** e **teclas configuráveis**. A **versão 1.6** deixou o celular de primeira classe: **joystick flutuante** com tiro automático (esquema **MODERNO**) ou o esquema **CLÁSSICO**, **botões maiores** e uma **ajuda do celular** que tira 25% da vida dos inimigos. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
+O escopo foi definido de forma deliberada e incremental: a **versão 1.0** entregou uma única batalha contra o chefe final, polida ao máximo. Com a base validada, a **versão 1.1** acrescentou uma **campanha com três mini-chefes** que concedem buffs, e a **versão 1.2** completou a progressão: **dois setores preparatórios** com alienígenas em formação (no estilo do Galaga) e um **chefe final gigante de 8 fases**, o **Leviatã**, em que os buffs coletados se tornam cada vez mais necessários. A **versão 1.3** transformou a campanha em um **sistema de progressão com 4 mundos**: cada mundo mantém o esquema de setores comuns, mini-chefes e um chefe, com dificuldade crescente, inimigos novos, 9 mini-chefes e 3 chefes inéditos, 12 buffs novos e progresso salvo. A **versão 1.4** trouxe o mapa de progresso, a versão para celular e os testes de garantia contra chefes imortais. A **versão 1.5** acrescentou o **Mundo 5 (Singularidade)**, com **6 mini-chefes de buffs únicos** e o chefe final **Ômega**, além de chefes de mundo que **escalam com os seus buffs**, um Leviatã com **10 fases**, a tela **Meus Buffs** e **teclas configuráveis**. A **versão 1.6** deixou o celular de primeira classe: **joystick flutuante** com tiro automático (esquema **MODERNO**) ou o esquema **CLÁSSICO** (padrão desde a v1.6.1), **botões maiores** e uma **ajuda do celular** que tira 25% da vida dos inimigos e deixa os tiros inimigos 20% mais lentos. A evolução do escopo está registrada no [documento de planejamento](docs/PLANEJAMENTO.md).
 
 ## 🧭 Objetivos
 
@@ -197,14 +197,14 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 💥 **Game feel moderno**: *hit-stop*, tremor de tela, flashes, partículas, ondas de choque e destroços com física.
 - 🎯 **Design justo**: hitbox reduzida, ataques telegrafados, modo foco (movimento preciso) e limpeza de tela ao morrer.
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
-- 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo), e **ajuda do celular** (inimigos com 25% menos vida, tiros 10% mais lentos, hitbox menor), automática em telas de toque.
+- 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo; padrão desde a v1.6.1), e **ajuda do celular** (inimigos com 25% menos vida, tiros 20% mais lentos, hitbox menor), ligada automaticamente em telas de toque.
 - 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
 - 🧪 **346 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
 
-| Ação | Teclado | Toque: MODERNO *(padrão, v1.6)* | Toque: CLÁSSICO |
+| Ação | Teclado | Toque: MODERNO *(v1.6)* | Toque: CLÁSSICO *(padrão)* |
 |---|---|---|---|
 | Mover | `Setas` ou `W A S D` | **Joystick**: toque e arraste em qualquer lugar | Arrastar o dedo |
 | Atirar | `Espaço`, `Z` ou `J` (segure) | Automático, sempre | Automático ao tocar |
@@ -221,7 +221,7 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 | Ligar/desligar vibração | `V` | Botão **VIBRA** no título | igual |
 | Tela cheia | `F` | Botão **TELA CHEIA** no título | igual |
 
-**Ajuda do celular** *(v1.6)*: em telas de toque, chefes e alienígenas têm **25% menos vida**, os tiros inimigos são **10% mais lentos** e a hitbox da nave é menor. Em **CONTROLES → TOQUE** dá para deixar **automática** (padrão), **ligada** ou **desligada**.
+**Ajuda do celular** *(v1.6)*: em telas de toque, chefes e alienígenas têm **25% menos vida**, os tiros inimigos são **20% mais lentos** e a hitbox da nave é menor. Em **CONTROLES → TOQUE** dá para deixar **automática** (padrão: ligada no celular, desligada no computador), **ligada** ou **desligada**.
 
 **Dica:** a nave só é atingida no **pontinho central** (ative o modo foco para vê-lo). Use os colchetes amarelos para saber onde atirar.
 

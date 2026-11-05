@@ -5,6 +5,21 @@
 
 ---
 
+## 05/11/2026: Versão 1.6.1 (ajuste da ajuda do celular)
+
+### Motivação
+Depois de jogar a v1.6: os tiros ainda estavam rápidos no celular, e o controle preferido como padrão é o **clássico**, com a ajuda ligada.
+
+### O que foi feito
+- `MOBILE_ASSIST.bulletSpeed`: 0,9 → **0,8** (tiros 20% mais lentos).
+- `loadTouchSettings`: esquema padrão `classic`. A ajuda continua `auto`: no celular ela já é ligada, e trocar o padrão para "ligada" deixaria o jogo mais fácil também no computador.
+- Preferências já salvas são respeitadas (só muda para quem nunca escolheu).
+
+### Aprendizado
+- Como o balanceamento do celular é um conjunto de multiplicadores em um só lugar, o ajuste pedido depois de jogar foi uma linha de código.
+
+---
+
 ## 05/11/2026: Versão 1.6 (joystick e ajuda do celular)
 
 ### Motivação

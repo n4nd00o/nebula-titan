@@ -124,7 +124,7 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 💥 Modern **game feel**: hit-stop, screen shake, flashes, particles, shockwaves, physics debris.
 - 🎯 **Fair design**: tiny hitbox, telegraphed attacks, focus mode, screen clear on death.
 - 🏆 Scoring with time/accuracy/no-damage bonuses, **S/A/B/C rank** and persistent high score.
-- 🕹️ **Mobile joystick** *(v1.6)*: **MODERN** scheme (floating joystick, auto-fire, focus by tilting the stick slightly, big bomb/dash buttons) or **CLASSIC** (the ship follows your finger), plus **mobile assist** (enemies with 25% less HP, 10% slower enemy bullets, smaller hitbox), automatic on touch screens.
+- 🕹️ **Mobile joystick** *(v1.6)*: **MODERN** scheme (floating joystick, auto-fire, focus by tilting the stick slightly, big bomb/dash buttons) or **CLASSIC** (the ship follows your finger; default since v1.6.1), plus **mobile assist** (enemies with 25% less HP, 20% slower enemy bullets, smaller hitbox), on automatically on touch screens.
 - 📱 **Mobile-ready** *(v1.4)*: on-screen **bomb/dash/pause** buttons, fully touch-driven menus, **fullscreen** portrait mode, rotate-device hint, notch-safe layout, **vibration**, and **installable PWA that works offline**.
 - 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
@@ -134,7 +134,7 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 
 ## 🕹️ Controls
 
-| Action | Keyboard | Touch (MODERN, default since v1.6 · CLASSIC) |
+| Action | Keyboard | Touch (MODERN · CLASSIC, the default since v1.6.1) |
 |---|---|---|
 | Move | `Arrows` / `WASD` | **Joystick**: touch and drag anywhere · CLASSIC: drag the ship |
 | Shoot | `Space` / `Z` / `J` (hold) | Always automatic · CLASSIC: while touching |

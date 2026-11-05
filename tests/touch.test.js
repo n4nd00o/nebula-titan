@@ -23,6 +23,7 @@ const memoryStorage = (initial = {}) => {
   return { data, get: (k, f) => (k in data ? data[k] : f), set: (k, v) => { data[k] = v; } };
 };
 const newInput = (storage = memoryStorage()) => new Input({ addEventListener() {} }, null, storage);
+const modernStorage = () => memoryStorage({ [SCHEME_KEY]: 'modern' });
 
 // ------------------------------------------------------------ geometria
 test('botões de toque: grandes (bomba >= 38 px de raio), sem se sobrepor e dentro da tela', () => {
@@ -54,7 +55,7 @@ test('stickVector: zona morta, limite no raio e direção correta', () => {
 });
 
 test('Input MODERNO: o 1º dedo livre vira joystick onde encostou; 2º dedo não dá dash; botões funcionam', () => {
-  const input = newInput();
+  const input = newInput(modernStorage());
   assert.equal(input.touchScheme, 'modern');
   assert.equal(input.touchStart({ x: 120, y: 500 }, { id: 1 }), true);
   assert.equal(input.stick.active, true);
@@ -71,8 +72,8 @@ test('Input MODERNO: o 1º dedo livre vira joystick onde encostou; 2º dedo não
   assert.equal(input.stick.vec.mag, 0);
 });
 
-test('Input CLÁSSICO: a nave segue o dedo e o 2º dedo dá dash (esquema original)', () => {
-  const input = newInput(memoryStorage({ [SCHEME_KEY]: 'classic' }));
+test('Input CLÁSSICO (padrão desde a v1.6.1): a nave segue o dedo e o 2º dedo dá dash', () => {
+  const input = newInput();
   assert.equal(input.touchScheme, 'classic');
   input.touchStart({ x: 200, y: 400 }, { id: 1 });
   assert.equal(input.pointer.active, true);
@@ -82,7 +83,7 @@ test('Input CLÁSSICO: a nave segue o dedo e o 2º dedo dá dash (esquema origin
 });
 
 test('setTouchScheme salva a escolha e solta os dedos acompanhados', () => {
-  const storage = memoryStorage();
+  const storage = modernStorage();
   const input = newInput(storage);
   input.touchStart({ x: 120, y: 500 }, { id: 1 });
   input.setTouchScheme('classic');
@@ -130,9 +131,10 @@ test('nave MODERNA atira sozinha mesmo sem tocar na tela; CLÁSSICA só com o de
 });
 
 // ------------------------------------------------------------ ajuda do celular
-test('preferências: padrão MODERNO + ajuda AUTOMÁTICA; valores inválidos voltam ao padrão', () => {
-  assert.deepEqual(loadTouchSettings(memoryStorage()), { scheme: 'modern', assist: 'auto' });
-  assert.deepEqual(loadTouchSettings(memoryStorage({ [SCHEME_KEY]: 'x', [ASSIST_KEY]: 7 })), { scheme: 'modern', assist: 'auto' });
+test('preferências: padrão CLÁSSICO + ajuda AUTOMÁTICA (ligada no celular); inválidos voltam ao padrão', () => {
+  assert.deepEqual(loadTouchSettings(memoryStorage()), { scheme: 'classic', assist: 'auto' });
+  assert.deepEqual(loadTouchSettings(memoryStorage({ [SCHEME_KEY]: 'x', [ASSIST_KEY]: 7 })), { scheme: 'classic', assist: 'auto' });
+  assert.equal(assistActive(loadTouchSettings(memoryStorage()).assist, true), true);
   assert.equal(cycle(SCHEMES, 'modern'), 'classic');
   assert.equal(cycle(ASSIST_MODES, 'auto', -1), 'off');
 });
@@ -157,7 +159,8 @@ function fakeGame(assist, touchMode = false) {
   };
 }
 
-test('ajuda LIGADA: chefe com 25% menos vida, tiros 10% mais lentos e hitbox de 3 px', () => {
+test('ajuda LIGADA: chefe com 25% menos vida, tiros 20% mais lentos e hitbox de 3 px', () => {
+  assert.equal(MOBILE_ASSIST.bulletSpeed, 0.8);
   const normal = new PlayScene(fakeGame('off'), { bossId: 'titan' });
   const easy = new PlayScene(fakeGame('on'), { bossId: 'titan' });
   assert.equal(normal.assist, false);

@@ -287,7 +287,7 @@ export class ControlsScene {
     ctx.strokeRect(a.x + 0.5, a.y + 0.5, a.w - 1, a.h - 1);
     drawText(ctx, `< ${ASSIST_LABELS[assist]} >`, W / 2, a.y + a.h / 2, { size: 10, align: 'center', baseline: 'middle', color: on ? '#38b764' : UI_COLORS.text });
     const info = [
-      'Inimigos com 25% menos vida, tiros inimigos 10% mais lentos',
+      'Inimigos com 25% menos vida, tiros inimigos 20% mais lentos',
       'e nave com hitbox menor. AUTOMÁTICA = só em telas de toque.',
       on ? 'Agora: LIGADA neste aparelho' : 'Agora: DESLIGADA neste aparelho',
     ];

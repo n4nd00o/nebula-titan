@@ -3,6 +3,13 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.1] - 2026-11-05
+
+### Alterado
+- **Ajuda do celular:** projéteis inimigos **20% mais lentos** (eram 10%). Vida dos inimigos (-25%) e hitbox (3 px) não mudaram.
+- **Controle padrão no celular agora é o CLÁSSICO** (a nave segue o dedo). O MODERNO (joystick) continua em CONTROLES → TOQUE. A ajuda segue **AUTOMÁTICA**, ou seja, **ligada em telas de toque** e desligada no computador.
+- Testes de `touch.test.js` atualizados para os padrões novos (total continua **346**).
+
 ## [1.6.0] - 2026-11-05
 
 ### Adicionado

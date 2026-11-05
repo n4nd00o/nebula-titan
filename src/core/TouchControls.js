@@ -1,7 +1,7 @@
 /**
  * TouchControls — tudo o que é específico do celular (v1.6).
  *
- *  - Dois ESQUEMAS de controle por toque:
+ *  - Dois ESQUEMAS de controle por toque (padrão: CLÁSSICO, desde a v1.6.1):
  *      moderno:  joystick FLUTUANTE (nasce onde o polegar encosta), tiro
  *                automático e botões grandes de BOMBA e DASH à direita;
  *                joystick pouco inclinado = modo foco (lento e preciso);
@@ -24,7 +24,7 @@ export const ASSIST_LABELS = Object.freeze({ auto: 'AUTOMÁTICA', on: 'LIGADA', 
 /** Quanto a ajuda do celular facilita. */
 export const MOBILE_ASSIST = Object.freeze({
   hpScale: 0.75, // chefes e alienígenas com 25% menos vida
-  bulletSpeed: 0.9, // projéteis inimigos 10% mais lentos
+  bulletSpeed: 0.8, // projéteis inimigos 20% mais lentos (v1.6.1; era 10%)
   hitRadius: 3, // hitbox da nave: 3 px (no computador: 4 px)
 });
 
@@ -73,10 +73,10 @@ export function stickVector(ox, oy, x, y) {
 
 /** Lê as preferências salvas (com valores padrão). */
 export function loadTouchSettings(storage) {
-  const scheme = storage?.get(SCHEME_KEY, 'modern');
+  const scheme = storage?.get(SCHEME_KEY, 'classic');
   const assist = storage?.get(ASSIST_KEY, 'auto');
   return {
-    scheme: SCHEMES.includes(scheme) ? scheme : 'modern',
+    scheme: SCHEMES.includes(scheme) ? scheme : 'classic',
     assist: ASSIST_MODES.includes(assist) ? assist : 'auto',
   };
 }

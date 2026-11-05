@@ -137,6 +137,8 @@ Pedido:
 | Quando a ajuda vale | **Automática em telas de toque**, com opção em CONTROLES | Ninguém precisa procurar; quem quer o desafio desliga |
 | Botões do modo moderno | **Bomba + dash grandes**; foco pelo joystick | Menos botões, mais área livre para o polegar |
 
+**Ajuste da v1.6.1** (depois de jogar): *"Gostei de como ficou, mas acho que no celular pode diminuir a velocidade dos projéteis em mais uns 10%, além disso quero que o modo padrão de controle no celular seja o clássico com assistência ligada"*. Os tiros com a ajuda ficaram 20% mais lentos e o padrão no celular passou a ser o **CLÁSSICO**; a ajuda continua "automática", que no celular já é ligada, para o computador não ficar mais fácil.
+
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.

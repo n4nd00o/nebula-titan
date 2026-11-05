@@ -6,6 +6,18 @@
 
 ---
 
+## [1.6.1] - 2026-11-05
+
+**Pedido:** "Gostei de como ficou, mas acho que no celular pode diminuir a velocidade dos projéteis em mais uns 10%, além disso quero que o modo padrão de controle no celular seja o clássico com assistência ligada"
+
+A **v1.6.1** está pronta e os 346 testes passam.
+
+- **Tiros inimigos no celular 20% mais lentos** (eram 10%). A vida dos inimigos (-25%) e a hitbox menor continuam iguais.
+- **Padrão no celular: controle CLÁSSICO com a ajuda ligada.** A ajuda continua em **AUTOMÁTICA**, que no celular já significa **ligada** (a tela de controles mostra "Agora: LIGADA neste aparelho"); assim o computador continua sem a ajuda. O joystick MODERNO segue disponível em CONTROLES → TOQUE.
+- Quem já tinha escolhido um controle na tela CONTROLES mantém a escolha; o padrão novo vale para quem nunca mexeu.
+
+---
+
 ## [1.6.0] - 2026-11-05
 
 **Pedido:** "Eu queria que os botões ficassem melhor para o celular, atualmente o jogo é feito pensando em jogar no computador, gostaria de que se for jogado no celular fique bem mais fácil, tipo inimigos com menos vida um pouco pelo menos, interface mais voltada para mexer pelo celular, gameplay mais acessível para celular, botões maiores e talvez um joystick para jogar, podendo ter dois modos de controlar, sendo o atual "clássico" e o moderno mais simplificado"
