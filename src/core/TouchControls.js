@@ -30,9 +30,9 @@ export const MOBILE_ASSIST = Object.freeze({
 
 /** Joystick virtual (unidades lógicas do jogo, 480x640). */
 export const STICK = Object.freeze({
-  radius: 54, // distância máxima do polegar até o centro
-  deadzone: 0.15, // abaixo disto (fração do raio) a nave não se move
-  focusBelow: 0.5, // abaixo disto o movimento é lento (modo foco)
+  radius: 42, // distância máxima do polegar até o centro (v1.6.2; era 54)
+  deadzone: 0.1, // abaixo disto (fração do raio) a nave não se move (v1.6.2; era 0.15)
+  focusBelow: 0.35, // abaixo disto o movimento é lento, modo foco (v1.6.2; era 0.5)
   ghost: Object.freeze({ x: 92, y: H - 120 }), // onde o joystick "fantasma" aparece parado
 });
 
@@ -69,6 +69,41 @@ export function stickVector(ox, oy, x, y) {
   const mag = Math.min(1, dist / STICK.radius);
   if (mag < STICK.deadzone || dist === 0) return { x: 0, y: 0, mag: 0 };
   return { x: (dx / dist) * mag, y: (dy / dist) * mag, mag };
+}
+
+/**
+ * Atualiza o joystick com a nova posição do polegar (v1.6.2).
+ *
+ * O centro deixa de ser fixo, para trocar de direção exigir pouco movimento:
+ *  - voltando em direção ao centro, o centro vem ao encontro do polegar
+ *    (a direção inverte na metade do caminho);
+ *  - passando do raio, o centro é arrastado junto (o polegar nunca "sobra").
+ */
+export function moveStick(stick, x, y) {
+  const px = stick.x - stick.ox;
+  const py = stick.y - stick.oy;
+  const offset = Math.hypot(px, py);
+  if (offset > 0) {
+    const ux = px / offset;
+    const uy = py / offset;
+    const inward = -((x - stick.x) * ux + (y - stick.y) * uy);
+    if (inward > 0) {
+      const shift = Math.min(inward, offset / 2);
+      stick.ox += ux * shift;
+      stick.oy += uy * shift;
+    }
+  }
+  const dx = x - stick.ox;
+  const dy = y - stick.oy;
+  const dist = Math.hypot(dx, dy);
+  if (dist > STICK.radius) {
+    const excess = (dist - STICK.radius) / dist;
+    stick.ox += dx * excess;
+    stick.oy += dy * excess;
+  }
+  stick.x = x;
+  stick.y = y;
+  stick.vec = stickVector(stick.ox, stick.oy, x, y);
 }
 
 /** Lê as preferências salvas (com valores padrão). */

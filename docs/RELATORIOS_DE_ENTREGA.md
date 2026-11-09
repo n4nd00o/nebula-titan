@@ -6,6 +6,18 @@
 
 ---
 
+## [1.6.2] - 2026-11-09
+
+**Pedido:** "Então tenho uma questão quanto ao analogico dentro do jogo, ele fica bem ruim de controlar a nave, fica pouco responsivo e com delay"
+
+A **v1.6.2** está pronta e os 348 testes passam. A tela foi conferida por captura (simulando toque no Edge); a sensação do controle ainda precisa ser confirmada num celular de verdade.
+
+- **O centro do joystick agora acompanha o polegar**, então inverter a direção exige bem menos movimento.
+- **Raio menor (42), zona morta menor (10%) e zona lenta menor (35%).** Ir da velocidade máxima para um lado à máxima para o outro caiu de cerca de 81 para cerca de 36 unidades de movimento do polegar.
+- A velocidade máxima da nave não mudou, e o esquema CLÁSSICO continua igual.
+
+---
+
 ## [1.6.1] - 2026-11-05
 
 **Pedido:** "Gostei de como ficou, mas acho que no celular pode diminuir a velocidade dos projéteis em mais uns 10%, além disso quero que o modo padrão de controle no celular seja o clássico com assistência ligada"

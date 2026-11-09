@@ -72,6 +72,48 @@ test('Input MODERNO: o 1º dedo livre vira joystick onde encostou; 2º dedo não
   assert.equal(input.stick.vec.mag, 0);
 });
 
+test('joystick responsivo (v1.6.2): o centro acompanha o polegar e inverter exige pouco movimento', () => {
+  const R = STICK.radius;
+  const input = newInput();
+  input.touchScheme = 'modern';
+  input.touchStart({ x: 200, y: 500 }, { id: 1 });
+
+  // Passar do raio arrasta o centro: o polegar nunca fica "sobrando".
+  input.touchMove(1, { x: 200 + R * 3, y: 500 });
+  assert.ok(Math.abs(input.stick.ox - (200 + R * 2)) < 1e-9);
+  assert.equal(input.stick.vec.mag, 1);
+
+  // Voltar meio raio já zera o joystick (antes era preciso voltar o raio inteiro).
+  const edge = 200 + R * 3;
+  for (let d = 1; d <= R / 2; d++) input.touchMove(1, { x: edge - d, y: 500 });
+  assert.equal(input.stick.vec.mag, 0, 'na metade do caminho a direção já está no neutro');
+
+  // Inverter até a velocidade máxima custa menos que o raio antigo + zona lenta (81 unidades).
+  const fullSpeedAt = R / 2 + R * STICK.focusBelow + 1;
+  assert.ok(fullSpeedAt < 40);
+  for (let d = Math.floor(R / 2) + 1; d <= Math.ceil(fullSpeedAt); d++) input.touchMove(1, { x: edge - d, y: 500 });
+  assert.ok(input.stick.vec.x < 0, 'a direção inverteu');
+  assert.ok(input.stick.vec.mag >= STICK.focusBelow, 'saiu da zona lenta');
+});
+
+test('joystick (v1.6.2): andar de lado não puxa o centro, e um salto grande não perde movimento', () => {
+  const R = STICK.radius;
+  const input = newInput();
+  input.touchScheme = 'modern';
+  input.touchStart({ x: 200, y: 500 }, { id: 1 });
+  input.touchMove(1, { x: 200 + R / 2, y: 500 });
+  input.touchMove(1, { x: 200 + R / 2, y: 500 + R / 4 });
+  assert.equal(input.stick.ox, 200);
+  assert.equal(input.stick.oy, 500);
+
+  const jump = newInput();
+  jump.touchScheme = 'modern';
+  jump.touchStart({ x: 200, y: 500 }, { id: 1 });
+  jump.touchMove(1, { x: 200 + R, y: 500 });
+  jump.touchMove(1, { x: 200 + R / 4, y: 500 }); // voltou 3/4 do raio de uma vez
+  assert.ok(Math.abs(jump.stick.vec.x - -0.25) < 1e-9);
+});
+
 test('Input CLÁSSICO (padrão desde a v1.6.1): a nave segue o dedo e o 2º dedo dá dash', () => {
   const input = newInput();
   assert.equal(input.touchScheme, 'classic');

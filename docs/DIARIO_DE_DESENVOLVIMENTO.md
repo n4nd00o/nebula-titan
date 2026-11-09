@@ -5,6 +5,19 @@
 
 ---
 
+## 09/11/2026: Versão 1.6.2 (joystick mais responsivo)
+
+### Motivação
+Jogando no celular, o joystick do esquema MODERNO ficava pouco responsivo e com sensação de atraso.
+
+### Diagnóstico
+O laço do jogo e o `touch-action` estavam corretos. O atraso era de **geometria**: com o centro fixo e raio 54, inverter a direção exigia levar o polegar até o outro lado do centro, passando por uma zona lenta que ia até 50% da inclinação. Eram cerca de 81 unidades de movimento até a nave voltar à velocidade máxima no sentido oposto.
+
+### Decisão
+O centro do joystick passou a acompanhar o polegar (arrastado ao passar do raio; vem ao encontro do polegar quando ele volta). Raio, zona morta e zona lenta também diminuíram. O mesmo movimento caiu para cerca de 36 unidades. A velocidade máxima da nave não mudou, para não alterar o equilíbrio do jogo.
+
+---
+
 ## 05/11/2026: Versão 1.6.1 (ajuste da ajuda do celular)
 
 ### Motivação

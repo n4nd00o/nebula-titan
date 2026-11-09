@@ -3,6 +3,17 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.6.2] - 2026-11-09
+
+### Corrigido
+- **Joystick do esquema MODERNO mais responsivo.** O atraso vinha da geometria do controle: com o centro fixo, inverter a direção exigia cruzar o joystick inteiro.
+  - O centro agora **acompanha o polegar** (`moveStick`): é arrastado ao passar do raio e vem ao encontro do polegar quando ele volta, invertendo a direção na metade do caminho.
+  - Raio de 54 para **42**, zona morta de 15% para **10%** e zona lenta (modo foco) de 50% para **35%** de inclinação.
+  - Da velocidade máxima para um lado à velocidade máxima para o outro: de cerca de 81 para cerca de **36 unidades** de movimento do polegar.
+
+### Testes
+- 2 testes novos em `touch.test.js` (total: **348**).
+
 ## [1.6.1] - 2026-11-05
 
 ### Alterado

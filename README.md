@@ -197,9 +197,9 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 💥 **Game feel moderno**: *hit-stop*, tremor de tela, flashes, partículas, ondas de choque e destroços com física.
 - 🎯 **Design justo**: hitbox reduzida, ataques telegrafados, modo foco (movimento preciso) e limpeza de tela ao morrer.
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
-- 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo; padrão desde a v1.6.1), e **ajuda do celular** (inimigos com 25% menos vida, tiros 20% mais lentos, hitbox menor), ligada automaticamente em telas de toque.
+- 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante que acompanha o polegar, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo; padrão desde a v1.6.1), e **ajuda do celular** (inimigos com 25% menos vida, tiros 20% mais lentos, hitbox menor), ligada automaticamente em telas de toque.
 - 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
-- 🧪 **346 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
+- 🧪 **348 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
@@ -328,7 +328,7 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (346 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
+A suíte (348 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).

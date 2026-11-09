@@ -15,7 +15,7 @@
  */
 import { GAME_WIDTH, GAME_HEIGHT } from '../config.js';
 import { buildKeyMap, defaultBindings, loadBindings, STORAGE_KEY } from './KeyBindings.js';
-import { touchZone, stickVector, loadTouchSettings, isTouchDevice, SCHEME_KEY } from './TouchControls.js';
+import { touchZone, moveStick, loadTouchSettings, isTouchDevice, SCHEME_KEY } from './TouchControls.js';
 
 export { touchZone };
 
@@ -136,9 +136,7 @@ export class Input {
 
   touchMove(id, pos) {
     if (this.stick.active && id === this.stick.id) {
-      this.stick.x = pos.x;
-      this.stick.y = pos.y;
-      this.stick.vec = stickVector(this.stick.ox, this.stick.oy, pos.x, pos.y);
+      moveStick(this.stick, pos.x, pos.y);
     } else if (this.pointer.active && id === this.pointer.id) {
       this.pointer.x = pos.x;
       this.pointer.y = pos.y;
