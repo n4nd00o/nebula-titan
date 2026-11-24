@@ -5,7 +5,7 @@
 <!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
 > **Group:** [NOME DO GRUPO] · **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
 >
-> **Members:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+> **Members:** Luiz Fernando Santana (RA [RA]) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
 <!-- integrantes:fim -->
 
 **A retro shoot 'em up with destructible bosses: four worlds of rising difficulty, 12 mini-bosses, 4 world bosses, routes of your choice, and a screen-filling star fortress.**
