@@ -1,5 +1,11 @@
 # 🗺️ Planejamento do Projeto: Nebula Titan
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Documento de planejamento: contexto, motivação, objetivos, escopo, requisitos, cronograma e riscos.
 > É um documento vivo, atualizado a cada etapa relevante do desenvolvimento.
 
@@ -144,6 +150,10 @@ Pedido:
 ### 2.7 Nome do jogo
 
 O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será público (portfólio), adotou-se um nome original, **Nebula Titan**. O jogo deixa explícito que é *inspirado* no clássico, sem usar nome, personagens, arte ou sons dele. Essa decisão também valoriza a autoria do projeto.
+
+### 2.8 v1.7: história e entrega da A3
+
+O enunciado da A3 avalia cinco critérios com o mesmo peso: **gráfico, jogabilidade, som, documentação e história**. Os quatro primeiros já estavam cobertos; faltava a **história dentro do jogo**. A v1.7 acrescentou só o que o enunciado pede, sem mexer na jogabilidade: introdução, textos entre mundos, finais de vitória e derrota, créditos do grupo, a seção **Entrega A3** no README (os 10 itens obrigatórios), integrantes em todos os documentos e os **slides** da apresentação (`docs/apresentacao/`).
 
 ## 3. Objetivos
 

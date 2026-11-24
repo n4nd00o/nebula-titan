@@ -1,7 +1,36 @@
 # Changelog
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+
+## [1.7.0] - 2026-11-24
+
+### Adicionado
+- **História dentro do jogo** (pedida na A3): Vega, a última piloto da Aliança, cruza os 5 mundos na NT-01 para destruir o Ômega.
+  - **Introdução** de 4 telas ao começar uma *Nova Campanha*, também disponível no botão **HISTÓRIA** do título.
+  - **Texto entre mundos**: ao vencer o chefe de um mundo, uma tela conta para onde a armada recuou, antes do Mapa de Progresso.
+  - **Final de vitória** depois do Ômega, com **créditos do grupo**; **final de derrota** ao escolher *desistir* (ESC) no fim de jogo da campanha.
+  - Frase da história na tela de fim de jogo da campanha.
+- `src/scenes/StoryScene.js`: páginas com texto datilografado, ilustração com os sprites do jogo, ENTER para avançar e ESC para pular.
+- `src/story/story.js` (textos) e `src/story/team.js` (integrantes).
+- Som: trilha **story** (lenta, Am F C G) e efeito **type** (máquina de escrever).
+- **Entrega A3** no README: os 10 itens obrigatórios do enunciado (identificação, história, como rodar, controles, regras, divisão de tarefas, créditos, tecnologia, uso de IA e capturas de tela).
+- `integrantes.json` + `npm run integrantes`: preenche grupo, integrantes e RAs no jogo e em todos os documentos.
+- **Slides da apresentação** (5) em `docs/apresentacao/`, com roteiro e gerador (`npm run slides`).
+- Capturas de tela em `docs/images/`.
+
+### Alterado
+- ESC no fim de jogo da campanha agora diz **desistir (final da derrota)** e mostra o final antes do menu.
+- ENTER na vitória final abre o **final da história** antes do menu.
+
+### Testes
+- `story.test.js` (5 testes): textos para cada momento da campanha, cada texto entre mundos cita o mundo de destino, tudo cabe na moldura e os créditos listam todos os integrantes (total: **353**).
 
 ## [1.6.2] - 2026-11-09
 

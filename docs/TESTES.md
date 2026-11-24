@@ -1,5 +1,11 @@
 # 🧪 Testes: Nebula Titan
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Os testes também são **documentação do projeto**: cada um descreve uma regra do jogo em português e prova que ela continua valendo.
 > Este documento lista o que cada arquivo garante, os bugs reais que viraram teste e como verificar o jogo.
 > **Regra do projeto:** nenhum teste é apagado para "fazer passar". Um teste só muda se a regra do jogo mudar, e a mudança fica registrada no [CHANGELOG](../CHANGELOG.md).
@@ -27,13 +33,15 @@ A integração contínua (GitHub Actions, [`.github/workflows/ci.yml`](../.githu
 | 1.5.0 | 333 | Mundo 5 (7 chefes novos entram nos testes genéricos e na garantia), buffs únicos, teclas configuráveis, escala por buffs, Leviatã com 10 fases |
 | 1.6.0 | 346 | Controles de celular: joystick, esquemas MODERNO/CLÁSSICO, botões maiores e ajuda do celular |
 | 1.6.1 | 346 | Padrões novos (CLÁSSICO, tiros 20% mais lentos com a ajuda) nos testes existentes |
-| **1.6.2** | **348** | **Joystick responsivo: centro que acompanha o polegar e inversão rápida de direção** |
+| 1.6.2 | 348 | Joystick responsivo: centro que acompanha o polegar e inversão rápida de direção |
+| **1.7.0** | **353** | **História no jogo: textos de cada momento da campanha, moldura e créditos do grupo** |
 
 ## 3. Catálogo por arquivo
 
 | Arquivo | Testes | O que garante |
 |---|---|---|
 | [`buffs.test.js`](../tests/buffs.test.js) | 8 | Buffs únicos do Mundo 5 com a **PlayScene real** e um jogo falso: Orbitais apagam projéteis, Tempo Bala desacelera no foco, Supercarga (8x, perfurante, a cada 5 s), Ascensão (+25%), Renascer (uma vez por luta), Vampirismo e Ricochete; a tela Meus Buffs cobre todos os buffs |
+| [`story.test.js`](../tests/story.test.js) | 5 | **História (v1.7)**: introdução, finais e um texto para cada mundo novo; cada texto entre mundos cita o mundo de destino; todas as páginas cabem na moldura da `StoryScene` (quebra de linha sem perder palavras); os créditos mostram o grupo e todos os integrantes |
 | [`touch.test.js`](../tests/touch.test.js) | 15 | **Celular (v1.6)**: botões grandes sem sobreposição, joystick (zona morta, limite, direção, centro que acompanha o polegar), `Input` nos esquemas MODERNO (1º dedo = joystick) e CLÁSSICO (padrão; 2º dedo = dash), mouse nunca cria joystick, nave com foco pelo joystick e tiro automático, preferências salvas e a **ajuda do celular** na `PlayScene` real (vida dos chefes e alienígenas, velocidade dos tiros, hitbox) |
 | [`controls.test.js`](../tests/controls.test.js) | 8 | **Teclas configuráveis**: todas as ações remapeáveis, conflito transfere a tecla sem deixar ação vazia, teclas reservadas, apagar alternativa, dados salvos inválidos, o `Input` real respondendo à nova tecla e salvando, ESC sempre pausa, textos de ajuda |
 | [`boss.test.js`](../tests/boss.test.js) | 15 | Nebula Titan: entrada invulnerável, alvos de cada fase, inclinação ao perder asa, quebra antecipada, fase pulada, fluxo completo, ricochete × dano, **colisão por pixel** e 3 testes de regressão de hitbox |

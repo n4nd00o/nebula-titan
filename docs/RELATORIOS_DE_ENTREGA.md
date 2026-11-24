@@ -1,8 +1,27 @@
 # 📦 Relatórios de entrega: Nebula Titan
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Os relatórios de cada versão, **na íntegra e sem edição**, como foram entregues ao fim de cada etapa.
 > Servem como registro do progresso do projeto. **Nunca apague uma entrada**: versões novas entram no topo.
 > O detalhe técnico de cada versão está no [CHANGELOG](../CHANGELOG.md), as decisões no [Diário](DIARIO_DE_DESENVOLVIMENTO.md) e os testes em [TESTES.md](TESTES.md).
+
+---
+
+## [1.7.0] - 2026-11-24
+
+**Pedido:** "Preciso que seguindo o arquivo de instruções .md e as instruções de texto a seguir: Linguagem que usou, ideias, explicando rapidamente, fazer um slide de 4 até 5 slides. Colocar nome dos participantes em todos os documentos, fazer slides, explicar decisões, adicionar uma história pro jogo. Você faça as mudanças no projeto, necessárias para a apresentação, sem afetar o jogo e seu funcionamento em grande escala, apenas adicionando o que foi solicitado"
+
+A **v1.7.0** está pronta e os 353 testes passam. As telas novas foram conferidas por captura no Edge.
+
+- **História dentro do jogo:** introdução na Nova Campanha (e no botão HISTÓRIA), um texto entre cada mundo, final de vitória com créditos do grupo e final de derrota ao desistir. Trilha própria e texto datilografado. A jogabilidade não mudou.
+- **Integrantes em todos os documentos:** bloco com grupo, disciplina, professor e integrantes abaixo do título de cada documento, preenchido a partir do `integrantes.json` com `npm run integrantes`. Por enquanto com marcadores ([RA], [INTEGRANTE 2]...).
+- **README com os 10 itens obrigatórios da A3**, incluindo a declaração de uso de IA e 3 capturas de tela.
+- **5 slides** em `docs/apresentacao/` (linguagem, ideias, decisões, história) com roteiro de fala.
 
 ---
 

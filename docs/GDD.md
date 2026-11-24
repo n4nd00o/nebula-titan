@@ -1,5 +1,11 @@
 # 📖 Game Design Document: Nebula Titan
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Versão 1.3 · Especificação de design do jogo
 
 ---
@@ -15,6 +21,27 @@
 | **Inspiração** | Galaga (1981) pela estrutura; Monster Hunter, Zelda e bullet hells modernos pelas mecânicas |
 | **Pitch** | *"Uma nave contra um titã. Escolha sua rota, roube o poder de cada guardião e desmonte o titã peça por peça."* |
 | **Modos** | **Campanha** (4 mundos: 2 setores → 3 mini-chefes em ordem livre → chefe; o Mundo 4 termina no Leviatã), com buffs, save e seleção de mundo; e **Duelo** (só o Titã, sem buffs) |
+
+## 1B. História (v1.7)
+
+| | |
+|---|---|
+| **Premissa** | Ano 2187. **Vega**, a última piloto da Aliança das Colônias, foge na nave **NT-01** e parte para o centro da galáxia para destruir o **Ômega**. |
+| **Conflito** | A armada do Ômega, puxada pelo **Titã**, apagou as colônias e derrubou a frota. Cada mundo é guardado por chefes biomecânicos. |
+| **Ligação com as mecânicas** | Cada chefe derrotado deixa um **núcleo de energia** = os **buffs**. Vencer um mundo abre a rota para o próximo. O Ômega é a mente que criou o Titã, por isso é o chefe final. |
+| **Apresentação** | Introdução de 4 telas (Nova Campanha e botão HISTÓRIA), um texto entre cada mundo, frase no fim de jogo. |
+| **Desfechos** | **Vitória:** o Ômega se desfaz, as colônias voltam a ter luz, créditos do grupo. **Derrota** (desistir após cair): "Sinal perdido", a galáxia escurece, mas os núcleos continuam salvos. |
+
+**Textos entre mundos** (aparecem ao vencer o chefe do mundo anterior):
+
+| Para o mundo | Gancho |
+|---|---|
+| 2. Cinturão Glacial | O Titã era só a vanguarda; a Hidra congela as rotas de fuga das colônias. |
+| 3. Forja Estelar | As naves inimigas nascem na Forja, guardada pela Égide. |
+| 4. Vazio Abissal | O Arconte e o Leviatã protegem o portal para o centro da galáxia. |
+| 5. Singularidade | O portal se abre: o Ômega espera. "Este é o último voo, Vega." |
+
+**Por que assim:** o enunciado pede a história **dentro do jogo**, mas a campanha já é longa. Por isso os textos são curtos (1 tela entre mundos), datilografados, com ENTER para acelerar e ESC para pular, e nunca interrompem uma luta. Os textos ficam em `src/story/story.js`, separados da cena que os mostra.
 
 ## 2. Pilares de design
 

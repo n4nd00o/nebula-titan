@@ -2,6 +2,12 @@
 
 # 🚀 NEBULA TITAN
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Group:** [NOME DO GRUPO] · **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Members:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 **A retro shoot 'em up with destructible bosses: four worlds of rising difficulty, 12 mini-bosses, 4 world bosses, routes of your choice, and a screen-filling star fortress.**
 
 *A modern reinterpretation of 1980s arcade classics, inspired by Galaga (Namco, 1981).*
@@ -20,6 +26,16 @@
 </div>
 
 ---
+
+## 🎓 A3 delivery (college assignment)
+
+The full list of required items (in Portuguese) is in the [main README](README.md#-entrega-a3). Summary:
+
+- **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho. Group and members are in the block under the title.
+- **Story in the game (v1.7):** in 2187, **Vega**, the last pilot of the Colonies' Alliance, flies the **NT-01** through five worlds to destroy **Omega**, the mind behind the Titan's armada. Shown as an intro, a text between worlds, a victory ending with the group credits and a defeat ending.
+- **Tech:** JavaScript + HTML5 Canvas + Web Audio, no libraries (not pygame): it runs in any browser and on phones, which matches the web/mobile part of the course.
+- **AI use:** Claude Code (Anthropic) was used as a programming assistant (code, tests, docs and slides); the group reviewed, tested and can explain everything.
+- **Slides:** [`docs/apresentacao/`](docs/apresentacao/).
 
 ## 🎯 About
 
@@ -129,7 +145,8 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 👽 Galaga-style **formation sectors** with 5 alien types.
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
-- 🧪 **348 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
+- 📜 **In-game story** *(v1.7)*: intro, texts between worlds, victory and defeat endings and the group credits.
+- 🧪 **353 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls

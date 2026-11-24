@@ -72,6 +72,8 @@ const SFX = {
   buff: (a) => [523, 784, 1047, 1568].forEach((f, i) =>
     a.tone({ type: 'triangle', freq: f, duration: i === 3 ? 0.5 : 0.12, volume: 0.1, delay: i * 0.09 })),
   select: (a) => a.tone({ type: 'square', freq: 880, freqEnd: 1320, duration: 0.08, volume: 0.06 }),
+  // Tique da máquina de escrever das telas de história (v1.7): curto e baixo.
+  type: (a) => a.tone({ type: 'square', freq: 1500 + Math.random() * 300, duration: 0.02, volume: 0.025 }),
   victory: (a) => [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) =>
     a.tone({ type: 'square', freq: f, duration: i === 6 ? 0.6 : 0.14, volume: 0.08, delay: i * 0.14 })),
   gameOver: (a) => [392, 349, 311, 262].forEach((f, i) =>
@@ -133,6 +135,8 @@ TRACKS.ice = { bpm: 128, chords: [[5, 8, 12], [1, 5, 8], [3, 7, 10], [0, 4, 7]],
 TRACKS.forge = { bpm: 148, chords: [[-2, 1, 5], [-6, -2, 1], [-4, 0, 3], [-7, -3, 0]], step: TRACKS.boss.step };
 // Mundo 4 (vazio): Si menor, sombria (Bm G A F#).
 TRACKS.void = { bpm: 138, chords: [[2, 5, 9], [-2, 2, 5], [0, 4, 7], [-3, 1, 4]], step: TRACKS.boss.step };
+// História (v1.7): lenta e melancólica, com o mesmo timbre da tela inicial (Am F C G).
+TRACKS.story = { bpm: 72, chords: [[0, 3, 7], [-4, 0, 3], [3, 7, 10], [-2, 2, 5]], step: TRACKS.title.step };
 
 export class AudioEngine {
   constructor(storage) {

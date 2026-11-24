@@ -11,7 +11,7 @@
  *  - CONTROLES: troca as teclas de cada ação (v1.5).
  *  - DUELO COM O TITÃ: luta direta contra o Nebula Titan, sem buffs.
  *
- * No topo ficam botões de toque: SOM, VIBRAR (celulares com vibração) e TELA CHEIA,
+ * No topo ficam botões de toque: HISTÓRIA (v1.7), SOM, VIBRAR (celulares com vibração) e TELA CHEIA,
  * e à esquerda uma lupa de busca.
  *
  * No celular (v1.6) o menu vira uma coluna de botões mais altos, fáceis de tocar.
@@ -29,6 +29,8 @@ import { canVibrate, vibrationEnabled, toggleVibration } from '../core/Haptics.j
 import { SCHEME_LABELS, loadTouchSettings, assistActive } from '../core/TouchControls.js';
 import { openSearch, isSearchOpen } from './SearchOverlay.js';
 import { HEART_BOSS } from '../boss/bosses/heart.js';
+import { StoryScene } from './StoryScene.js';
+import { INTRO } from '../story/story.js';
 
 const BOSS_PREVIEW = [
   ['wingL', -66, -8], ['wingR', 66, -8],
@@ -133,6 +135,7 @@ export class TitleScene {
   topButtons() {
     const game = this.game;
     const buttons = [{ id: 'sound', label: game.audio.muted ? 'SOM OFF' : 'SOM ON', action: () => game.audio.toggleMute() }];
+    buttons.unshift({ id: 'story', label: 'HISTÓRIA', action: () => this.showStory() });
     if (canVibrate()) {
       buttons.push({ id: 'vibe', label: vibrationEnabled(game.storage) ? 'VIBRA ON' : 'VIBRA OFF', action: () => toggleVibration(game.storage) });
     }
@@ -157,6 +160,13 @@ export class TitleScene {
     game.changeScene(new PlayScene(game, { encounter: HEART_BOSS }));
   }
 
+  /** Botão HISTÓRIA: rever a introdução e voltar ao menu. */
+  showStory() {
+    const game = this.game;
+    game.audio.unlock();
+    game.changeScene(new StoryScene(game, { pages: INTRO, next: () => new TitleScene(game) }));
+  }
+
   move(delta) {
     const n = this.options.length;
     this.selected = (this.selected + delta + n) % n;
@@ -177,9 +187,10 @@ export class TitleScene {
         resumeCampaign(game, this.save);
         break;
       case 'new': {
-        // A campanha começa pelos setores obrigatórios (sem mapa até lá).
+        // A campanha começa com a introdução da história (v1.7) e depois os
+        // setores obrigatórios (sem mapa até lá).
         const campaign = new Campaign();
-        game.changeScene(new PlayScene(game, { bossId: campaign.available()[0], campaign }));
+        game.changeScene(new StoryScene(game, { pages: INTRO, next: () => new PlayScene(game, { bossId: campaign.available()[0], campaign }) }));
         break;
       }
       case 'world':

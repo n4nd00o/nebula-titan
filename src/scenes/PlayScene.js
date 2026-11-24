@@ -46,6 +46,8 @@ import { PROGRESS_KEY } from '../systems/Progress.js';
 import { haptic } from '../core/Haptics.js';
 import { keyLabel, controlsHelp } from '../core/KeyBindings.js';
 import { BuffsScene } from './BuffsScene.js';
+import { StoryScene } from './StoryScene.js';
+import { INTERLUDES, ENDING_VICTORY, ENDING_DEFEAT } from '../story/story.js';
 import {
   MOBILE_ASSIST, TOUCH_BUTTONS, STICK, SCHEME_LABELS, loadTouchSettings, assistActive, isTouchDevice,
 } from '../core/TouchControls.js';
@@ -218,8 +220,12 @@ export class PlayScene {
 
   /** ESC/MENU nas telas de pausa e de fim: o treino volta ao mapa; o resto, ao título. */
   exitToMenu() {
-    if (this.practice) this.game.changeScene(new ProgressScene(this.game, { focusWorld: this.worldIndex, openWorld: true }));
-    else this.game.changeScene(new TitleScene(this.game));
+    const game = this.game;
+    if (this.practice) game.changeScene(new ProgressScene(game, { focusWorld: this.worldIndex, openWorld: true }));
+    else if (this.campaign && this.state === 'gameover') {
+      // Desistir da campanha depois de cair = final de derrota da história (v1.7).
+      game.changeScene(new StoryScene(game, { pages: ENDING_DEFEAT, label: 'FINAL', theme: WORLDS[4].theme, next: () => new TitleScene(game) }));
+    } else game.changeScene(new TitleScene(game));
   }
 
   enter() {
@@ -676,10 +682,15 @@ export class PlayScene {
       campaign.recordContinue();
       game.changeScene(new PlayScene(game, { bossId: this.def.id, campaign }));
     } else if (campaign.complete) {
-      game.changeScene(new TitleScene(game));
+      // Ômega derrotado: final de vitória da história e créditos (v1.7).
+      game.changeScene(new StoryScene(game, { pages: ENDING_VICTORY, label: 'FINAL', theme: WORLDS[4].theme, next: () => new TitleScene(game) }));
     } else if (this.worldCleared) {
-      // Mundo concluído: o Mapa de Progresso mostra o avanço até o próximo mundo.
-      game.changeScene(new ProgressScene(game, { campaign, focusWorld: this.worldCleared, celebrate: this.worldCleared }));
+      // Mundo concluído: texto da história sobre o próximo mundo (v1.7) e,
+      // depois, o Mapa de Progresso mostra o avanço até ele.
+      const toMap = () => new ProgressScene(game, { campaign, focusWorld: this.worldCleared, celebrate: this.worldCleared });
+      const pages = INTERLUDES[this.worldCleared];
+      if (pages) game.changeScene(new StoryScene(game, { pages, label: `ENTRE MUNDOS · ${this.worldCleared} DE 5`, theme: WORLDS[this.worldCleared].theme, next: toMap }));
+      else game.changeScene(toMap());
     } else if (campaign.nextIsStage) {
       game.changeScene(new PlayScene(game, { bossId: campaign.available()[0], campaign }));
     } else {
@@ -1256,6 +1267,7 @@ export class PlayScene {
   drawGameOver(ctx) {
     this.drawOverlay(ctx, Math.min(0.7, this.stateTime));
     drawText(ctx, 'FIM DE JOGO', W / 2, 190, { size: 22, align: 'center', color: '#ff2848' });
+    if (this.campaign && !this.practice) drawText(ctx, 'A NT-01 foi abatida. As colônias ainda esperam, Vega.', W / 2, 220, { size: 6, align: 'center', color: UI_COLORS.muted });
     const label = (this.boss.phaseLabel ?? 'fase').toLowerCase();
     drawText(ctx, `${this.def.name}: ${label} ${this.boss.phaseIndex + 1} de ${this.boss.phaseCount}`, W / 2, 240, { size: 8, align: 'center' });
     drawText(ctx, `PONTOS ${this.score}`, W / 2, 270, { size: 10, align: 'center', color: UI_COLORS.accent });
@@ -1264,7 +1276,8 @@ export class PlayScene {
       const retry = this.campaign && !this.practice ? 'ENTER  continuar (pontos zerados)' : 'ENTER  tentar de novo';
       if (Math.floor(this.stateTime * 2) % 2 === 0) drawText(ctx, retry, W / 2, 360, { size: 8, align: 'center' });
       if (this.campaign && !this.practice) drawText(ctx, 'Você mantém os buffs e volta com 3 vidas', W / 2, 378, { size: 6, align: 'center', color: UI_COLORS.muted });
-      drawText(ctx, this.practice ? 'ESC  voltar ao mapa' : 'ESC  menu', W / 2, 398, { size: 8, align: 'center', color: UI_COLORS.muted });
+      const quit = this.practice ? 'ESC  voltar ao mapa' : this.campaign ? 'ESC  desistir (final da derrota)' : 'ESC  menu';
+      drawText(ctx, quit, W / 2, 398, { size: 8, align: 'center', color: UI_COLORS.muted });
     }
   }
 
@@ -1374,7 +1387,7 @@ export class PlayScene {
       drawText(ctx, `${w.number}: ${route || '(seleção de mundo)'}`, W / 2, 362 + i * 13, { size: 6, align: 'center' });
     });
     drawText(ctx, `PARTES DE ${this.def.name} DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
-    this.drawPrompt(ctx, 'ENTER  menu principal');
+    this.drawPrompt(ctx, 'ENTER  ver o final da história');
   }
 
   /** Vitória no TREINO: só estatísticas; nada muda no save. */

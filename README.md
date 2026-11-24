@@ -2,6 +2,12 @@
 
 # 🚀 NEBULA TITAN
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 **Um shoot 'em up retrô com chefes de partes destrutíveis: cinco mundos com dificuldade crescente, 18 mini-chefes, 4 chefes de mundo, uma fortaleza estelar que ocupa a tela inteira e o Ômega, o criador da frota.**
 
 *Releitura moderna dos clássicos arcade dos anos 80, inspirada em Galaga (Namco, 1981).*
@@ -15,15 +21,15 @@
 
 [🎮 Jogar online](#-jogar-online) · [📖 Game Design](docs/GDD.md) · [🏗️ Arquitetura](docs/ARQUITETURA.md) · [🗺️ Planejamento](docs/PLANEJAMENTO.md) · [🇺🇸 English](README.en.md)
 
-<!-- Quando tiver uma captura de tela/GIF, salve em docs/images/ e descomente a linha abaixo:
-![Gameplay do Nebula Titan](docs/images/gameplay.gif)
--->
+![Luta contra o Titã](docs/images/luta-tita.png)
 
 </div>
 
 ---
 
 ## 📌 Sumário
+
+**[🎓 Entrega A3: itens obrigatórios do enunciado](#-entrega-a3)** · [🎤 Slides da apresentação](docs/apresentacao/)
 
 1. [Sobre o projeto](#-sobre-o-projeto)
 2. [Objetivos](#-objetivos)
@@ -43,6 +49,110 @@
 16. [Autor](#-autor)
 
 ---
+
+## 🎓 Entrega A3
+
+Esta seção reúne, em um só lugar, os **itens obrigatórios do README** pedidos no enunciado da A3 (Desenvolvimento de um Jogo). Os detalhes de cada item estão nas seções indicadas.
+
+### 1. Identificação
+
+| | |
+|---|---|
+| **Jogo** | Nebula Titan |
+| **Disciplina (UC)** | Usabilidade, desenvolvimento web, mobile e jogos |
+| **Professor** | Elzo Brito dos Santos Filho |
+| **Grupo e integrantes** | no bloco abaixo do título deste README e na tabela da [divisão de tarefas](#6-divisão-de-tarefas) |
+
+### 2. Descrição e história
+
+**Nebula Titan** é um *shoot 'em up* retrô (tiro com nave, visto de cima) com **chefes de partes destrutíveis**: cada parte que você arranca muda a aparência e os ataques do chefe. A campanha tem **5 mundos**, cada um com setores de alienígenas em formação, mini-chefes que dão *buffs* e um chefe de mundo, até o chefe final **Ômega**.
+
+**A história aparece dentro do jogo** *(v1.7)*:
+
+| Parte | No jogo |
+|---|---|
+| **Premissa** | Ano 2187. **Vega** é a **última piloto da Aliança das Colônias**. Na nave **NT-01**, ela precisa chegar ao centro da galáxia e destruir o **Ômega**. |
+| **Conflito** | A armada do Ômega, liderada pelo **Titã**, apagou as colônias e derrubou a frota da Aliança. Cada mundo é guardado por chefes biomecânicos. |
+| **Apresentação** | **Introdução** de 4 telas ao começar uma *Nova Campanha* (também no botão **HISTÓRIA** do menu); **um texto entre cada mundo** contando para onde a armada recuou; frase da história na tela de *fim de jogo*. |
+| **Desfecho** | **Vitória:** o Ômega se desfaz, as luzes das colônias voltam e aparecem os **créditos com o grupo**. **Derrota:** ao desistir depois de cair, o final "Sinal perdido" mostra a galáxia escurecendo. |
+| **Coerência** | Os *buffs* são os **núcleos de energia** que cada chefe derrotado deixa para a NT-01; cada mundo tem paleta e música próprias; as telas de história têm **trilha própria, mais lenta**, e som de máquina de escrever. |
+
+### 3. Como rodar
+
+- **Online, sem instalar nada:** [nebula-titan.vercel.app](https://nebula-titan.vercel.app).
+- **Pelo código-fonte:** pré-requisito [Node.js](https://nodejs.org/) 18+. O jogo **não tem dependências** (não há `pip install` nem `npm install`):
+
+```bash
+npm start          # abre o servidor local em http://localhost:5173
+npm test           # roda os testes automatizados
+```
+
+Passo a passo completo em [Como executar](#-como-executar). O `package.json` faz o papel do `requirements.txt`.
+
+### 4. Controles
+
+A tabela de cada tecla e sua ação está em [Como jogar](#-como-jogar). Resumo: **setas/WASD** movem, **Espaço/Z** atira, **Shift** = modo foco, **C** = dash, **X** = bomba, **P/Esc** = pausa, **M** = som. Os controles também são explicados **dentro do jogo** (tela inicial e menu **CONTROLES**, onde dá para trocar as teclas).
+
+### 5. Regras
+
+- **Ganhar:** derrotar o **Ômega**, chefe final do Mundo 5. Cada chefe é vencido destruindo os **pontos fracos** de cada fase (marcados com colchetes amarelos).
+- **Perder:** a nave tem **vidas** (máximo 5); ao perder todas, aparece o *fim de jogo*. Dá para **continuar** (mantém os buffs, zera os pontos) ou **desistir**, que mostra o final de derrota.
+- **Pontuar:** pontos por inimigo e por parte destruída, mais bônus de **tempo**, **precisão** e **sem dano** em cada luta, que geram um **rank** (S/A/B/C). Vida extra a cada 50.000 pontos e +100.000 por **corrida perfeita**. O recorde fica salvo no navegador.
+- **Dificuldade crescente:** cada mundo tem inimigos mais rápidos e resistentes, e os chefes de mundo ficam mais fortes conforme os seus buffs.
+
+### 6. Divisão de tarefas
+
+<!-- integrantes-tabela:inicio (gerado por npm run integrantes) -->
+| Integrante | RA | O que fez |
+|---|---|---|
+| Luiz Fernando Santana | [RA] | Programação, game design e documentação |
+| [INTEGRANTE 2] | [RA] | [função] |
+| [INTEGRANTE 3] | [RA] | [função] |
+<!-- integrantes-tabela:fim -->
+
+> Para preencher nomes, RAs e funções: edite [`integrantes.json`](integrantes.json) e rode `npm run integrantes`. O script atualiza este README, os documentos de `docs/` e os créditos dentro do jogo.
+
+### 7. Créditos
+
+| Recurso | Autor | Fonte / licença |
+|---|---|---|
+| Sprites (naves, chefes, alienígenas, efeitos) | **Criados pelo grupo** (pixel art gerada por código em `src/graphics/`) | Próprio |
+| Músicas e efeitos sonoros | **Criados pelo grupo** (sintetizados em tempo real em `src/core/AudioEngine.js`, sem arquivos de som) | Próprio |
+| História e textos | **Criados pelo grupo** (`src/story/story.js`) | Próprio |
+| Fonte **Press Start 2P** | CodeMan38 | [Google Fonts](https://fonts.google.com/specimen/Press+Start+2P), SIL Open Font License 1.1 |
+| Paleta de cores **Sweetie 16** | GrafxKid | [Lospec](https://lospec.com/palette-list/sweetie-16), uso livre com crédito |
+
+Nenhuma imagem ou som de terceiros foi usado. Inspirações de design estão em [Créditos e inspiração](#-créditos-e-inspiração).
+
+### 8. Tecnologia
+
+**JavaScript (ES Modules) + HTML5 Canvas + Web Audio API**, sem bibliotecas. Não usamos pygame. A justificativa:
+
+- **Roda em qualquer navegador**, inclusive no celular, sem instalar Python nem bibliotecas; o professor pode jogar pelo link.
+- O enunciado pede **usabilidade web e mobile**: o jogo tem controles de toque, joystick e funciona como app (PWA).
+- A lógica foi escrita "na mão" (laço principal, colisão, estados, áudio), os mesmos conceitos das aulas com pygame: `update()` + `draw()` a 60 quadros por segundo, cenas como estados e colisão por círculos.
+
+Detalhes em [Tecnologias utilizadas](#-tecnologias-utilizadas) e [ARQUITETURA.md](docs/ARQUITETURA.md).
+
+### 9. Uso de IA
+
+**Foi utilizada IA.** Declaração conforme a seção 6 do enunciado:
+
+| Ferramenta | Para quê | Em quais arquivos |
+|---|---|---|
+| **Claude Code** (Anthropic) | Assistente de programação: planejar funcionalidades, gerar e revisar código, escrever testes, encontrar bugs e redigir a documentação e os slides | Código em `src/` (cenas, chefes, sistemas, `src/story/`), testes em `tests/`, scripts em `scripts/`, documentação (`README*.md`, `CHANGELOG.md`, `docs/`) e slides (`docs/apresentacao/`) |
+
+As ideias do jogo (Galaga com chefes de partes destrutíveis, mundos, buffs, controles do celular e a história) e as decisões foram do grupo; todo o código gerado foi lido, testado e jogado pelo grupo, que sabe explicar cada parte.
+
+### 10. Capturas de tela
+
+| Tela inicial | Introdução da história | Luta contra o Titã |
+|---|---|---|
+| ![Tela inicial](docs/images/tela-inicial.png) | ![Introdução da história](docs/images/historia.png) | ![Luta contra o Titã](docs/images/luta-tita.png) |
+
+### Apresentação
+
+Os slides (5) e o roteiro da apresentação estão em [`docs/apresentacao/`](docs/apresentacao/).
 
 ## 🎯 Sobre o projeto
 
@@ -199,7 +309,8 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 🏆 **Pontuação e rank** (S/A/B/C) com bônus de tempo, precisão e "sem dano", além de recorde salvo no navegador.
 - 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante que acompanha o polegar, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo; padrão desde a v1.6.1), e **ajuda do celular** (inimigos com 25% menos vida, tiros 20% mais lentos, hitbox menor), ligada automaticamente em telas de toque.
 - 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
-- 🧪 **348 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
+- 📜 **História dentro do jogo** *(v1.7)*: introdução, textos entre os mundos, finais de vitória e de derrota e créditos com o grupo, com trilha própria e texto datilografado.
+- 🧪 **353 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
@@ -328,7 +439,7 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (348 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
+A suíte (353 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).
@@ -452,7 +563,7 @@ Estudante de Engenharia de Software na Universidade São Judas Tadeu(USJT).
 - LinkedIn: [linkedin.com/in/luiz-fernando-santana-trindade](https://www.linkedin.com/in/luiz-fernando-santana-trindade/)
 - E-mail: luizfernandosantanadev@gmail.com
 
-<!-- Se o projeto foi feito em grupo, liste aqui os demais integrantes e o papel de cada um. -->
+Integrantes do grupo e o que cada um fez: veja a [divisão de tarefas](#6-divisão-de-tarefas).
 
 ## 📄 Licença
 

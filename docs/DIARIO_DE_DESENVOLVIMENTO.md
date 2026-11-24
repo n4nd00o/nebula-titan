@@ -1,9 +1,29 @@
 # 📓 Diário de Desenvolvimento
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Registro cronológico das decisões, problemas e aprendizados do projeto.
 > Novas entradas são adicionadas no topo.
 
 ---
+
+## 24/11/2026: Versão 1.7 (história e entrega da A3)
+
+### Contexto
+O enunciado da A3 pede que a história esteja **dentro do jogo** (premissa, conflito, apresentação e desfecho), além de README com itens obrigatórios e uma apresentação.
+
+### Decisão
+- **Premissa escolhida:** "a última piloto da Aliança". Ela explica o que já existia: os buffs viram **núcleos de energia** deixados pelos chefes, e os cinco mundos viram a rota até o Ômega.
+- **Uma cena genérica** (`StoryScene`) com páginas e `next()`, em vez de telas soltas: a mesma cena faz a introdução, os textos entre mundos e os dois finais.
+- **Sem atrapalhar quem quer jogar:** textos curtos, ENTER acelera o texto, ESC pula tudo, e nada aparece no meio de uma luta.
+- **Integrantes num lugar só** (`integrantes.json`): um script espalha os nomes pelo jogo e por todos os documentos, para não esquecer nenhum.
+
+### Aprendizado
+A fonte *Press Start 2P* é monoespaçada, então dá para quebrar o texto contando letras, sem medir no canvas. Isso deixou a quebra testável no Node.
 
 ## 09/11/2026: Versão 1.6.2 (joystick mais responsivo)
 

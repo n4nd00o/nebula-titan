@@ -1,14 +1,19 @@
 {
   "name": "nebula-titan",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "homepage": "https://nebula-titan.vercel.app",
-  "repository": { "type": "git", "url": "https://github.com/n4nd00o/nebula-titan.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/n4nd00o/nebula-titan.git"
+  },
   "description": "Shoot 'em up retrô inspirado em Galaga: 5 mundos com dificuldade crescente e 24 chefes de partes destrutíveis. JavaScript puro + HTML5 Canvas, sem dependências.",
   "type": "module",
   "private": true,
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "integrantes": "node scripts/integrantes.mjs",
+    "slides": "node docs/apresentacao/gerar-slides.cjs"
   },
   "engines": {
     "node": ">=18"

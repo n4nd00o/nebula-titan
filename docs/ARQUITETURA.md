@@ -1,5 +1,11 @@
 # 🏗️ Arquitetura: Nebula Titan
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 > Como o jogo é organizado por dentro e por que cada decisão foi tomada.
 
 ---
@@ -188,6 +194,14 @@ Arquivos: [`src/systems/Progress.js`](../src/systems/Progress.js) (lógica pura)
 - **PWA:** `manifest.webmanifest` + `sw.js` com estratégia **rede primeiro, cache de reserva**. Online, cada deploy aparece na hora; offline, o jogo sai do cache. O service worker fica desligado no `?debug`.
 
 A `PlayScene` recebe `{ bossId, campaign, practice }`. Os buffs são lidos de `campaign.buffs` e aplicados à nave (`Player.buffs`), à criação das `Wingman` (uma ou duas) e às cargas de bomba. A dificuldade do mundo vira `hpScale` e `attackRate` no `Boss`/`WaveStage` e um multiplicador de velocidade em `spawnEnemyBullet`. Depois de cada vitória a cena salva a campanha (`campaignSave`) e o número de mundos liberados (`worldsUnlocked`).
+
+### StoryScene: a história (v1.7)
+
+`StoryScene` é uma cena genérica: recebe **páginas** (`{ title, text, art }`) e uma função **`next()`** que devolve a cena seguinte. Assim a mesma cena serve para a introdução (→ `PlayScene`), os textos entre mundos (→ `ProgressScene`) e os finais (→ `TitleScene`), sem que ela precise importar nenhuma dessas cenas (evita import circular).
+
+- **Dados separados da apresentação:** os textos ficam em `src/story/story.js` e os integrantes em `src/story/team.js`; os dois são JavaScript puro, testável no Node (`tests/story.test.js`).
+- **Quebra de linha sem canvas:** a fonte é monoespaçada, então `wrapText` conta caracteres em vez de medir pixels; a moldura cresce com o número de linhas.
+- **Pontos de entrada:** `TitleScene` (Nova Campanha e botão HISTÓRIA) e `PlayScene.continueAfterEnd`/`exitToMenu` (mundo concluído, vitória final, desistir após o fim de jogo). Nenhuma regra de luta foi alterada.
 
 ## 5. O motor de chefes
 

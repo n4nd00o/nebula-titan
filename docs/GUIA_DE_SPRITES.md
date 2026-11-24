@@ -1,5 +1,11 @@
 # 🎨 Guia de Sprites: como desenhar a sua própria arte
 
+<!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
+> **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+>
+> **Integrantes:** Luiz Fernando Santana (RA [RA]) · [INTEGRANTE 2] (RA [RA]) · [INTEGRANTE 3] (RA [RA])
+<!-- integrantes:fim -->
+
 O jogo funciona **completo sem nenhuma imagem**: toda a pixel art é gerada por código. Mesmo assim, qualquer sprite pode ser substituído por um **PNG desenhado à mão** (modo misto). As variações de dano (rachaduras, flash branco, carcaça e tom de fúria) são **geradas automaticamente** a partir do seu desenho, então você só precisa desenhar a versão **intacta**.
 
 ---
