@@ -1,6 +1,6 @@
 {
   "_como_usar": "Preencha o grupo e os integrantes (nome completo, RA e o que fez) e rode: npm run integrantes. Isso atualiza o jogo (créditos), o README e todos os documentos de docs/.",
-  "group": "[NOME DO GRUPO]",
+  "group": "Grupo 19 (Nebula Titan)",
   "course": "Usabilidade, desenvolvimento web, mobile e jogos",
   "professor": "Elzo Brito dos Santos Filho",
   "members": [

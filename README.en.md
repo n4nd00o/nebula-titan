@@ -3,7 +3,7 @@
 # 🚀 NEBULA TITAN
 
 <!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
-> **Group:** [NOME DO GRUPO] · **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
+> **Group:** Grupo 19 (Nebula Titan) · **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
 >
 > **Members:** Luiz Fernando Santana Trindade (RA 824125942) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
 <!-- integrantes:fim -->

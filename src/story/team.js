@@ -7,7 +7,7 @@
  */
 // integrantes:inicio (gerado por scripts/integrantes.mjs, não edite à mão)
 export const TEAM = Object.freeze({
-  group: '[NOME DO GRUPO]',
+  group: 'Grupo 19 (Nebula Titan)',
   members: Object.freeze([
     Object.freeze({ name: 'Luiz Fernando Santana Trindade', ra: '824125942', role: 'Programação, game design e documentação' }),
     Object.freeze({ name: 'Luccas Alberto Geraldes Andrade', ra: '823116823', role: 'Design das músicas e das fases' }),
