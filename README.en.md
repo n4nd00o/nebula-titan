@@ -5,7 +5,7 @@
 <!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
 > **Group:** [NOME DO GRUPO] · **Course:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
 >
-> **Members:** Luiz Fernando Santana (RA [RA]) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
+> **Members:** Luiz Fernando Santana Trindade (RA 824125942) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
 <!-- integrantes:fim -->
 
 **A retro shoot 'em up with destructible bosses: four worlds of rising difficulty, 12 mini-bosses, 4 world bosses, routes of your choice, and a screen-filling star fortress.**
@@ -230,7 +230,7 @@ Full write-up (Portuguese): [docs/ARQUITETURA.md](docs/ARQUITETURA.md) · Game D
 
 ## 👤 Author
 
-**Luiz Fernando Santana**: [GitHub](https://github.com/n4nd00o) · [LinkedIn](https://www.linkedin.com/in/luiz-fernando-santana-trindade/) · luizfernandosantanadev@gmail.com
+**Luiz Fernando Santana Trindade**: [GitHub](https://github.com/n4nd00o) · [LinkedIn](https://www.linkedin.com/in/luiz-fernando-santana-trindade/) · luizfernandosantanadev@gmail.com
 
 ## 📄 License
 

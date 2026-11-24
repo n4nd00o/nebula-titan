@@ -4,8 +4,8 @@
   "course": "Usabilidade, desenvolvimento web, mobile e jogos",
   "professor": "Elzo Brito dos Santos Filho",
   "members": [
-    { "name": "Luiz Fernando Santana", "ra": "[RA]", "role": "Programação, game design e documentação" },
-    { "name": "Luccas Alberto Geraldes Andrade", "ra": "823116823", "role": "[função]" },
-    { "name": "Nathan Silva Barreto", "ra": "823258091", "role": "[função]" }
+    { "name": "Luiz Fernando Santana Trindade", "ra": "824125942", "role": "Programação, game design e documentação" },
+    { "name": "Luccas Alberto Geraldes Andrade", "ra": "823116823", "role": "Design das músicas e das fases" },
+    { "name": "Nathan Silva Barreto", "ra": "823258091", "role": "Design das músicas e das fases" }
   ]
 }

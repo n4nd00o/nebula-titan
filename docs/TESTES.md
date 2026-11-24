@@ -3,7 +3,7 @@
 <!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
 > **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
 >
-> **Integrantes:** Luiz Fernando Santana (RA [RA]) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
+> **Integrantes:** Luiz Fernando Santana Trindade (RA 824125942) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
 <!-- integrantes:fim -->
 
 > Os testes também são **documentação do projeto**: cada um descreve uma regra do jogo em português e prova que ela continua valendo.

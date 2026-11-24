@@ -5,7 +5,7 @@
 <!-- integrantes:inicio (gerado por npm run integrantes; edite integrantes.json) -->
 > **Grupo:** [NOME DO GRUPO] · **Disciplina:** Usabilidade, desenvolvimento web, mobile e jogos · **Professor:** Elzo Brito dos Santos Filho
 >
-> **Integrantes:** Luiz Fernando Santana (RA [RA]) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
+> **Integrantes:** Luiz Fernando Santana Trindade (RA 824125942) · Luccas Alberto Geraldes Andrade (RA 823116823) · Nathan Silva Barreto (RA 823258091)
 <!-- integrantes:fim -->
 
 **Um shoot 'em up retrô com chefes de partes destrutíveis: cinco mundos com dificuldade crescente, 18 mini-chefes, 4 chefes de mundo, uma fortaleza estelar que ocupa a tela inteira e o Ômega, o criador da frota.**
@@ -105,9 +105,9 @@ A tabela de cada tecla e sua ação está em [Como jogar](#-como-jogar). Resumo:
 <!-- integrantes-tabela:inicio (gerado por npm run integrantes) -->
 | Integrante | RA | O que fez |
 |---|---|---|
-| Luiz Fernando Santana | [RA] | Programação, game design e documentação |
-| Luccas Alberto Geraldes Andrade | 823116823 | [função] |
-| Nathan Silva Barreto | 823258091 | [função] |
+| Luiz Fernando Santana Trindade | 824125942 | Programação, game design e documentação |
+| Luccas Alberto Geraldes Andrade | 823116823 | Design das músicas e das fases |
+| Nathan Silva Barreto | 823258091 | Design das músicas e das fases |
 <!-- integrantes-tabela:fim -->
 
 > Para preencher nomes, RAs e funções: edite [`integrantes.json`](integrantes.json) e rode `npm run integrantes`. O script atualiza este README, os documentos de `docs/` e os créditos dentro do jogo.
@@ -556,7 +556,7 @@ nebula-titan/
 
 ## 👤 Autor
 
-**Luiz Fernando Santana**
+**Luiz Fernando Santana Trindade**
 Estudante de Engenharia de Software na Universidade São Judas Tadeu(USJT).
 
 - GitHub: [@n4nd00o](https://github.com/n4nd00o)

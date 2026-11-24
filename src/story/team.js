@@ -9,9 +9,9 @@
 export const TEAM = Object.freeze({
   group: '[NOME DO GRUPO]',
   members: Object.freeze([
-    Object.freeze({ name: 'Luiz Fernando Santana', ra: '[RA]', role: 'Programação, game design e documentação' }),
-    Object.freeze({ name: 'Luccas Alberto Geraldes Andrade', ra: '823116823', role: '[função]' }),
-    Object.freeze({ name: 'Nathan Silva Barreto', ra: '823258091', role: '[função]' }),
+    Object.freeze({ name: 'Luiz Fernando Santana Trindade', ra: '824125942', role: 'Programação, game design e documentação' }),
+    Object.freeze({ name: 'Luccas Alberto Geraldes Andrade', ra: '823116823', role: 'Design das músicas e das fases' }),
+    Object.freeze({ name: 'Nathan Silva Barreto', ra: '823258091', role: 'Design das músicas e das fases' }),
   ]),
 });
 // integrantes:fim
