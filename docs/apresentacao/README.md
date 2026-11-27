@@ -8,6 +8,10 @@
 
 **Slides:** [`Nebula-Titan-Apresentacao.pptx`](Nebula-Titan-Apresentacao.pptx), 5 slides, abre no PowerPoint e no Google Slides. Cada slide tem **anotações do apresentador** com o que falar.
 
+**Vídeo da demonstração:** [`demonstracao.mp4`](demonstracao.mp4), 72 segundos, sem som. Ele está **dentro do slide 5** (clique no vídeo para tocar no PowerPoint) e também solto nesta pasta, para abrir em qualquer player. Foi gravado do jogo real, seguindo o roteiro da demonstração: tela inicial → introdução da história → primeiro setor → pausa e Meus Buffs → Duelo com o Titã, em que as duas asas do chefe são destruídas. Na gravação a nave estava invencível e o piloto era automático, para o vídeo não depender de ninguém jogar bem.
+
+**QR code:** na **capa** e no **slide 5**, abre [nebula-titan.vercel.app](https://nebula-titan.vercel.app) para quem quiser jogar no celular. A imagem também está em [`docs/images/qr-jogo.png`](../images/qr-jogo.png).
+
 **Jogo para a demonstração:** [nebula-titan.vercel.app](https://nebula-titan.vercel.app) (ou `npm start` → http://localhost:5173).
 
 ## Roteiro de falas (cerca de 5 minutos, Luiz e Nathan)
@@ -72,7 +76,7 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 >
 > A história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.
 
-**Demonstração (1:00)**: o Nathan joga e comenta. As falas são curtas para dar para jogar ao mesmo tempo.
+**Demonstração (1:00)**: o Nathan comenta enquanto o **vídeo do slide 5** roda (um clique nele para tocar). O vídeo segue exatamente a ordem da tabela abaixo, então as falas acompanham as cenas. Se preferirem jogar ao vivo, a tabela também serve: a coluna da esquerda diz o que apertar.
 
 | O que fazer no jogo | O que falar |
 |---|---|
@@ -130,7 +134,8 @@ Esta parte **não é para ler na apresentação**. É para vocês entenderem os 
 
 ### Antes de começar
 
-- Deixe o jogo aberto em outra aba: [nebula-titan.vercel.app](https://nebula-titan.vercel.app).
+- Teste o vídeo do slide 5 no computador da sala. Se o PowerPoint de lá não tocar vídeo, abra o `demonstracao.mp4` direto.
+- Deixe o jogo aberto em outra aba, caso queiram jogar ao vivo: [nebula-titan.vercel.app](https://nebula-titan.vercel.app).
 - Teste o som da sala: a música e os efeitos também contam na nota.
 - Se a internet falhar, rode `npm start` e abra http://localhost:5173.
 

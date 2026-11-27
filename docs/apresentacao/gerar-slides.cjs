@@ -63,6 +63,22 @@ function shot(slide, file, x, y, h, label) {
   if (label) slide.addText(label, { x: x - 0.3, y: y + h + 0.08, w: w + 0.6, h: 0.25, fontFace: BODY, fontSize: 10, italic: true, color: C.muted, align: 'center', margin: 0, isTextBox: true });
 }
 
+/** QR code que abre o jogo online, com a legenda ao lado (side) ou embaixo. */
+const GAME_URL = 'nebula-titan.vercel.app';
+function qr(slide, x, y, size, side) {
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: x - 0.06, y: y - 0.06, w: size + 0.12, h: size + 0.12, rectRadius: 0.06, fill: { color: 'FFFFFF' }, line: { color: C.cyan, width: 1.5 } });
+  slide.addImage({ path: IMG('qr-jogo.png'), x, y, w: size, h: size, altText: `QR code que abre o jogo em ${GAME_URL}` });
+  const caption = [
+    { text: 'JOGUE AGORA', options: { fontFace: HEAD, fontSize: 12, bold: true, color: C.cyan, breakLine: true } },
+    { text: 'Aponte a câmera do celular', options: { fontSize: 10, color: C.text, breakLine: true } },
+    { text: GAME_URL, options: { fontSize: 9, color: C.muted } },
+  ];
+  const box = side
+    ? { x: x + size + 0.2, y, w: 1.6, h: size, valign: 'middle' }
+    : { x: x - 0.25, y: y + size + 0.14, w: size + 0.5, h: 0.75, valign: 'top', align: 'center' };
+  slide.addText(caption, { ...box, fontFace: BODY, margin: 0, isTextBox: true });
+}
+
 // ---------------------------------------------------------------- 1. Capa
 {
   const s = pres.addSlide({ masterName: 'NT_CONTEUDO' });
@@ -81,7 +97,8 @@ function shot(slide, file, x, y, h, label) {
   s.addText(team.group.toUpperCase(), { x: 0.5, y: 3.1, w: 5.8, h: 0.3, fontFace: HEAD, fontSize: 12, bold: true, color: C.cyan, margin: 0, isTextBox: true });
   s.addText(people, { x: 0.5, y: 3.42, w: 5.8, h: 1.1, fontFace: BODY, fontSize: 13, color: C.text, margin: 0, valign: 'top', paraSpaceAfter: 2, isTextBox: true });
   s.addText(`${team.course} · Prof. ${team.professor}`, { x: 0.5, y: 4.65, w: 5.8, h: 0.3, fontFace: BODY, fontSize: 11, color: C.muted, margin: 0, isTextBox: true });
-  shot(s, 'luta-tita.png', 6.55, 0.5, 3.9, null);
+  shot(s, 'luta-tita.png', 7.0, 0.45, 3.2, null);
+  qr(s, 6.65, 3.9, 0.95, true);
   s.addNotes("Boa noite, professor. Somos o Grupo 19, formado pelo Luiz, pelo Luccas e pelo Nathan. O nosso jogo é o Nebula Titan, um jogo de nave no estilo arcade em que os chefes são montados por partes. Cada parte que você destrói muda a aparência e os ataques do chefe.");
 }
 
@@ -172,10 +189,21 @@ function shot(slide, file, x, y, h, label) {
     const y = 1.45 + i * 0.9;
     s.addShape(pres.shapes.OVAL, { x: 0.5, y: y + 0.12, w: 0.42, h: 0.42, fill: { color } });
     s.addText(String(i + 1), { x: 0.5, y: y + 0.12, w: 0.42, h: 0.42, fontFace: HEAD, fontSize: 14, bold: true, color: C.bg, align: 'center', valign: 'middle', margin: 0, isTextBox: true });
-    s.addText(head, { x: 1.1, y, w: 4.9, h: 0.3, fontFace: HEAD, fontSize: 14, bold: true, color, margin: 0, isTextBox: true });
-    s.addText(body, { x: 1.1, y: y + 0.3, w: 4.9, h: 0.5, fontFace: BODY, fontSize: 13, color: C.text, margin: 0, valign: 'top', isTextBox: true });
+    s.addText(head, { x: 1.1, y, w: 3.9, h: 0.3, fontFace: HEAD, fontSize: 14, bold: true, color, margin: 0, isTextBox: true });
+    s.addText(body, { x: 1.1, y: y + 0.3, w: 3.9, h: 0.55, fontFace: BODY, fontSize: 12, color: C.text, margin: 0, valign: 'top', isTextBox: true });
   });
-  shot(s, 'historia.png', 6.85, 1.4, 3.4, 'Introdução no jogo');
+  // Vídeo da demonstração (gravado do jogo, 72 s, sem som): clique para tocar.
+  const vh = 3.4;
+  const vw = vh * 0.75;
+  const vx = 5.3;
+  const vy = 1.4;
+  s.addShape(pres.shapes.RECTANGLE, { x: vx - 0.05, y: vy - 0.05, w: vw + 0.1, h: vh + 0.1, fill: { color: C.line }, line: { color: C.pink, width: 1.5 } });
+  s.addMedia({
+    type: 'video', path: path.join(__dirname, 'demonstracao.mp4'), x: vx, y: vy, w: vw, h: vh,
+    cover: 'image/png;base64,' + fs.readFileSync(IMG('demonstracao-capa.png')).toString('base64'),
+  });
+  s.addText('Demonstração (clique para tocar)', { x: vx - 0.3, y: vy + vh + 0.08, w: vw + 0.6, h: 0.25, fontFace: BODY, fontSize: 10, italic: true, color: C.muted, align: 'center', margin: 0, isTextBox: true });
+  qr(s, 8.25, 1.45, 1.1, false);
   s.addNotes("Agora a história. No ano 2187, a armada do Ômega, liderada pelo Titã, apagou as colônias. A Vega, última piloto da Aliança, foge na nave NT-01 para destruir o Ômega no centro da galáxia.\n\nA história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.\n\nDEMONSTRAÇÃO (1:30): Nova Campanha > introdução (ENTER, depois ESC) > 30 s do primeiro setor > P e I > Q > Duelo com o Titã. Roteiro completo em docs/apresentacao/README.md.\n\nFECHAMENTO: Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e o Nathan e o Luccas cuidaram das músicas e do design das fases. Obrigado! Alguma pergunta?");
 }
 
