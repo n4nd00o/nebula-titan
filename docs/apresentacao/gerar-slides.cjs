@@ -113,7 +113,7 @@ function shot(slide, file, x, y, h, label) {
     x: 5.5, y: 3.3, w: 4, h: 1.65, color: C.green, head: 'Node.js só para rodar',
     body: 'npm start abre o servidor local; npm test roda os testes. O jogo em si não tem dependências.',
   });
-  s.addNotes("Fizemos o jogo em JavaScript, que roda direto no navegador, com o Canvas para desenhar e a Web Audio para o som. A gente não usou pygame porque a disciplina também trata de web e mobile: assim o jogo abre por um link, até no celular, sem instalar nada. Não usamos nenhuma biblioteca. Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, então não dependemos de arquivos de terceiros. E o projeto tem 353 testes automáticos.");
+  s.addNotes("Fizemos o jogo em JavaScript, com o Canvas para desenhar e a Web Audio para o som. Escolhemos JavaScript em vez de pygame porque ele roda direto no navegador: o jogo abre por um link, até no celular, sem instalar Python nem nada. E a disciplina também trata de web e mobile, então fazia sentido o jogo funcionar nos dois.\n\nOs conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, porque assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 353 testes automáticos.");
 }
 
 // ------------------------------------------------ 3. Decisões técnicas, dificuldade e IA
@@ -122,7 +122,7 @@ function shot(slide, file, x, y, h, label) {
   title(s, 'Decisões técnicas', '02 · POR DENTRO DO JOGO');
   const decisions = [
     ['Sem engine', 'Laço, colisão, desenho e áudio escritos por nós para entender o que as engines escondem.', C.gold],
-    ['Chefes como dados', 'Um motor único lê a descrição de cada chefe (partes, fases, ataques). Chefe novo = arquivo novo.', C.cyan],
+    ['Chefes como dados', 'Um motor único lê a descrição de cada chefe. Com 24 chefes, corrigir o motor corrige todos.', C.cyan],
     ['PC e celular juntos', 'O mesmo código atende mouse, teclado e toque, e o jogo instala como app e roda offline.', C.green],
   ];
   decisions.forEach(([head, body, color], i) => {
@@ -136,7 +136,7 @@ function shot(slide, file, x, y, h, label) {
     x: 5.05, y: 3.4, w: 4.45, h: 1.6, color: C.pink, head: 'Uso de IA (declarado)',
     body: 'Claude Code como assistente de código, testes, documentação e slides. Ideias e decisões do grupo; tudo revisado, testado e jogado por nós.',
   });
-  s.addNotes("Agora, três decisões técnicas. Primeiro, não usamos engine: o laço, a colisão, o desenho e o áudio foram escritos por nós, para entender o que uma engine faz por baixo. Segundo, os chefes são descritos como dados: um motor único lê as partes, as fases e os ataques de cada chefe, então um chefe novo é só um arquivo novo. Terceiro, o mesmo código roda no computador e no celular, e o jogo pode ser instalado como app e jogado sem internet.\n\nA maior dificuldade técnica foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. Criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.\n\nUsamos IA, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Isso está declarado no README, e as ideias e decisões foram do grupo.\n\nPassagem: agora a parte de design e a história do jogo.");
+  s.addNotes("Agora, as decisões técnicas e o porquê de cada uma.\n\nPrimeiro, não usamos engine. O motivo é que a disciplina ensina os fundamentos, como o laço, a colisão e o desenho, e o enunciado pede que a lógica do jogo seja nossa. Numa engine isso já vem pronto; escrevendo à mão, a gente teve que entender cada parte. E o jogo fica leve: abre direto no navegador, sem instalar e sem precisar compilar.\n\nSegundo, os chefes são descritos como dados. No começo o código sabia detalhes de um chefe só. Quando o jogo chegou a 24 chefes, copiar esse código para cada um ia espalhar os mesmos erros por todo lado. Então fizemos um motor único que lê um arquivo com as partes, as fases e os ataques de cada chefe. Assim, um chefe novo é só um arquivo novo, e corrigir o motor corrige todos de uma vez.\n\nTerceiro, o mesmo código serve para o computador e o celular, porque o navegador trata mouse e toque do mesmo jeito; assim não precisamos de duas versões. E o jogo pode ser instalado como app e jogado sem internet.\n\nA maior dificuldade foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. Com 24 chefes, não dava para jogar tudo de novo a cada mudança, então criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.\n\nUsamos IA, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Declaramos no README porque o enunciado exige, e as ideias e decisões foram do grupo.\n\nPassagem: agora a parte de design e a história do jogo.");
 }
 
 // ------------------------------------------------------- 4. Ideias de design
@@ -155,7 +155,7 @@ function shot(slide, file, x, y, h, label) {
     card(s, { x: 0.5 + col * 3.15, y: 1.45 + row * 1.85, w: 3.0, h: 1.7, head, body, color });
   });
   shot(s, 'tela-inicial.png', 7.15, 1.4, 3.4, 'Tela inicial');
-  s.addNotes("A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes: asas, canhões e escudos são partes separadas, e arrancar uma muda o visual e os ataques do chefe.\n\nA campanha tem cinco mundos. Cada mundo tem setores com inimigos em formação, três mini-chefes que você enfrenta na ordem que quiser, e um chefe no final. Cada mini-chefe dá um buff, como tiro triplo ou dash, e os chefes ficam mais fortes conforme os seus buffs, então a dificuldade sempre cresce.\n\nTambém quisemos que o jogo fosse justo: os ataques são avisados antes, a área da nave que leva dano é pequena, e dá para pausar e continuar. No celular, os controles ficam na tela.");
+  s.addNotes("A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes: asas, canhões e escudos são partes separadas, e arrancar uma muda o visual e os ataques do chefe. Fizemos assim porque queríamos que o jogador visse o efeito de cada tiro, e que a ordem em que ele destrói as partes mudasse a luta.\n\nA campanha tem cinco mundos, com três mini-chefes que você enfrenta na ordem que quiser, para o jogador ter escolha. Cada mini-chefe dá um buff, como tiro triplo ou dash. E os chefes ficam mais fortes conforme os seus buffs, porque sem isso o jogador ficaria forte demais e o fim do jogo perderia a graça.\n\nTambém quisemos que o jogo fosse justo: a ideia é que, quando você morre, a culpa seja sua e não do jogo. Por isso os ataques são avisados antes e a área da nave que leva dano é pequena. No celular, o toque é menos preciso que o teclado, então lá os inimigos têm menos vida e os tiros são mais lentos.");
 }
 
 // ------------------------------------------------------------- 5. História

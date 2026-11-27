@@ -20,10 +20,10 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 |---|---|---|
 | **Luiz** (técnico) | Slide 1 · Capa | 0:20 |
 | | Slide 2 · Linguagem | 0:50 |
-| | Slide 3 · Decisões técnicas, dificuldade e IA | 0:50 |
-| **Nathan** (design) | Slide 4 · Design | 0:50 |
+| | Slide 3 · Decisões técnicas, dificuldade e IA | 1:10 |
+| **Nathan** (design) | Slide 4 · Design | 0:55 |
 | | Slide 5 · História | 0:40 |
-| | Demonstração | 1:10 |
+| | Demonstração | 1:00 |
 | | Fechamento | 0:15 |
 
 > As falas são uma base: não precisa decorar palavra por palavra. As mesmas falas estão nas **anotações** de cada slide do PowerPoint, sem o nome de quem fala.
@@ -36,29 +36,35 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 
 **Slide 2 · Linguagem (0:50)**
 
-> Fizemos o jogo em **JavaScript**, que roda direto no navegador, com o **Canvas** para desenhar e a **Web Audio** para o som. A gente não usou pygame porque a disciplina também trata de web e mobile: assim o jogo abre por um link, até no celular, sem instalar nada.
+> Fizemos o jogo em **JavaScript**, com o **Canvas** para desenhar e a **Web Audio** para o som. Escolhemos JavaScript em vez de pygame **porque** ele roda direto no navegador: o jogo abre por um link, até no celular, sem instalar Python nem nada. E a disciplina também trata de web e mobile, então fazia sentido o jogo funcionar nos dois.
 >
-> Não usamos nenhuma biblioteca. Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, então não dependemos de arquivos de terceiros. E o projeto tem 353 testes automáticos.
+> Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, **porque** assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 353 testes automáticos.
 
-**Slide 3 · Decisões técnicas (0:50)**
+**Slide 3 · Decisões técnicas (1:10)**
 
-> Agora, três decisões técnicas. Primeiro, **não usamos engine**: o laço, a colisão, o desenho e o áudio foram escritos por nós, para entender o que uma engine faz por baixo. Segundo, os **chefes são descritos como dados**: um motor único lê as partes, as fases e os ataques de cada chefe, então um chefe novo é só um arquivo novo. Terceiro, o **mesmo código roda no computador e no celular**, e o jogo pode ser instalado como app e jogado sem internet.
+> Agora, as decisões técnicas e o porquê de cada uma.
 >
-> A maior dificuldade técnica foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. Criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.
+> Primeiro, **não usamos engine**. O motivo é que a disciplina ensina os fundamentos, como o laço, a colisão e o desenho, e o enunciado pede que a lógica do jogo seja nossa. Numa engine isso já vem pronto; escrevendo à mão, a gente teve que entender cada parte. E o jogo fica leve: abre direto no navegador, sem instalar e sem precisar compilar.
 >
-> Usamos **IA**, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Isso está declarado no README, e as ideias e decisões foram do grupo.
+> Segundo, os **chefes são descritos como dados**. No começo o código sabia detalhes de um chefe só. Quando o jogo chegou a 24 chefes, copiar esse código para cada um ia espalhar os mesmos erros por todo lado. Então fizemos um motor único que lê um arquivo com as partes, as fases e os ataques de cada chefe. Assim, um chefe novo é só um arquivo novo, e corrigir o motor corrige todos de uma vez.
+>
+> Terceiro, o **mesmo código serve para o computador e o celular**, porque o navegador trata mouse e toque do mesmo jeito; assim não precisamos de duas versões. E o jogo pode ser instalado como app e jogado sem internet.
+>
+> A maior dificuldade foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. Com 24 chefes, não dava para jogar tudo de novo a cada mudança, então criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.
+>
+> Usamos **IA**, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Declaramos no README porque o enunciado exige, e as ideias e decisões foram do grupo.
 >
 > Agora o Nathan vai falar das escolhas de design e da história do jogo.
 
 ### Bloco do Nathan: design, história e demonstração
 
-**Slide 4 · Design (0:50)**
+**Slide 4 · Design (0:55)**
 
-> A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes: asas, canhões e escudos são partes separadas, e arrancar uma muda o visual e os ataques do chefe.
+> A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes: asas, canhões e escudos são partes separadas, e arrancar uma muda o visual e os ataques do chefe. Fizemos assim **porque** queríamos que o jogador visse o efeito de cada tiro, e que a ordem em que ele destrói as partes mudasse a luta.
 >
-> A campanha tem **cinco mundos**. Cada mundo tem setores com inimigos em formação, três mini-chefes que você enfrenta na ordem que quiser, e um chefe no final. Cada mini-chefe dá um **buff**, como tiro triplo ou dash, e os chefes ficam mais fortes conforme os seus buffs, então a dificuldade sempre cresce.
+> A campanha tem **cinco mundos**, com três mini-chefes que você enfrenta na ordem que quiser, para o jogador ter escolha. Cada mini-chefe dá um **buff**, como tiro triplo ou dash. E os chefes ficam mais fortes conforme os seus buffs, **porque** sem isso o jogador ficaria forte demais e o fim do jogo perderia a graça.
 >
-> Também quisemos que o jogo fosse **justo**: os ataques são avisados antes, a área da nave que leva dano é pequena, e dá para pausar e continuar. No celular, os controles ficam na tela.
+> Também quisemos que o jogo fosse **justo**: a ideia é que, quando você morre, a culpa seja sua e não do jogo. Por isso os ataques são avisados antes e a área da nave que leva dano é pequena. No celular, o toque é menos preciso que o teclado, então lá os inimigos têm menos vida e os tiros são mais lentos.
 
 **Slide 5 · História (0:40)**
 
@@ -66,7 +72,7 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 >
 > A história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.
 
-**Demonstração (1:10)**: o Nathan joga e comenta. As falas são curtas para dar para jogar ao mesmo tempo.
+**Demonstração (1:00)**: o Nathan joga e comenta. As falas são curtas para dar para jogar ao mesmo tempo.
 
 | O que fazer no jogo | O que falar |
 |---|---|
@@ -79,6 +85,38 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 **Fechamento (0:15)**
 
 > Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e eu e o Luccas cuidamos das músicas e do design das fases. Obrigado! Alguma pergunta?
+
+### Por que decidimos assim (para estudar antes)
+
+Esta parte **não é para ler na apresentação**. É para vocês entenderem os motivos e conseguirem responder se o professor perguntar mais.
+
+**Decisões técnicas (Luiz)**
+
+| Decisão | Por quê | Se perguntarem mais |
+|---|---|---|
+| **JavaScript em vez de pygame** | Roda no navegador de qualquer computador ou celular, sem instalar nada. O professor joga pelo link. A disciplina inclui web e mobile. | Cada envio para o GitHub publica o site sozinho na Vercel, de graça. |
+| **Sem engine** (Unity, Godot, Phaser) | A disciplina ensina os fundamentos e o enunciado diz que "a lógica do jogo é escrita pelo grupo". Uma engine esconde o laço, a colisão e o desenho; escrevendo à mão, a gente aprende como funcionam. | O código inteiro tem menos de 1 MB e abre direto no navegador; com uma engine, o jogo precisaria ser exportado/compilado e carregaria o motor dela junto. Como o escopo era controlado, escrever o motor custou pouco. |
+| **Laço com passo fixo de 1/60 s** | Se o jogo andasse "o tempo que passou desde o último quadro", ele ficaria diferente em cada monitor: num computador lento, um tiro rápido poderia pular por cima do alvo sem acertar. Com passo fixo, a simulação avança sempre do mesmo jeito, em qualquer máquina. | Se a aba fica em segundo plano, o jogo limita o atraso a 0,25 s para não tentar "recuperar" vários segundos de uma vez (`src/core/Game.js`). |
+| **Cada tela é um estado (cena)** | Menu, luta, mapa e história têm regras diferentes. Separar em cenas deixa cada uma simples, e trocar de tela é só trocar a cena ativa. | `game.changeScene(...)` em `src/core/Game.js`; as cenas ficam em `src/scenes/`. |
+| **Colisão por círculos** | É o teste mais simples e rápido: basta comparar a distância entre os centros com a soma dos raios. Com até uns 450 tiros na tela e uma nave só, dá para testar todos sem otimização. | Nas partes do chefe o teste usa a forma do desenho (máscara de pixels), para o tiro acertar onde a peça realmente aparece. |
+| **Chefes como dados** | Com 24 chefes, copiar código para cada um repetiria os mesmos erros. Um motor único lê a descrição de cada chefe (partes, fases, ataques). Corrigir o motor corrige todos, e um chefe novo é só um arquivo novo. | O motor fica em `src/boss/Boss.js` e cada chefe em `src/boss/bosses/`. |
+| **Arte e som feitos por código** | O enunciado exige crédito e licença para tudo que é de terceiros. Gerando por código, não existe arquivo de terceiros. Também deixa o jogo leve e com cara de console antigo. | Os desenhos são matrizes de cores (`src/graphics/`) e o som é sintetizado na hora (`src/core/AudioEngine.js`). |
+| **PC e celular no mesmo código** | O navegador trata mouse, toque e caneta pelo mesmo tipo de evento (Pointer Events), então não precisamos de duas versões. Instalar como app (PWA) deixa jogar sem internet. | `src/core/Input.js` e `src/core/TouchControls.js`; o modo offline fica no `sw.js`. |
+| **Testes automáticos** | São 24 chefes: não dá para jogar todos de novo a cada mudança. O teste joga cada chefe sozinho e avisa se algum ficou impossível. | O teste da Hidra passava antes mesmo com o chefe impossível, porque aceitava um espaço de 3 pixels para atirar. Hoje ele exige pelo menos 12 pixels. |
+| **Declarar a IA** | O enunciado exige a declaração; IA não declarada é violação de autoria. | Os testes e o jogo jogado por nós são a forma de garantir que entendemos e conferimos o que foi gerado. |
+
+**Escolhas de design (Nathan)**
+
+| Decisão | Por quê |
+|---|---|
+| **Chefes montados por partes** | Para o jogador ver o efeito de cada tiro e para a ordem das escolhas mudar a luta (perder uma asa deixa o chefe inclinado e muda os ataques). |
+| **Mini-chefes em qualquer ordem** | Dá escolha ao jogador e faz cada partida ser um pouco diferente. |
+| **Buffs como recompensa** | Recompensam vencer um mini-chefe e mudam o jeito de jogar (dash, tiro triplo, bomba). |
+| **Chefes que escalam com os buffs** | Sem isso, quem junta muitos buffs ficaria forte demais e o fim do jogo perderia o desafio. |
+| **Jogo justo** | A morte tem que parecer culpa do jogador, nunca do jogo: ataques avisados antes, área de dano pequena, pausa e continuar. |
+| **Ajuda no celular** | O toque é menos preciso que o teclado, então no celular os inimigos têm 25% menos vida e os tiros inimigos são 20% mais lentos. |
+| **História curta e que dá para pular** | O enunciado pede a história dentro do jogo, mas a campanha já é longa. Textos curtos, ENTER acelera e ESC pula, e nada aparece no meio de uma luta. |
+| **Buffs viram "núcleos de energia" na história** | Assim a história explica as mecânicas, em vez de ser só um texto à parte. |
 
 ### Se o professor perguntar
 
