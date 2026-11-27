@@ -82,7 +82,7 @@ function shot(slide, file, x, y, h, label) {
   s.addText(people, { x: 0.5, y: 3.42, w: 5.8, h: 1.1, fontFace: BODY, fontSize: 13, color: C.text, margin: 0, valign: 'top', paraSpaceAfter: 2, isTextBox: true });
   s.addText(`${team.course} · Prof. ${team.professor}`, { x: 0.5, y: 4.65, w: 5.8, h: 0.3, fontFace: BODY, fontSize: 11, color: C.muted, margin: 0, isTextBox: true });
   shot(s, 'luta-tita.png', 6.55, 0.5, 3.9, null);
-  s.addNotes("LUIZ (0:25): Boa noite, professor. Somos o Grupo 19: eu sou o Luiz, este é o Nathan, e o Luccas também faz parte do grupo. O nosso jogo é o Nebula Titan, um jogo de nave no estilo arcade em que os chefes são montados por partes. Cada parte que você destrói muda a aparência e os ataques do chefe.");
+  s.addNotes("Boa noite, professor. Somos o Grupo 19, formado pelo Luiz, pelo Luccas e pelo Nathan. O nosso jogo é o Nebula Titan, um jogo de nave no estilo arcade em que os chefes são montados por partes. Cada parte que você destrói muda a aparência e os ataques do chefe.");
 }
 
 // ------------------------------------------------- 2. Linguagem e tecnologia
@@ -113,13 +113,36 @@ function shot(slide, file, x, y, h, label) {
     x: 5.5, y: 3.3, w: 4, h: 1.65, color: C.green, head: 'Node.js só para rodar',
     body: 'npm start abre o servidor local; npm test roda os testes. O jogo em si não tem dependências.',
   });
-  s.addNotes("LUIZ (0:50): Fizemos o jogo em JavaScript, que roda direto no navegador, com o Canvas para desenhar e a Web Audio para o som. A gente não usou pygame porque a disciplina também trata de web e mobile: assim o jogo abre por um link, até no celular, sem instalar nada. Não usamos nenhuma biblioteca. Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, então não dependemos de arquivos de terceiros. E o projeto tem 353 testes automáticos.");
+  s.addNotes("Fizemos o jogo em JavaScript, que roda direto no navegador, com o Canvas para desenhar e a Web Audio para o som. A gente não usou pygame porque a disciplina também trata de web e mobile: assim o jogo abre por um link, até no celular, sem instalar nada. Não usamos nenhuma biblioteca. Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, então não dependemos de arquivos de terceiros. E o projeto tem 353 testes automáticos.");
 }
 
-// -------------------------------------------------------------- 3. Ideias
+// ------------------------------------------------ 3. Decisões técnicas, dificuldade e IA
 {
   const s = pres.addSlide({ masterName: 'NT_CONTEUDO' });
-  title(s, 'Do Galaga a chefes que se desmontam', '02 · IDEIAS');
+  title(s, 'Decisões técnicas', '02 · POR DENTRO DO JOGO');
+  const decisions = [
+    ['Sem engine', 'Laço, colisão, desenho e áudio escritos por nós para entender o que as engines escondem.', C.gold],
+    ['Chefes como dados', 'Um motor único lê a descrição de cada chefe (partes, fases, ataques). Chefe novo = arquivo novo.', C.cyan],
+    ['PC e celular juntos', 'O mesmo código atende mouse, teclado e toque, e o jogo instala como app e roda offline.', C.green],
+  ];
+  decisions.forEach(([head, body, color], i) => {
+    card(s, { x: 0.5 + i * 3.05, y: 1.45, w: 2.9, h: 1.75, head, body, color });
+  });
+  card(s, {
+    x: 0.5, y: 3.4, w: 4.45, h: 1.6, color: C.orange, head: 'Dificuldade técnica',
+    body: 'Um chefe ficava impossível de vencer: o corpo bloqueava os tiros. Criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.',
+  });
+  card(s, {
+    x: 5.05, y: 3.4, w: 4.45, h: 1.6, color: C.pink, head: 'Uso de IA (declarado)',
+    body: 'Claude Code como assistente de código, testes, documentação e slides. Ideias e decisões do grupo; tudo revisado, testado e jogado por nós.',
+  });
+  s.addNotes("Agora, três decisões técnicas. Primeiro, não usamos engine: o laço, a colisão, o desenho e o áudio foram escritos por nós, para entender o que uma engine faz por baixo. Segundo, os chefes são descritos como dados: um motor único lê as partes, as fases e os ataques de cada chefe, então um chefe novo é só um arquivo novo. Terceiro, o mesmo código roda no computador e no celular, e o jogo pode ser instalado como app e jogado sem internet.\n\nA maior dificuldade técnica foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. Criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.\n\nUsamos IA, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Isso está declarado no README, e as ideias e decisões foram do grupo.\n\nPassagem: agora a parte de design e a história do jogo.");
+}
+
+// ------------------------------------------------------- 4. Ideias de design
+{
+  const s = pres.addSlide({ masterName: 'NT_CONTEUDO' });
+  title(s, 'Do Galaga a chefes que se desmontam', '03 · DESIGN');
   const ideas = [
     ['Chefes modulares', 'Asas, canhões e escudos são partes com vida própria. Arrancar uma muda o visual e os ataques.', C.pink],
     ['5 mundos', 'Setores com alienígenas em formação, 3 mini-chefes à escolha e um chefe por mundo, até o Ômega.', C.gold],
@@ -132,13 +155,13 @@ function shot(slide, file, x, y, h, label) {
     card(s, { x: 0.5 + col * 3.15, y: 1.45 + row * 1.85, w: 3.0, h: 1.7, head, body, color });
   });
   shot(s, 'tela-inicial.png', 7.15, 1.4, 3.4, 'Tela inicial');
-  s.addNotes("NATHAN (0:45): A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes. A campanha tem cinco mundos. Cada mundo tem setores com inimigos em formação, três mini-chefes que você enfrenta na ordem que quiser, e um chefe no final. Cada mini-chefe dá um buff, como tiro triplo ou dash. Os chefes ficam mais fortes conforme os seus buffs, então a dificuldade sempre cresce. E dá para jogar no celular, com controles na tela.");
+  s.addNotes("A aula começou com o Snake. A gente partiu do Galaga, mas mudou o foco para as lutas contra chefes: asas, canhões e escudos são partes separadas, e arrancar uma muda o visual e os ataques do chefe.\n\nA campanha tem cinco mundos. Cada mundo tem setores com inimigos em formação, três mini-chefes que você enfrenta na ordem que quiser, e um chefe no final. Cada mini-chefe dá um buff, como tiro triplo ou dash, e os chefes ficam mais fortes conforme os seus buffs, então a dificuldade sempre cresce.\n\nTambém quisemos que o jogo fosse justo: os ataques são avisados antes, a área da nave que leva dano é pequena, e dá para pausar e continuar. No celular, os controles ficam na tela.");
 }
 
-// ------------------------------------------------------------- 4. História
+// ------------------------------------------------------------- 5. História
 {
   const s = pres.addSlide({ masterName: 'NT_CONTEUDO' });
-  title(s, 'A última piloto da Aliança', '03 · HISTÓRIA');
+  title(s, 'A última piloto da Aliança', '04 · HISTÓRIA');
   const rows = [
     ['Premissa', 'Ano 2187. Vega foge na nave NT-01 para destruir o Ômega, no centro da galáxia.', C.gold],
     ['Conflito', 'A armada do Ômega, liderada pelo Titã, apagou as colônias e derrubou a frota.', C.pink],
@@ -153,30 +176,7 @@ function shot(slide, file, x, y, h, label) {
     s.addText(body, { x: 1.1, y: y + 0.3, w: 4.9, h: 0.5, fontFace: BODY, fontSize: 13, color: C.text, margin: 0, valign: 'top', isTextBox: true });
   });
   shot(s, 'historia.png', 6.85, 1.4, 3.4, 'Introdução no jogo');
-  s.addNotes("NATHAN (0:40): Agora a história. No ano 2187, a armada do Ômega, liderada pelo Titã, apagou as colônias. A Vega, última piloto da Aliança, foge na nave NT-01 para destruir o Ômega no centro da galáxia. A história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.\n\nDEPOIS DESTE SLIDE, DEMONSTRAÇÃO (1:30): Nathan joga, Luiz narra. Nova Campanha > introdução (ENTER, depois ESC) > 30 s do primeiro setor > P e I > Q > Duelo com o Titã. Roteiro completo em docs/apresentacao/README.md.");
-}
-
-// ------------------------------------------------- 5. Decisões, dificuldade e IA
-{
-  const s = pres.addSlide({ masterName: 'NT_CONTEUDO' });
-  title(s, 'Decisões que tomamos', '04 · DECISÕES');
-  const decisions = [
-    ['Sem engine', 'Laço, colisão, desenho e áudio escritos por nós para entender o que as engines escondem.', C.gold],
-    ['Chefes como dados', 'Um motor único lê a descrição de cada chefe (partes, fases, ataques). Chefe novo = arquivo novo.', C.cyan],
-    ['Justo de jogar', 'Ataques avisados antes, hitbox pequena, modo foco, pausa, continue e progresso salvo.', C.green],
-  ];
-  decisions.forEach(([head, body, color], i) => {
-    card(s, { x: 0.5 + i * 3.05, y: 1.45, w: 2.9, h: 1.75, head, body, color });
-  });
-  card(s, {
-    x: 0.5, y: 3.4, w: 4.45, h: 1.6, color: C.orange, head: 'Dificuldade técnica',
-    body: 'Um chefe ficava impossível de vencer: o corpo bloqueava os tiros. Criamos testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados.',
-  });
-  card(s, {
-    x: 5.05, y: 3.4, w: 4.45, h: 1.6, color: C.pink, head: 'Uso de IA (declarado)',
-    body: 'Claude Code como assistente de código, testes, documentação e slides. Ideias e decisões do grupo; tudo revisado, testado e jogado por nós.',
-  });
-  s.addNotes("LUIZ (0:40): Três decisões guiaram o projeto. Primeiro, sem engine, para entender o que uma engine faz por baixo. Segundo, os chefes são descritos como dados: um chefe novo é só um arquivo novo. Terceiro, o jogo tem que ser justo: os ataques são avisados antes e a área da nave que leva dano é pequena. A maior dificuldade foi um chefe impossível de vencer: na fase 3 da Hidra Glacial, o corpo bloqueava todos os tiros. A gente criou testes que jogam cada chefe sozinhos e provam que todos podem ser derrotados. Usamos IA, o Claude Code, como assistente no código, nos testes, na documentação e nos slides. Isso está declarado no README, e as ideias e decisões foram do grupo.\n\nNATHAN (0:10): Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e eu e o Luccas cuidamos das músicas e do design das fases. Obrigado! Alguma pergunta?");
+  s.addNotes("Agora a história. No ano 2187, a armada do Ômega, liderada pelo Titã, apagou as colônias. A Vega, última piloto da Aliança, foge na nave NT-01 para destruir o Ômega no centro da galáxia.\n\nA história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.\n\nDEMONSTRAÇÃO (1:30): Nova Campanha > introdução (ENTER, depois ESC) > 30 s do primeiro setor > P e I > Q > Duelo com o Titã. Roteiro completo em docs/apresentacao/README.md.\n\nFECHAMENTO: Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e o Nathan e o Luccas cuidaram das músicas e do design das fases. Obrigado! Alguma pergunta?");
 }
 
 // Grava sem as entradas de pasta que o pptxgenjs coloca no ZIP (o OneDrive e
