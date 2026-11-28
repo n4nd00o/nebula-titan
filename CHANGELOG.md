@@ -9,6 +9,30 @@
 Todas as mudanças relevantes do projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.8.0] - 2026-11-28
+
+Ajustes a partir do retorno escrito de um jogador que testou o jogo.
+
+### Corrigido
+- **Hidra Glacial vencida parada.** Na 1ª fase, o tiro mirado das cabeças se dividia em 4 agulhas em leque; com número par, o vão do meio caía bem na linha da mira, e a nave parada em x≈300 passava a fase sem morrer. Agora são **5 agulhas** (a do meio segue a mira). Simulação: parada, a nave antes vencia a fase em 122 s sem morrer; agora perde as 3 vidas em ~17 s. Quem se move não sente diferença além de uma agulha a mais.
+
+### Adicionado
+- **Treino de Voo** (`TutorialScene`): tutorial jogável antes do Setor 1 na primeira campanha. Três passos com a tecla desenhada na tela: mover, destruir 3 alvos e pausar (no celular, só os dois primeiros). ENTER ou o botão PULAR pula.
+- **Dica de habilidade nova**: na primeira luta depois de ganhar **dash**, **bomba** ou **tempo bala**, um cartão mostra a tecla e a luta espera o jogador apertá-la.
+- **Tela CONFIGURAÇÕES** (`SettingsScene`): volume da **música** e dos **efeitos** (0 a 10, salvo), som, vibração, tela cheia e, no celular, esquema de toque e ajuda do celular.
+- **Teclado desenhado** na tela CONTROLES (`src/graphics/keyboard.js`): as teclas de cada ação aparecem pintadas na cor da ação.
+- `src/systems/Onboarding.js`: lógica pura das primeiras vezes (opções do menu, passos do treino, dicas).
+
+### Alterado
+- **Teclas padrão:** dash no **Shift** (era C/L) e modo foco no **C/L** (era Shift). Quem já tinha trocado as teclas mantém as suas.
+- **Menu inicial enxuto:** na primeira vez só INICIAR JOGO, CONTROLES e CONFIGURAÇÕES; as outras opções aparecem depois de jogar. Saíram o botão HISTÓRIA (a história aparece ao jogar) e os botões pequenos do topo (foram para CONFIGURAÇÕES).
+- **Menos texto, letra maior:** descrições e dicas pequenas cortadas em todas as telas (menu, pausa, fim de luta, rota de ataque, mapa, buffs, história); o que ficou usa no mínimo 7–8 px. A pausa agora tem só os três botões.
+- HUD: o dash mostra a tecla quando está pronto e a bomba mostra o número de cargas com a tecla embaixo.
+- Página TOQUE dos controles só explica os controles; a escolha de esquema e de ajuda foi para CONFIGURAÇÕES.
+
+### Testes
+- `onboarding.test.js` (8 testes) e regressão da Hidra parada em `worlds.test.js` (total: **362**).
+
 ## [1.7.0] - 2026-11-24
 
 ### Adicionado

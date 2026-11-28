@@ -34,20 +34,22 @@ A integração contínua (GitHub Actions, [`.github/workflows/ci.yml`](../.githu
 | 1.6.0 | 346 | Controles de celular: joystick, esquemas MODERNO/CLÁSSICO, botões maiores e ajuda do celular |
 | 1.6.1 | 346 | Padrões novos (CLÁSSICO, tiros 20% mais lentos com a ajuda) nos testes existentes |
 | 1.6.2 | 348 | Joystick responsivo: centro que acompanha o polegar e inversão rápida de direção |
-| **1.7.0** | **353** | **História no jogo: textos de cada momento da campanha, moldura e créditos do grupo** |
+| 1.7.0 | 353 | História no jogo: textos de cada momento da campanha, moldura e créditos do grupo |
+| **1.8.0** | **362** | **Feedback de jogadores: Hidra não vence mais parada, menu da primeira vez, treino de voo, dicas de habilidade, teclado desenhado, volume e teclas padrão novas** |
 
 ## 3. Catálogo por arquivo
 
 | Arquivo | Testes | O que garante |
 |---|---|---|
 | [`buffs.test.js`](../tests/buffs.test.js) | 8 | Buffs únicos do Mundo 5 com a **PlayScene real** e um jogo falso: Orbitais apagam projéteis, Tempo Bala desacelera no foco, Supercarga (8x, perfurante, a cada 5 s), Ascensão (+25%), Renascer (uma vez por luta), Vampirismo e Ricochete; a tela Meus Buffs cobre todos os buffs |
+| [`onboarding.test.js`](../tests/onboarding.test.js) | 8 | **Primeiras vezes (v1.8)**: menu com só 3 opções na primeira vez (e sem botão de história), o que conta como "já jogou", passos do Treino de Voo em ordem e imutáveis (no celular, sem o passo de pausar), cada dica de habilidade aparece uma vez, teclas padrão novas (dash no SHIFT, foco no C), teclado desenhado cabe na tela sem teclas sobrepostas e com todas as teclas padrão, volume de 0 a 10 salvo e limitado |
 | [`story.test.js`](../tests/story.test.js) | 5 | **História (v1.7)**: introdução, finais e um texto para cada mundo novo; cada texto entre mundos cita o mundo de destino; todas as páginas cabem na moldura da `StoryScene` (quebra de linha sem perder palavras); os créditos mostram o grupo e todos os integrantes |
 | [`touch.test.js`](../tests/touch.test.js) | 15 | **Celular (v1.6)**: botões grandes sem sobreposição, joystick (zona morta, limite, direção, centro que acompanha o polegar), `Input` nos esquemas MODERNO (1º dedo = joystick) e CLÁSSICO (padrão; 2º dedo = dash), mouse nunca cria joystick, nave com foco pelo joystick e tiro automático, preferências salvas e a **ajuda do celular** na `PlayScene` real (vida dos chefes e alienígenas, velocidade dos tiros, hitbox) |
 | [`controls.test.js`](../tests/controls.test.js) | 8 | **Teclas configuráveis**: todas as ações remapeáveis, conflito transfere a tecla sem deixar ação vazia, teclas reservadas, apagar alternativa, dados salvos inválidos, o `Input` real respondendo à nova tecla e salvando, ESC sempre pausa, textos de ajuda |
 | [`boss.test.js`](../tests/boss.test.js) | 15 | Nebula Titan: entrada invulnerável, alvos de cada fase, inclinação ao perder asa, quebra antecipada, fase pulada, fluxo completo, ricochete × dano, **colisão por pixel** e 3 testes de regressão de hitbox |
 | [`minibosses.test.js`](../tests/minibosses.test.js) | 101 | **Testes genéricos** para cada chefe registrado (definição válida, alvo atingível no centro, fluxo até a derrota, 20 s de luta sem quebrar) + mecânicas da Sentinela, Colmeia e Ceifador |
 | [`reachability.test.js`](../tests/reachability.test.js) | 99 | **Garantia "nenhum chefe imortal"** e **hitboxes** (ver seção 4) |
-| [`worlds.test.js`](../tests/worlds.test.js) | 19 | Mundos 2-4: projéteis que se dividem/fazem curva/aceleram, mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo (Hidra, Escaravelho, Vórtice, Gêmeos, Fornalha, Martelo, Égide, Espectro, Eco, Arconte) |
+| [`worlds.test.js`](../tests/worlds.test.js) | 20 | Mundos 2-4: projéteis que se dividem/fazem curva/aceleram, mísseis, Ala Dupla, alienígenas novos e a mecânica central de cada chefe novo (Hidra, Escaravelho, Vórtice, Gêmeos, Fornalha, Martelo, Égide, Espectro, Eco, Arconte). **Regressão v1.8:** na 1ª fase da Hidra, a nave parada (no antigo ponto seguro, x=300) precisa ser atingida |
 | [`campaign.test.js`](../tests/campaign.test.js) | 19 | **5 mundos**, os dois círculos do Mundo 5, chefes de mundo que **escalam com os buffs** (e mini-chefes que não), origem de cada buff, ordem obrigatória (setores → mini-chefes → chefe), buffs em qualquer ordem, bônus de mundo, Leviatã só após o Arconte, dificuldade crescente, seleção de mundo, **salvar/carregar** (e saves inválidos), vidas, *continue*, corrida perfeita |
 | [`progress.test.js`](../tests/progress.test.js) | 11 | **Mapa de progresso**: status das fases e mundos, histórico que sobrevive ao fim da campanha, saves antigos, layout sem sobreposição. **Celular**: zonas de toque, botões da pausa, vibração (inclusive sem suporte) |
 | [`stages.test.js`](../tests/stages.test.js) | 22 | Setores: ondas cabem na formação, vagas únicas, inimigos entram/formam/mergulham/atiram, cada mundo traz um alienígena novo, setores mais agressivos a cada mundo |
@@ -94,6 +96,7 @@ Ele vale **automaticamente** para todo chefe registrado em `src/boss/bosses/inde
 | 1.4 | Hitbox dos alienígenas menor que o sprite | `reachability.test.js` (raio × sprite) |
 | 1.5.0 | Véu do Ômega intangível justamente no início da fase (o ciclo usava o relógio global do chefe) | `minibosses.test.js` (alvo atingível no início da fase) |
 | 1.4.1 | **Hidra imortal** na fase 3: o corpo bloqueava as escamas de cima depois que as de baixo caíam (o teste antigo aceitava uma fresta de 3 px) | `reachability.test.js` (janela mínima + regressão da Hidra) |
+| 1.8.0 | **Hidra vencida parada** (relatado por um jogador): na 1ª fase, o tiro mirado se dividia em 4 agulhas e o vão do meio caía bem em cima da nave; parada em x≈300, ela passava a fase sem morrer | `worlds.test.js` (nave parada em x=300 tem que ser atingida) |
 
 ## 6. Verificação além dos testes automatizados
 

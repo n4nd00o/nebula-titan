@@ -11,6 +11,9 @@ import { EnemyBullet, PlayerBullet, PlayerMissile } from '../src/entities/projec
 import { ALIEN_TYPES } from '../src/entities/alienTypes.js';
 import { Wingman } from '../src/entities/Wingman.js';
 import { createFakeWorld, tick, tickUntilFight } from './helpers.js';
+import { PlayScene } from '../src/scenes/PlayScene.js';
+import { Campaign } from '../src/systems/Campaign.js';
+import { defaultBindings } from '../src/core/KeyBindings.js';
 
 function fight(id) {
   const world = createFakeWorld();
@@ -276,4 +279,28 @@ test('dificuldade: attackRate acelera os ataques do chefe', () => {
     return world.bullets.length;
   };
   assert.ok(count(1.3) > count(1), 'mais ataques com attackRate maior');
+});
+
+// Regressão v1.8: na 1ª fase da Hidra, ficar parado (atirando) era seguro em
+// x≈300. O tiro mirado se dividia em 4 agulhas e o vão do meio caía em cima
+// da nave. Agora são 5 agulhas: a do centro segue a linha da mira.
+test('Hidra: ficar parado na 1ª fase não é seguro (regressão v1.8)', () => {
+  const rec = createFakeWorld();
+  const game = {
+    input: { bindings: defaultBindings(), isDown: (a) => a === 'fire', wasPressed: () => false, pointer: { active: false }, stick: { active: false }, tap: null, touchMode: false },
+    audio: rec.audio, sprites: rec.sprites, starfield: rec.starfield,
+    // Dicas de habilidade já vistas: senão a luta espera a dica do dash/bomba.
+    storage: { get: (k, f) => (k === 'abilityTipsSeen' ? ['dash', 'bomb', 'bulletTime'] : f), set() {} },
+    changeScene() {}, resumeScene() {},
+  };
+  const scene = new PlayScene(game, { bossId: 'hydra', campaign: Campaign.startingAt(1) });
+  const player = scene.player;
+  let hits = 0;
+  const hit = player.hit.bind(player);
+  player.hit = (s) => (hit(s) ? (hits++, true) : false);
+  for (let t = 0; t < 60 && scene.boss.phaseIndex === 0 && scene.state === 'playing'; t += 1 / 60) {
+    player.x = 300; // o antigo ponto seguro
+    scene.update(1 / 60);
+  }
+  assert.ok(hits >= 3, `parada em x=300 a nave só foi atingida ${hits} vez(es) em 60 s`);
 });

@@ -23,8 +23,10 @@ export const DEFAULT_BINDINGS = Object.freeze({
   left: ['ArrowLeft', 'KeyA'],
   right: ['ArrowRight', 'KeyD'],
   fire: ['Space', 'KeyZ'],
-  focus: ['ShiftLeft', 'ShiftRight'],
-  dash: ['KeyC', 'KeyL'],
+  // v1.8 (feedback de jogadores): o dash é mais usado que o foco, então fica no
+  // SHIFT, ao alcance do mindinho; o foco foi para o C.
+  focus: ['KeyC', 'KeyL'],
+  dash: ['ShiftLeft', 'ShiftRight'],
   bomb: ['KeyX', 'KeyK'],
   pause: ['KeyP', 'Escape'],
 });

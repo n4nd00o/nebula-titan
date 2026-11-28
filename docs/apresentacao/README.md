@@ -42,7 +42,7 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 
 > Fizemos o jogo em **JavaScript**, com o **Canvas** para desenhar e a **Web Audio** para o som. Escolhemos JavaScript em vez de pygame **porque** ele roda direto no navegador: o jogo abre por um link, até no celular, sem instalar Python nem nada. E a disciplina também trata de web e mobile, então fazia sentido o jogo funcionar nos dois.
 >
-> Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, **porque** assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 353 testes automáticos.
+> Os conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, **porque** assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 362 testes automáticos.
 
 **Slide 3 · Decisões técnicas (1:10)**
 
@@ -138,6 +138,8 @@ Esta parte **não é para ler na apresentação**. É para vocês entenderem os 
 - Deixe o jogo aberto em outra aba, caso queiram jogar ao vivo: [nebula-titan.vercel.app](https://nebula-titan.vercel.app).
 - Teste o som da sala: a música e os efeitos também contam na nota.
 - Se a internet falhar, rode `npm start` e abra http://localhost:5173.
+
+**Desde a v1.8 (jogando ao vivo):** num navegador que nunca jogou, o menu mostra só **INICIAR JOGO, CONTROLES e CONFIGURAÇÕES**, e depois da introdução aparece o **Treino de Voo** (ENTER pula). O **dash agora é no Shift** e o foco no C. Na primeira luta com uma habilidade nova aparece um cartão pedindo para apertar a tecla. O vídeo `demonstracao.mp4` foi gravado antes dessas mudanças.
 
 **Dica para a demonstração:** o modo `?debug` (http://localhost:5173/?debug) tem atalhos: `T` destrói o alvo atual (pula fases), `G` liga a invencibilidade. Útil para mostrar o Ômega ou o final da história sem jogar a campanha inteira.
 

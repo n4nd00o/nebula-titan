@@ -19,25 +19,25 @@ test('todas as ações do jogo podem ser remapeadas (mover, atirar, foco, dash, 
 });
 
 test('trocar uma tecla: a ação passa a responder à nova tecla e o mapa usado pelo Input muda', () => {
-  const r = assignKey(defaultBindings(), 'dash', 0, 'KeyE');
+  const r = assignKey(defaultBindings(), 'focus', 0, 'KeyE');
   assert.ok(r.ok);
-  assert.deepEqual(r.bindings.dash, ['KeyE', 'KeyL']);
+  assert.deepEqual(r.bindings.focus, ['KeyE', 'KeyL']);
   const map = buildKeyMap(r.bindings);
-  assert.equal(map.KeyE, 'dash');
-  assert.equal(map.KeyC, undefined, 'a tecla antiga deixa de fazer dash');
+  assert.equal(map.KeyE, 'focus');
+  assert.equal(map.KeyC, undefined, 'a tecla antiga deixa de fazer foco');
   assert.equal(map.Enter, 'confirm', 'teclas fixas continuam no mapa');
 });
 
 test('conflito: a tecla sai da outra ação, que nunca fica sem tecla', () => {
-  const r = assignKey(defaultBindings(), 'bomb', 0, 'KeyC'); // C era do dash
+  const r = assignKey(defaultBindings(), 'bomb', 0, 'KeyC'); // C era do foco
   assert.ok(r.ok);
-  assert.equal(r.movedFrom, 'dash');
+  assert.equal(r.movedFrom, 'focus');
   assert.deepEqual(r.bindings.bomb, ['KeyC', 'KeyK']);
-  assert.deepEqual(r.bindings.dash, ['KeyL']);
+  assert.deepEqual(r.bindings.focus, ['KeyL']);
   // Ação com UMA tecla só perde a sua tecla: recebe a antiga da outra ação.
-  let b = clearSlot(defaultBindings(), 'dash', 1); // dash = [C]
+  let b = clearSlot(defaultBindings(), 'focus', 1); // foco = [C]
   const r2 = assignKey(b, 'bomb', 0, 'KeyC');
-  assert.deepEqual(r2.bindings.dash, ['KeyX'], 'dash herda o X que era da bomba');
+  assert.deepEqual(r2.bindings.focus, ['KeyX'], 'foco herda o X que era da bomba');
   b = r2.bindings;
   assert.equal(new Set(usedKeys(b)).size, usedKeys(b).length, 'nenhuma tecla em duas ações');
 });

@@ -12,6 +12,7 @@ import { BUFFS, REWARDS } from '../systems/Campaign.js';
 import { PlayScene } from './PlayScene.js';
 import { TitleScene } from './TitleScene.js';
 import { ProgressScene } from './ProgressScene.js';
+import { wrapText } from '../story/story.js';
 
 const NODE_RADIUS = 40;
 
@@ -160,22 +161,18 @@ export class MapScene {
     const { campaign, world } = this;
     const sprites = this.game.sprites;
 
-    for (const [b, label] of [[MENU_BUTTON, '< MENU'], [MAP_BUTTON, 'MAPA (TAB)']]) {
+    for (const [b, label] of [[MENU_BUTTON, '< MENU'], [MAP_BUTTON, 'MAPA']]) {
       ctx.fillStyle = 'rgba(26, 28, 44, 0.85)';
       ctx.fillRect(b.x, b.y, b.w, b.h);
       ctx.strokeStyle = '#566c86';
       ctx.lineWidth = 1;
       ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
-      drawText(ctx, label, b.x + b.w / 2, b.y + b.h / 2, { size: 6, align: 'center', baseline: 'middle', color: UI_COLORS.muted });
+      drawText(ctx, label, b.x + b.w / 2, b.y + b.h / 2, { size: 8, align: 'center', baseline: 'middle', color: UI_COLORS.muted });
     }
     drawText(ctx, `MUNDO ${world.number}: ${world.name}`, W / 2, 16, { size: 8, align: 'center', color: world.theme.accent });
     drawText(ctx, 'ROTA DE ATAQUE', W / 2, 32, { size: 16, align: 'center', color: UI_COLORS.accent });
-    drawText(ctx, 'Escolha o próximo alvo. A ordem importa!', W / 2, 56, { size: 6, align: 'center', color: UI_COLORS.muted });
-    drawText(ctx, `PONTOS ${String(campaign.score).padStart(7, '0')}`, W / 2, 72, { size: 7, align: 'center' });
-
-    // Buffs já conquistados (resumo)
-    drawText(ctx, campaign.buffs.size ? `BUFFS: ${campaign.buffs.size}` : 'SEM BUFFS AINDA', 14, 96, { size: 6, color: UI_COLORS.muted });
-    drawText(ctx, `VIDAS ${campaign.lives}/5   MORTES ${campaign.deaths}`, W - 14, 96, { size: 6, align: 'right', color: UI_COLORS.muted });
+    drawText(ctx, `PONTOS ${String(campaign.score).padStart(7, '0')}`, W / 2, 62, { size: 8, align: 'center' });
+    drawText(ctx, `VIDAS ${campaign.lives}/5`, W / 2, 80, { size: 8, align: 'center', color: UI_COLORS.muted });
 
     // Ligações: mini-chefes -> chefe -> chefe final
     const boss = this.nodes.find((n) => n.kind === 'boss');
@@ -191,12 +188,6 @@ export class MapScene {
       ctx.stroke();
     }
     ctx.setLineDash([]);
-
-    // Setores do mundo já vencidos
-    const sectors = world.circles
-      ? 'DOIS CÍRCULOS: VENÇA OS 3 DE BAIXO PARA ABRIR OS 3 DE CIMA'
-      : world.stages.map((id) => `${ENCOUNTERS[id].name} OK`).join('   ');
-    drawText(ctx, sectors, W / 2, 112, { size: 6, align: 'center', color: '#38b764' });
 
     this.nodes.forEach((node, i) => this.drawNode(ctx, sprites, node, i === this.selected));
     this.drawInfo(ctx);
@@ -217,7 +208,7 @@ export class MapScene {
       drawText(ctx, 'A FORTALEZA ESTELAR. OITO SEÇÕES.', W / 2, 226, { size: 7, align: 'center', alpha });
     }
 
-    drawText(ctx, this.game.input.touchMode ? 'Toque em um alvo para lutar' : '< > escolher   ENTER lutar   TAB mapa   ESC menu', W / 2, H - 22, { size: 6, align: 'center', color: '#566c86' });
+    drawText(ctx, this.game.input.touchMode ? 'TOQUE EM UM ALVO' : 'ENTER LUTAR    ESC MENU', W / 2, H - 22, { size: 8, align: 'center', color: '#566c86' });
   }
 
   drawNode(ctx, sprites, node, selected) {
@@ -247,10 +238,6 @@ export class MapScene {
     drawText(ctx, name, node.x, node.y + node.r + 8, { size: 7, align: 'center', color: defeated ? '#38b764' : UI_COLORS.text });
     if (defeated) drawText(ctx, 'DERROTADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#a7f070' });
     if (locked) drawText(ctx, 'BLOQUEADO', node.x, node.y - 4, { size: 7, align: 'center', color: '#566c86' });
-    if (!defeated && REWARDS[node.id]) {
-      const buff = BUFFS[REWARDS[node.id]];
-      drawText(ctx, buff.short, node.x, node.y + node.r + 20, { size: 6, align: 'center', color: buff.color });
-    }
 
     if (selected) {
       const r = node.r + 8 + Math.sin(this.time * 8) * 2;
@@ -278,13 +265,14 @@ export class MapScene {
     ctx.strokeRect(20.5, y + 0.5, W - 41, 119);
 
     drawText(ctx, def.name, W / 2, y + 12, { size: 12, align: 'center', color: UI_COLORS.boss });
-    drawText(ctx, def.description, W / 2, y + 34, { size: 6, align: 'center' });
-    drawText(ctx, `${def.phases.length} FASES`, W / 2, y + 50, { size: 6, align: 'center', color: UI_COLORS.muted });
+    // v1.8: letra maior (8), quebrada em até duas linhas.
+    const lines = (text) => wrapText(text, Math.floor((W - 60) / 8)).slice(0, 2);
+    lines(def.description).forEach((line, i) => drawText(ctx, line, W / 2, y + 32 + i * 13, { size: 8, align: 'center' }));
 
     if (REWARDS[node.id]) {
       const buff = BUFFS[REWARDS[node.id]];
-      drawText(ctx, `RECOMPENSA: ${buff.name}`, W / 2, y + 72, { size: 8, align: 'center', color: buff.color });
-      drawText(ctx, buff.description, W / 2, y + 90, { size: 6, align: 'center', color: UI_COLORS.muted });
+      drawText(ctx, `RECOMPENSA: ${buff.name}`, W / 2, y + 66, { size: 8, align: 'center', color: buff.color });
+      lines(buff.description).forEach((line, i) => drawText(ctx, line, W / 2, y + 84 + i * 13, { size: 8, align: 'center', color: UI_COLORS.muted }));
     } else if (node.kind === 'boss') {
       const remaining = this.world.minis.filter((id) => !this.campaign.defeated.has(id)).length;
       const next = this.world.finale ? 'GUARDIÃO DO LEVIATÃ.' : this.world.circles ? 'O CRIADOR DA FROTA.' : `CHEFE DO MUNDO ${this.world.number}.`;

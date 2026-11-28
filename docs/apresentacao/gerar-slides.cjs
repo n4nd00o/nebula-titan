@@ -109,7 +109,7 @@ function qr(slide, x, y, size, side) {
   const stats = [
     ['0', 'bibliotecas', C.green],
     ['60', 'quadros/s', C.cyan],
-    ['353', 'testes', C.gold],
+    ['362', 'testes', C.gold],
   ];
   stats.forEach(([n, label, color], i) => {
     const x = 0.5 + i * 1.55;
@@ -130,7 +130,7 @@ function qr(slide, x, y, size, side) {
     x: 5.5, y: 3.3, w: 4, h: 1.65, color: C.green, head: 'Node.js só para rodar',
     body: 'npm start abre o servidor local; npm test roda os testes. O jogo em si não tem dependências.',
   });
-  s.addNotes("Fizemos o jogo em JavaScript, com o Canvas para desenhar e a Web Audio para o som. Escolhemos JavaScript em vez de pygame porque ele roda direto no navegador: o jogo abre por um link, até no celular, sem instalar Python nem nada. E a disciplina também trata de web e mobile, então fazia sentido o jogo funcionar nos dois.\n\nOs conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, porque assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 353 testes automáticos.");
+  s.addNotes("Fizemos o jogo em JavaScript, com o Canvas para desenhar e a Web Audio para o som. Escolhemos JavaScript em vez de pygame porque ele roda direto no navegador: o jogo abre por um link, até no celular, sem instalar Python nem nada. E a disciplina também trata de web e mobile, então fazia sentido o jogo funcionar nos dois.\n\nOs conceitos são os mesmos das aulas: um laço que atualiza e desenha o jogo 60 vezes por segundo, cada tela é um estado, e a colisão é feita com círculos. A arte e as músicas são geradas pelo próprio código, porque assim não dependemos de arquivos de outras pessoas, que precisariam de licença e crédito. E o projeto tem 362 testes automáticos.");
 }
 
 // ------------------------------------------------ 3. Decisões técnicas, dificuldade e IA

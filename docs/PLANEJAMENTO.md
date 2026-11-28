@@ -155,6 +155,10 @@ O nome **"Galaga"** é marca registrada da Bandai Namco. Como o projeto será p�
 
 O enunciado da A3 avalia cinco critérios com o mesmo peso: **gráfico, jogabilidade, som, documentação e história**. Os quatro primeiros já estavam cobertos; faltava a **história dentro do jogo**. A v1.7 acrescentou só o que o enunciado pede, sem mexer na jogabilidade: introdução, textos entre mundos, finais de vitória e derrota, créditos do grupo, a seção **Entrega A3** no README (os 10 itens obrigatórios), integrantes em todos os documentos e os **slides** da apresentação (`docs/apresentacao/`).
 
+### 2.9 v1.8: ajustes pelo feedback de um jogador
+
+O primeiro teste com um jogador de fora mostrou que o jogo era divertido, mas difícil de **entender sozinho**: telas cheias, texto pequeno, sem tutorial, habilidades esquecidas e o dash longe da mão. A v1.8 foi uma versão de **usabilidade** (tema da disciplina): menu enxuto, treino jogável, dicas de habilidade, teclado desenhado, tela de configurações com volume e textos maiores. Também corrigiu a Hidra, que podia ser vencida com a nave parada.
+
 ## 3. Objetivos
 
 ### 3.1 Objetivo geral

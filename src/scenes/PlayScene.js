@@ -47,6 +47,9 @@ import { haptic } from '../core/Haptics.js';
 import { keyLabel, controlsHelp } from '../core/KeyBindings.js';
 import { BuffsScene } from './BuffsScene.js';
 import { StoryScene } from './StoryScene.js';
+import { nextAbilityTip, seenTips, markTipSeen } from '../systems/Onboarding.js';
+import { wrapText } from '../story/story.js';
+import { drawKeyCap } from '../graphics/keyboard.js';
 import { INTERLUDES, ENDING_VICTORY, ENDING_DEFEAT } from '../story/story.js';
 import {
   MOBILE_ASSIST, TOUCH_BUTTONS, STICK, SCHEME_LABELS, loadTouchSettings, assistActive, isTouchDevice,
@@ -168,6 +171,35 @@ export class PlayScene {
     this.ricochetTimer = 0;
     this.superTimer = 0;
     this.rebirthUsed = false;
+    // v1.8: dica curta da habilidade de ativação recém-liberada (dash, bomba...).
+    this.tip = this.custom ? null : nextAbilityTip(this.player.buffs, seenTips(this.storage));
+  }
+
+  /** Dica de habilidade na tela: a luta espera até o jogador usar a tecla (ou ENTER/toque). */
+  updateTip(input) {
+    if (!(input.wasPressed(this.tip.action) || input.wasPressed('confirm') || input.tap)) return;
+    markTipSeen(this.storage, this.tip.id);
+    this.audio.play('powerup');
+    this.tip = nextAbilityTip(this.player.buffs, seenTips(this.storage));
+  }
+
+  drawTip(ctx) {
+    const tip = this.tip;
+    this.drawOverlay(ctx, 0.75);
+    ctx.fillStyle = 'rgba(26, 28, 44, 0.95)';
+    ctx.fillRect(24, 200, W - 48, 220);
+    ctx.strokeStyle = '#ffcd75';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(25, 201, W - 50, 218);
+    drawText(ctx, tip.title, W / 2, 222, { size: 11, align: 'center', color: '#ffcd75' });
+    drawText(ctx, tip.text, W / 2, 252, { size: 9, align: 'center' });
+    const pulse = Math.floor(Date.now() / 333) % 2 === 0;
+    if (this.input.touchMode) {
+      drawText(ctx, 'TOQUE PARA CONTINUAR', W / 2, 370, { size: 10, align: 'center', color: pulse ? UI_COLORS.text : '#94b0c2' });
+      return;
+    }
+    drawKeyCap(ctx, this.input.bindings[tip.action][0], W / 2, 320, { size: 14, color: '#ffcd75' });
+    drawText(ctx, 'APERTE PARA TESTAR', W / 2, 382, { size: 9, align: 'center', color: pulse ? UI_COLORS.text : '#94b0c2' });
   }
 
   /** Esta luta encerra o modo atual? (Leviatã na campanha; Titã no duelo) */
@@ -593,6 +625,11 @@ export class PlayScene {
   update(dt) {
     const input = this.input;
 
+    if (this.tip) {
+      this.updateTip(input);
+      return;
+    }
+
     if (this.state === 'paused') {
       const button = input.tap ? pauseButtonAt(input.tap) : null;
       if (button === 'menu' || input.wasPressed('quit')) {
@@ -1011,7 +1048,8 @@ export class PlayScene {
     this.drawJoystick(ctx);
     this.drawAnnouncement(ctx);
 
-    if (this.state === 'paused') this.drawPause(ctx);
+    if (this.tip) this.drawTip(ctx);
+    else if (this.state === 'paused') this.drawPause(ctx);
     else if (this.state === 'gameover') this.drawGameOver(ctx);
     else if (this.state === 'victory') this.drawVictory(ctx);
 
@@ -1081,7 +1119,7 @@ export class PlayScene {
       if (boss.state === 'fight') {
         const special = boss.hudHint?.();
         const hint = special ?? `ALVO: ${boss.phase.title}`;
-        drawText(ctx, hint, W / 2, 62, { size: 6, align: 'center', color: special && this.def.kind !== 'waves' ? UI_COLORS.accent : UI_COLORS.muted });
+        drawText(ctx, hint, W / 2, 62, { size: 8, align: 'center', color: special && this.def.kind !== 'waves' ? UI_COLORS.accent : UI_COLORS.muted });
       }
     }
 
@@ -1090,21 +1128,13 @@ export class PlayScene {
       this.sprites.draw(ctx, 'player', 18 + i * 22, H - 18, { scale: 0.45 });
     }
 
-    // Buffs da campanha (acima das vidas): recarga do dash + total de buffs
+    // Dash (acima das vidas): mostra a TECLA quando está pronto, para não ser
+    // esquecido (v1.8: menos texto, só o que ajuda a jogar).
     const player = this.player;
-    let bx = 10;
     if (player.buffs.has('dash')) {
-      const label = player.dashCooldown > 0 ? `DASH ${player.dashCooldown.toFixed(1)}` : 'DASH OK';
-      drawText(ctx, label, bx, H - 44, { size: 6, color: player.dashCooldown > 0 ? '#566c86' : BUFFS.dash.color });
-      bx += label.length * 6 + 10;
-    }
-    if (player.buffs.size > 0) {
-      const label = `BUFFS ${player.buffs.size}`;
-      drawText(ctx, label, bx, H - 44, { size: 6, color: UI_COLORS.muted });
-      bx += label.length * 6 + 10;
-    }
-    if (this.campaign) {
-      drawText(ctx, `MUNDO ${this.world.number}`, bx, H - 44, { size: 6, color: this.world.theme.accent });
+      const ready = player.dashCooldown <= 0;
+      const label = ready ? `${touch ? '' : `${keyLabel(this.input.bindings.dash[0])} `}DASH` : `DASH ${player.dashCooldown.toFixed(1)}`;
+      drawText(ctx, label, 10, H - 46, { size: 8, color: ready ? BUFFS.dash.color : '#566c86' });
     }
 
     // Botão/indicador da bomba (canto inferior direito; também é área de toque)
@@ -1120,8 +1150,10 @@ export class PlayScene {
       ctx.strokeStyle = this.bombs > 0 ? '#e43b8c' : '#566c86';
       ctx.lineWidth = 2;
       ctx.stroke();
-      drawText(ctx, `X${this.bombs}`, cx, cy - 1, { size: 8, align: 'center', baseline: 'middle', color: this.bombs > 0 ? '#ffffff' : '#566c86' });
-      drawText(ctx, 'BOMBA', cx, cy + 26, { size: 5, align: 'center', color: UI_COLORS.muted, baseline: 'top' });
+      // Número de cargas no círculo e a tecla embaixo (v1.8).
+      drawText(ctx, String(this.bombs), cx, cy - 1, { size: 12, align: 'center', baseline: 'middle', color: this.bombs > 0 ? '#ffffff' : '#566c86' });
+      // A tecla da bomba embaixo do círculo (antes: a palavra "BOMBA" bem pequena).
+      drawText(ctx, keyLabel(this.input.bindings.bomb[0]), cx, cy + 25, { size: 7, align: 'center', color: UI_COLORS.muted, baseline: 'top' });
     }
 
     // Power-ups temporários (acima da bomba)
@@ -1195,19 +1227,9 @@ export class PlayScene {
       const label = touch
         ? { resume: 'CONTINUAR', buffs: 'MEUS BUFFS', menu: this.practice ? 'MAPA' : 'MENU' }[b.id]
         : { resume: `CONTINUAR  (${pauseKey})`, buffs: 'MEUS BUFFS  (I)', menu: this.practice ? 'MAPA  (Q)' : 'MENU  (Q)' }[b.id];
-      drawText(ctx, label, W / 2, b.y + b.h / 2, { size: 8, align: 'center', baseline: 'middle' });
+      drawText(ctx, label, W / 2, b.y + b.h / 2, { size: 10, align: 'center', baseline: 'middle' });
     }
-    // Controles atuais (as teclas podem ser trocadas em CONTROLES, no título).
-    if (!this.input.touchMode) controlsHelp(this.input.bindings).forEach((line, i) => {
-      drawText(ctx, line, W / 2, 372 + i * 16, { size: 6, align: 'center', color: UI_COLORS.muted });
-    });
-    drawText(ctx, `BUFFS CONQUISTADOS: ${this.player.buffs.size}/${Object.keys(BUFFS).length}`, W / 2, 420, { size: 7, align: 'center', color: UI_COLORS.accent });
-    if (this.input.touchMode) {
-      drawText(ctx, `CONTROLE DE TOQUE: ${SCHEME_LABELS[this.input.touchScheme] ?? 'MODERNO'}`, W / 2, 446, { size: 7, align: 'center', color: UI_COLORS.muted });
-    }
-    if (this.assist) {
-      drawText(ctx, 'AJUDA DO CELULAR LIGADA: inimigos -25% vida, tiros mais lentos', W / 2, 464, { size: 5, align: 'center', color: '#38b764' });
-    }
+    // v1.8: só os três botões. Teclas e opções ficam em CONTROLES e CONFIGURAÇÕES.
   }
 
   /** Botão redondo de toque (bomba/dash) com anel de recarga. */
@@ -1226,7 +1248,7 @@ export class PlayScene {
       ctx.stroke();
     }
     drawText(ctx, label, b.x, b.y - 3, { size: 11, align: 'center', baseline: 'middle', color: ready ? '#ffffff' : '#566c86' });
-    drawText(ctx, caption, b.x, b.y + b.r - 16, { size: 5, align: 'center', color: ready ? UI_COLORS.muted : '#566c86', baseline: 'top' });
+    drawText(ctx, caption, b.x, b.y + b.r - 17, { size: 7, align: 'center', color: ready ? UI_COLORS.muted : '#566c86', baseline: 'top' });
   }
 
   /** Joystick do esquema MODERNO: onde o polegar está (ou um "fantasma" mostrando onde tocar). */
@@ -1260,14 +1282,14 @@ export class PlayScene {
     ctx.fill();
     ctx.restore();
     if (!active && this.stats.time < 8) {
-      drawText(ctx, 'TOQUE E ARRASTE', ox, oy + STICK.radius + 8, { size: 5, align: 'center', color: UI_COLORS.muted });
+      drawText(ctx, 'TOQUE E ARRASTE', ox, oy + STICK.radius + 8, { size: 8, align: 'center', color: UI_COLORS.muted });
     }
   }
 
   drawGameOver(ctx) {
     this.drawOverlay(ctx, Math.min(0.7, this.stateTime));
     drawText(ctx, 'FIM DE JOGO', W / 2, 190, { size: 22, align: 'center', color: '#ff2848' });
-    if (this.campaign && !this.practice) drawText(ctx, 'A NT-01 foi abatida. As colônias ainda esperam, Vega.', W / 2, 220, { size: 6, align: 'center', color: UI_COLORS.muted });
+    if (this.campaign && !this.practice) drawText(ctx, 'AS COLÔNIAS AINDA ESPERAM, VEGA.', W / 2, 220, { size: 8, align: 'center', color: UI_COLORS.muted });
     const label = (this.boss.phaseLabel ?? 'fase').toLowerCase();
     drawText(ctx, `${this.def.name}: ${label} ${this.boss.phaseIndex + 1} de ${this.boss.phaseCount}`, W / 2, 240, { size: 8, align: 'center' });
     drawText(ctx, `PONTOS ${this.score}`, W / 2, 270, { size: 10, align: 'center', color: UI_COLORS.accent });
@@ -1275,7 +1297,6 @@ export class PlayScene {
     if (this.stateTime > 1.2) {
       const retry = this.campaign && !this.practice ? 'ENTER  continuar (pontos zerados)' : 'ENTER  tentar de novo';
       if (Math.floor(this.stateTime * 2) % 2 === 0) drawText(ctx, retry, W / 2, 360, { size: 8, align: 'center' });
-      if (this.campaign && !this.practice) drawText(ctx, 'Você mantém os buffs e volta com 3 vidas', W / 2, 378, { size: 6, align: 'center', color: UI_COLORS.muted });
       const quit = this.practice ? 'ESC  voltar ao mapa' : this.campaign ? 'ESC  desistir (final da derrota)' : 'ESC  menu';
       drawText(ctx, quit, W / 2, 398, { size: 8, align: 'center', color: UI_COLORS.muted });
     }
@@ -1328,7 +1349,7 @@ export class PlayScene {
       drawText(ctx, `MUNDO ${this.worldCleared} CONCLUÍDO!`, W / 2, 252, { size: 10, align: 'center', color: '#ffcd75' });
       drawText(ctx, `PRÓXIMO: MUNDO ${nextWorld.number}`, W / 2, 274, { size: 7, align: 'center', color: UI_COLORS.muted });
       drawText(ctx, nextWorld.name, W / 2, 290, { size: 9, align: 'center', color: nextWorld.theme.accent });
-      drawText(ctx, 'PROGRESSO SALVO', W / 2, 326, { size: 6, align: 'center', color: '#38b764' });
+      drawText(ctx, 'PROGRESSO SALVO', W / 2, 326, { size: 8, align: 'center', color: '#38b764' });
     } else if (this.stateTime > 0.8 && this.gainedBuffs.length === 0) {
       // Sem buff: setores dão só pontos; chefes abrem o caminho.
       const next = this.campaign.available()[0];
@@ -1344,19 +1365,22 @@ export class PlayScene {
     if (this.stateTime > 0.8) {
       this.gainedBuffs.forEach((id, i) => {
         const buff = BUFFS[id];
-        const y = 240 + i * 82;
+        const y = 240 + i * 94;
         ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
-        ctx.fillRect(30, y, W - 60, 70);
+        ctx.fillRect(30, y, W - 60, 84);
         ctx.strokeStyle = buff.color;
         ctx.lineWidth = 2;
-        ctx.strokeRect(30, y, W - 60, 70);
+        ctx.strokeRect(30, y, W - 60, 84);
         const label = REWARDS[this.def.id] === id ? 'BUFF OBTIDO' : `BÔNUS DO MUNDO ${this.world.number}`;
-        drawText(ctx, label, W / 2, y + 10, { size: 7, align: 'center', color: UI_COLORS.muted });
+        drawText(ctx, label, W / 2, y + 10, { size: 8, align: 'center', color: UI_COLORS.muted });
         drawText(ctx, buff.name, W / 2, y + 26, { size: 12, align: 'center', color: buff.color });
-        drawText(ctx, buff.description, W / 2, y + 48, { size: 6, align: 'center' });
+        // Descrição com letra maior, quebrada em até duas linhas (v1.8).
+        wrapText(buff.description, Math.floor((W - 80) / 8)).slice(0, 2).forEach((line, k) => {
+          drawText(ctx, line, W / 2, y + 48 + k * 14, { size: 8, align: 'center' });
+        });
       });
-      const livesY = 240 + Math.max(1, this.gainedBuffs.length) * 82 + 6;
-      drawText(ctx, `VIDAS: ${this.player.lives}/${PLAYER.maxLives}   MORTES NA CAMPANHA: ${this.campaign.deaths}`, W / 2, livesY, { size: 6, align: 'center', color: UI_COLORS.muted });
+      const livesY = 240 + Math.max(1, this.gainedBuffs.length) * 94 + 4;
+      drawText(ctx, `VIDAS ${this.player.lives}/${PLAYER.maxLives}`, W / 2, livesY, { size: 8, align: 'center', color: UI_COLORS.muted });
     }
     this.drawPrompt(ctx, this.campaign.nextIsStage ? 'ENTER  próximo setor' : 'ENTER  voltar ao mapa');
   }
@@ -1381,12 +1405,6 @@ export class PlayScene {
     drawText(ctx, r.rank, W / 2, 279, { size: 36, align: 'center', color: r.rank === 'S' ? '#ffcd75' : '#73eff7' });
     if (c.perfect) drawText(ctx, 'CORRIDA PERFEITA!', W / 2, 324, { size: 10, align: 'center', color: '#ffcd75' });
 
-    drawText(ctx, 'SUA ROTA DE MINI-CHEFES', W / 2, 346, { size: 7, align: 'center', color: UI_COLORS.muted });
-    WORLDS.forEach((w, i) => {
-      const route = c.order.filter((id) => w.minis.includes(id)).map((id) => ENCOUNTERS[id].name).join(' > ');
-      drawText(ctx, `${w.number}: ${route || '(seleção de mundo)'}`, W / 2, 362 + i * 13, { size: 6, align: 'center' });
-    });
-    drawText(ctx, `PARTES DE ${this.def.name} DESTRUÍDAS: ${this.boss.destroyedOrder.length}`, W / 2, 422, { size: 7, align: 'center', color: UI_COLORS.muted });
     this.drawPrompt(ctx, 'ENTER  ver o final da história');
   }
 
@@ -1404,7 +1422,7 @@ export class PlayScene {
       ['PONTOS', String(r.total)],
       ['RANK DA LUTA', r.rank],
     ], 170);
-    drawText(ctx, 'O progresso da campanha não muda no treino.', W / 2, 270, { size: 6, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, 'O TREINO NÃO MUDA O PROGRESSO', W / 2, 270, { size: 8, align: 'center', color: UI_COLORS.muted });
     this.drawPrompt(ctx, 'ENTER  voltar ao mapa');
   }
 

@@ -12,6 +12,7 @@ import { GAME_WIDTH as W, GAME_HEIGHT as H, UI_COLORS } from '../config.js';
 import { drawText } from '../graphics/text.js';
 import { ENCOUNTERS } from '../encounters.js';
 import { BUFFS, REWARDS, WORLDS, buffSource } from '../systems/Campaign.js';
+import { wrapText } from '../story/story.js';
 
 const BACK = Object.freeze({ x: 8, y: 8, w: 96, h: 30 });
 const TAB_Y = 84;
@@ -100,14 +101,14 @@ export class BuffsScene {
       ctx.strokeStyle = active ? w.theme.accent : '#333c57';
       ctx.lineWidth = active ? 2 : 1;
       ctx.strokeRect(x + 2.5, TAB_Y + 0.5, TAB_W - 5, 23);
-      drawText(ctx, `M${w.number} ${got}/${buffsOfWorld(i).length}`, x + TAB_W / 2, TAB_Y + 12, { size: 6, align: 'center', baseline: 'middle', color: active ? UI_COLORS.text : '#566c86' });
+      drawText(ctx, `M${w.number} ${got}/${buffsOfWorld(i).length}`, x + TAB_W / 2, TAB_Y + 12, { size: 8, align: 'center', baseline: 'middle', color: active ? UI_COLORS.text : '#566c86' });
     });
 
     const world = WORLDS[this.page];
     buffsOfWorld(this.page).forEach((id, i) => this.drawCard(ctx, id, CARD_Y0 + i * (CARD_H + CARD_GAP), world));
 
     const touch = this.game.input.touchMode;
-    drawText(ctx, touch ? 'Toque nas abas para trocar de mundo' : '< > trocar de mundo   ESC voltar', W / 2, H - 20, { size: 6, align: 'center', color: '#566c86' });
+    drawText(ctx, touch ? 'TOQUE NAS ABAS' : '< > MUNDO    ESC VOLTAR', W / 2, H - 22, { size: 8, align: 'center', color: '#566c86' });
 
     // Botão voltar
     ctx.fillStyle = 'rgba(26, 28, 44, 0.9)';
@@ -134,13 +135,15 @@ export class BuffsScene {
 
     if (owned) {
       drawText(ctx, buff.name, x + 26, y + 10, { size: 9, color: buff.color });
-      drawText(ctx, buff.description, x + 26, y + 28, { size: 6 });
-      drawText(ctx, sourceLabel(id), x + 26, y + 44, { size: 5, color: UI_COLORS.muted });
+      // v1.8: descrição com letra maior (até duas linhas); a origem saiu (era texto minúsculo).
+      wrapText(buff.description, Math.floor((w - 40) / 8)).slice(0, 2).forEach((line, i) => {
+        drawText(ctx, line, x + 26, y + 28 + i * 13, { size: 8 });
+      });
     } else {
       drawText(ctx, '???', x + 26, y + 10, { size: 9, color: '#566c86' });
       const src = buffSource(id);
-      const hint = src.kind === 'mini' ? `Derrote ${ENCOUNTERS[src.id].name} (Mundo ${world.number})` : `Vença os mini-chefes do Mundo ${world.number}`;
-      drawText(ctx, hint, x + 26, y + 30, { size: 6, color: '#566c86' });
+      const hint = src.kind === 'mini' ? `DERROTE ${ENCOUNTERS[src.id].name}` : 'VENÇA OS MINI-CHEFES';
+      drawText(ctx, hint, x + 26, y + 30, { size: 8, color: '#566c86' });
     }
   }
 }

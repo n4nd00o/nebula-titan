@@ -29,7 +29,7 @@
 | **Premissa** | Ano 2187. **Vega**, a última piloto da Aliança das Colônias, foge na nave **NT-01** e parte para o centro da galáxia para destruir o **Ômega**. |
 | **Conflito** | A armada do Ômega, puxada pelo **Titã**, apagou as colônias e derrubou a frota. Cada mundo é guardado por chefes biomecânicos. |
 | **Ligação com as mecânicas** | Cada chefe derrotado deixa um **núcleo de energia** = os **buffs**. Vencer um mundo abre a rota para o próximo. O Ômega é a mente que criou o Titã, por isso é o chefe final. |
-| **Apresentação** | Introdução de 4 telas (Nova Campanha e botão HISTÓRIA), um texto entre cada mundo, frase no fim de jogo. |
+| **Apresentação** | Introdução de 4 telas (ao começar uma Nova Campanha), um texto entre cada mundo, frase no fim de jogo. |
 | **Desfechos** | **Vitória:** o Ômega se desfaz, as colônias voltam a ter luz, créditos do grupo. **Derrota** (desistir após cair): "Sinal perdido", a galáxia escurece, mas os núcleos continuam salvos. |
 
 **Textos entre mundos** (aparecem ao vencer o chefe do mundo anterior):
@@ -456,12 +456,28 @@ A barra do chefe é **segmentada por fase**: segmentos já vencidos ficam vazios
 
 Ver a [tabela de controles no README](../README.md#️-como-jogar).
 
+### Teclas padrão e primeiras vezes (v1.8, feedback de jogadores)
+
+Um jogador testou o jogo e mandou um retorno escrito. O que mudou por causa dele:
+
+| Problema relatado | Mudança |
+|---|---|
+| Ficar parado na 1ª fase da Hidra vencia sem levar dano | O tiro mirado das cabeças agora se divide em 5 agulhas (eram 4): a do meio segue na linha da mira |
+| O dash é mais importante que o foco, e o `C` era difícil de alcançar no meio da luta | **Dash no `Shift`**, foco no `C`/`L` |
+| Telas cheias, muito texto pequeno | Menu da primeira vez com só 3 opções; descrições e dicas pequenas cortadas; o que ficou usa letra maior (mínimo 7–8 px) |
+| Botão para rever a história no menu era desnecessário | Removido: a história aparece ao jogar |
+| A tela de controles só tinha texto | **Teclado desenhado**, com as teclas pintadas na cor de cada ação |
+| Faltava um tutorial jogando | **Treino de Voo** antes do Setor 1 na primeira campanha: mover, destruir 3 alvos e pausar, com a tecla desenhada na tela (dá para pular) |
+| Era fácil esquecer as habilidades novas | **Dica curta** na primeira luta depois de ganhar dash, bomba ou tempo bala; a luta espera o jogador apertar a tecla |
+
+Som, vibração e tela cheia saíram dos botões pequenos do topo do menu e foram para a nova tela **CONFIGURAÇÕES**, que também tem o **volume da música e dos efeitos** (0 a 10) e, no celular, o esquema de toque e a ajuda do celular.
+
 ### Celular (v1.6): dois esquemas e ajuda do celular
 - **Padrão desde a v1.6.1: CLÁSSICO com a ajuda ligada** (a ajuda fica em "automática", que liga em telas de toque).
 - **MODERNO**: o primeiro dedo fora dos botões cria um **joystick flutuante** onde encostou. A direção é analógica; com o polegar dentro do anel tracejado (menos de 35% de inclinação; 50% antes da v1.6.2) a nave anda devagar e mostra a hitbox (**modo foco**). Desde a v1.6.2 o centro do joystick **acompanha o polegar**, para inverter a direção com pouco movimento. O tiro é **sempre automático**. Bomba e dash ficam em **botões grandes** à direita.
 - **CLÁSSICO**: o esquema da v1.4 (abaixo).
 - **Ajuda do celular**: o celular é menos preciso que o teclado, então em telas de toque os inimigos têm **25% menos vida**, os tiros inimigos ficam **20% mais lentos** (eram 10% na v1.6.0) e a hitbox da nave cai de 4 para **3 px**. Modos: automática (padrão), ligada, desligada.
-- Escolhas na tela **CONTROLES → TOQUE**, salvas no navegador.
+- Escolhas na tela **CONFIGURAÇÕES** (até a v1.7 ficavam em CONTROLES → TOQUE), salvas no navegador.
 
 ### Celular (v1.4)
 - A nave segue o dedo (um pouco acima dele, para o dedo não cobrir a nave) e atira sozinha.

@@ -73,7 +73,7 @@ Esta seção reúne, em um só lugar, os **itens obrigatórios do README** pedid
 |---|---|
 | **Premissa** | Ano 2187. **Vega** é a **última piloto da Aliança das Colônias**. Na nave **NT-01**, ela precisa chegar ao centro da galáxia e destruir o **Ômega**. |
 | **Conflito** | A armada do Ômega, liderada pelo **Titã**, apagou as colônias e derrubou a frota da Aliança. Cada mundo é guardado por chefes biomecânicos. |
-| **Apresentação** | **Introdução** de 4 telas ao começar uma *Nova Campanha* (também no botão **HISTÓRIA** do menu); **um texto entre cada mundo** contando para onde a armada recuou; frase da história na tela de *fim de jogo*. |
+| **Apresentação** | **Introdução** de 4 telas ao começar uma *Nova Campanha*; **um texto entre cada mundo** contando para onde a armada recuou; frase da história na tela de *fim de jogo*. |
 | **Desfecho** | **Vitória:** o Ômega se desfaz, as luzes das colônias voltam e aparecem os **créditos com o grupo**. **Derrota:** ao desistir depois de cair, o final "Sinal perdido" mostra a galáxia escurecendo. |
 | **Coerência** | Os *buffs* são os **núcleos de energia** que cada chefe derrotado deixa para a NT-01; cada mundo tem paleta e música próprias; as telas de história têm **trilha própria, mais lenta**, e som de máquina de escrever. |
 
@@ -91,7 +91,7 @@ Passo a passo completo em [Como executar](#-como-executar). O `package.json` faz
 
 ### 4. Controles
 
-A tabela de cada tecla e sua ação está em [Como jogar](#-como-jogar). Resumo: **setas/WASD** movem, **Espaço/Z** atira, **Shift** = modo foco, **C** = dash, **X** = bomba, **P/Esc** = pausa, **M** = som. Os controles também são explicados **dentro do jogo** (tela inicial e menu **CONTROLES**, onde dá para trocar as teclas).
+A tabela de cada tecla e sua ação está em [Como jogar](#-como-jogar). Resumo: **setas/WASD** movem, **Espaço/Z** atira, **Shift** = dash, **X** = bomba, **C** = modo foco, **P/Esc** = pausa, **M** = som. Os controles também são ensinados **dentro do jogo**: o **Treino de Voo** jogável antes do Setor 1, uma dica curta cada vez que uma habilidade nova é liberada e a tela **CONTROLES**, que mostra as teclas num teclado desenhado *(v1.8)*.
 
 ### 5. Regras
 
@@ -310,7 +310,8 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 - 🕹️ **Joystick no celular** *(v1.6)*: esquema **MODERNO** (joystick flutuante que acompanha o polegar, tiro automático, foco com o joystick pouco inclinado, botões grandes de bomba e dash) ou **CLÁSSICO** (a nave segue o dedo; padrão desde a v1.6.1), e **ajuda do celular** (inimigos com 25% menos vida, tiros 20% mais lentos, hitbox menor), ligada automaticamente em telas de toque.
 - 📱 **Feito para celular também** *(v1.4)*: botões de **bomba, dash e pausa** na tela, menus 100% por toque, **tela cheia** em modo retrato, aviso para girar o aparelho, respeito ao *notch*, **vibração** e **instalável como app (PWA)**, inclusive **offline**.
 - 📜 **História dentro do jogo** *(v1.7)*: introdução, textos entre os mundos, finais de vitória e de derrota e créditos com o grupo, com trilha própria e texto datilografado.
-- 🧪 **353 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
+- 🧭 **Primeiras vezes guiadas** *(v1.8, a partir de feedback de jogadores)*: menu enxuto na primeira vez, **Treino de Voo** jogável, dica de cada habilidade nova, tela **CONTROLES** com teclado desenhado, tela **CONFIGURAÇÕES** (volume de música e efeitos, vibração, tela cheia, celular) e textos maiores em todas as telas.
+- 🧪 **362 testes automatizados**: todos os chefes e setores, a campanha de 5 mundos, os buffs únicos, as teclas configuráveis, o joystick e a ajuda do celular, salvar/carregar, o mapa de progresso, os controles de toque, as mecânicas novas, colisões, pontuação e integridade dos sprites, além de **testes de garantia** que jogam cada chefe só com tiros vindos de baixo para provar que nenhum fica imortal.
 - 🐞 **Modo debug** (`?debug`) com hitboxes, contador de FPS, invencibilidade, todos os buffs e atalho para pular fases.
 
 ## 🕹️ Como jogar
@@ -318,21 +319,24 @@ A especificação completa está no [Game Design Document](docs/GDD.md).
 | Ação | Teclado | Toque: MODERNO *(v1.6)* | Toque: CLÁSSICO *(padrão)* |
 |---|---|---|---|
 | Mover | `Setas` ou `W A S D` | **Joystick**: toque e arraste em qualquer lugar | Arrastar o dedo |
-| Atirar | `Espaço`, `Z` ou `J` (segure) | Automático, sempre | Automático ao tocar |
-| Modo foco (lento + hitbox visível) | `Shift` | Joystick **pouco inclinado** | — |
-| Dash *(buff do Ceifador)* | `C` ou `L` | Botão **DASH** | Botão **DASH** ou um **segundo dedo** |
+| Atirar | `Espaço` ou `Z` (segure) | Automático, sempre | Automático ao tocar |
+| Dash *(buff do Ceifador)* | `Shift` *(v1.8)* | Botão **DASH** | Botão **DASH** ou um **segundo dedo** |
 | Bomba de Pulso *(após os 3 mini-chefes)* | `X` ou `K` | Botão **BOMBA** no canto inferior direito | igual |
+| Modo foco (lento + hitbox visível) | `C` ou `L` *(v1.8)* | Joystick **pouco inclinado** | — |
 | Ver meus buffs | `I` | Botão **MEUS BUFFS** na pausa / **BUFFS** no mapa | igual |
-| Trocar teclas / esquema de toque | Título → **CONTROLES** | **CONTROLES** → página **TOQUE** | igual |
+| Ver e trocar teclas | Título → **CONTROLES** (teclado desenhado) | **CONTROLES** → página **TOQUE** | igual |
 | Navegar nos menus/mapas | `Setas` + `Enter` | Tocar na opção (no mapa: tocar de novo para jogar) | igual |
 | Mapa de progresso (na Rota de Ataque) | `Tab` | Botão **MAPA** | igual |
 | Pausar | `P` ou `Esc` | Botão ⏸ no canto superior direito | igual |
 | Voltar ao menu (pausado) | `Q` | Botão **MENU** da pausa | igual |
-| Ligar/desligar som | `M` | Botão **SOM** no título | igual |
-| Ligar/desligar vibração | `V` | Botão **VIBRA** no título | igual |
-| Tela cheia | `F` | Botão **TELA CHEIA** no título | igual |
+| Ligar/desligar som | `M` | Título → **CONFIGURAÇÕES** | igual |
+| Volume da música e dos efeitos | Título → **CONFIGURAÇÕES** | igual | igual |
+| Ligar/desligar vibração | `V` | Título → **CONFIGURAÇÕES** | igual |
+| Tela cheia | `F` | Título → **CONFIGURAÇÕES** | igual |
 
-**Ajuda do celular** *(v1.6)*: em telas de toque, chefes e alienígenas têm **25% menos vida**, os tiros inimigos são **20% mais lentos** e a hitbox da nave é menor. Em **CONTROLES → TOQUE** dá para deixar **automática** (padrão: ligada no celular, desligada no computador), **ligada** ou **desligada**.
+**Por que o dash fica no Shift?** *(v1.8)* Jogadores contaram que o dash é muito mais usado que o modo foco e que era difícil alcançar o `C` no meio da luta. Agora o dash fica no `Shift`, ao lado do mindinho, e o foco foi para o `C`.
+
+**Ajuda do celular** *(v1.6)*: em telas de toque, chefes e alienígenas têm **25% menos vida**, os tiros inimigos são **20% mais lentos** e a hitbox da nave é menor. Em **CONFIGURAÇÕES → AJUDA** dá para deixar **automática** (padrão: ligada no celular, desligada no computador), **ligada** ou **desligada**.
 
 **Dica:** a nave só é atingida no **pontinho central** (ative o modo foco para vê-lo). Use os colchetes amarelos para saber onde atirar.
 
@@ -439,7 +443,7 @@ Principais decisões (explicadas em profundidade em [docs/ARQUITETURA.md](docs/A
 npm test
 ```
 
-A suíte (353 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
+A suíte (362 testes, catalogados em [docs/TESTES.md](docs/TESTES.md)) cobre:
 
 - **Lógica do chefe**: progressão de fases, invulnerabilidade na entrada e nas transições, quebra antecipada, fase pulada, inclinação por asa perdida, *hit test* (ricochete × dano) e o fluxo completo até a derrota.
 - **Colisão**: AABB, círculo × círculo, círculo × retângulo, distância ponto-segmento (laser) e **colisão por pixel** nas partes do chefe (com testes de regressão de bugs reais).

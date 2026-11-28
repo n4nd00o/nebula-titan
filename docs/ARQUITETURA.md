@@ -201,7 +201,23 @@ A `PlayScene` recebe `{ bossId, campaign, practice }`. Os buffs são lidos de `c
 
 - **Dados separados da apresentação:** os textos ficam em `src/story/story.js` e os integrantes em `src/story/team.js`; os dois são JavaScript puro, testável no Node (`tests/story.test.js`).
 - **Quebra de linha sem canvas:** a fonte é monoespaçada, então `wrapText` conta caracteres em vez de medir pixels; a moldura cresce com o número de linhas.
-- **Pontos de entrada:** `TitleScene` (Nova Campanha e botão HISTÓRIA) e `PlayScene.continueAfterEnd`/`exitToMenu` (mundo concluído, vitória final, desistir após o fim de jogo). Nenhuma regra de luta foi alterada.
+- **Pontos de entrada:** `TitleScene` (Nova Campanha; o botão HISTÓRIA da v1.7 saiu na v1.8) e `PlayScene.continueAfterEnd`/`exitToMenu` (mundo concluído, vitória final, desistir após o fim de jogo). Nenhuma regra de luta foi alterada.
+
+### Primeiras vezes: treino, dicas, configurações e controles (v1.8)
+
+Feitas a partir de feedback de jogadores. A regra foi a mesma da história: **lógica pura num módulo testável, cenas só desenham**.
+
+| Arquivo | Papel |
+|---|---|
+| `src/systems/Onboarding.js` | Quais opções o menu mostra (`titleOptionIds`: 3 na primeira vez), passos do treino (`createTutorial`/`tutorialEvent`, estado imutável) e dicas de habilidade (`nextAbilityTip`). Salva `played`, `tutorialDone` e `abilityTipsSeen` |
+| `src/scenes/TutorialScene.js` | Treino de Voo: reaproveita `Player`, `PlayerBullet` e `ParticleSystem` com uma cena mínima (o `Player` só precisa de `scene.input` e `scene.firePlayerShot`) |
+| `src/scenes/SettingsScene.js` | Volume, som, vibração, tela cheia e opções de toque |
+| `src/graphics/keyboard.js` | `keyboardLayout` (posição de cada tecla, testada), `drawKeyboard` e `drawKeyCap` |
+| `AudioEngine.setVolume` | Volume 0–10 por canal (`musicBus`/`sfxBus`), salvo em `musicVolume`/`sfxVolume` |
+
+- **Fluxo da nova campanha:** `TitleScene` → `StoryScene` (introdução) → `TutorialScene` (só até ser concluído uma vez) → `PlayScene` (Setor 1).
+- **Dica de habilidade:** a `PlayScene` guarda `this.tip`; enquanto ela existe, `update()` só espera a tecla da habilidade (ou ENTER/toque) e `draw()` desenha o cartão por cima. Lutas especiais (`custom`) não mostram dicas.
+- **Teclas padrão:** dash no `Shift`, foco no `C`/`L` (`DEFAULT_BINDINGS`). Quem já tinha trocado teclas mantém as suas.
 
 ## 5. O motor de chefes
 

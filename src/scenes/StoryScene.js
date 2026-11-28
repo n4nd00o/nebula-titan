@@ -123,7 +123,7 @@ export class StoryScene {
     ctx.strokeRect(24, 262, W - 48, boxH);
     const footY = 262 + boxH + 18;
 
-    drawText(ctx, this.label, W / 2, 274, { size: 6, align: 'center', color: UI_COLORS.muted });
+    drawText(ctx, this.label, W / 2, 272, { size: 8, align: 'center', color: UI_COLORS.muted });
     drawText(ctx, this.page.title, W / 2, 290, { size: 12, align: 'center', color: accent });
 
     let left = Math.floor(this.shown);
@@ -144,7 +144,7 @@ export class StoryScene {
       const last = this.index === n - 1;
       drawText(ctx, last ? 'ENTER  começar' : 'ENTER  continuar', W / 2, footY + 20, { size: 8, align: 'center' });
     }
-    drawText(ctx, 'ESC  pular história', W / 2, footY + 40, { size: 6, align: 'center', color: '#566c86' });
+    drawText(ctx, 'ESC PULA A HISTÓRIA', W / 2, footY + 40, { size: 8, align: 'center', color: '#566c86' });
   }
 
   /** Ilustração simples no topo da página, feita com os sprites do jogo. */

@@ -138,11 +138,21 @@ TRACKS.void = { bpm: 138, chords: [[2, 5, 9], [-2, 2, 5], [0, 4, 7], [-3, 1, 4]]
 // História (v1.7): lenta e melancólica, com o mesmo timbre da tela inicial (Am F C G).
 TRACKS.story = { bpm: 72, chords: [[0, 3, 7], [-4, 0, 3], [3, 7, 10], [-2, 2, 5]], step: TRACKS.title.step };
 
+/** Volume de cada canal, de 0 a 10 (v1.8, tela CONFIGURAÇÕES). 10 = volume original. */
+export const VOLUME_STEPS = 10;
+const BUS_GAIN = { music: 0.4, sfx: 0.9 };
+const VOLUME_KEYS = { music: 'musicVolume', sfx: 'sfxVolume' };
+const clampVolume = (v) => Math.max(0, Math.min(VOLUME_STEPS, Math.round(Number.isFinite(v) ? v : VOLUME_STEPS)));
+
 export class AudioEngine {
   constructor(storage) {
     this.storage = storage;
     this.ctx = null;
     this.muted = storage.get('muted', false);
+    this.volume = {
+      music: clampVolume(storage.get(VOLUME_KEYS.music, VOLUME_STEPS)),
+      sfx: clampVolume(storage.get(VOLUME_KEYS.sfx, VOLUME_STEPS)),
+    };
     this.tempo = 1;
     this.track = null;
     this.pendingTrack = null;
@@ -164,10 +174,10 @@ export class AudioEngine {
     this.master.gain.value = this.muted ? 0 : MASTER_VOLUME;
     this.master.connect(this.ctx.destination);
     this.sfxBus = this.ctx.createGain();
-    this.sfxBus.gain.value = 0.9;
+    this.sfxBus.gain.value = this.busGain('sfx');
     this.sfxBus.connect(this.master);
     this.musicBus = this.ctx.createGain();
-    this.musicBus.gain.value = 0.4;
+    this.musicBus.gain.value = this.busGain('music');
     this.musicBus.connect(this.master);
 
     // 1 segundo de ruído branco reaproveitado por todos os sons de ruído.
@@ -186,6 +196,20 @@ export class AudioEngine {
       this.master.gain.setTargetAtTime(this.muted ? 0 : MASTER_VOLUME, this.ctx.currentTime, 0.02);
     }
     return this.muted;
+  }
+
+  /** Ganho do canal ('music' ou 'sfx') para o volume atual. */
+  busGain(kind) {
+    return BUS_GAIN[kind] * (this.volume[kind] / VOLUME_STEPS);
+  }
+
+  /** Muda o volume (0 a 10) de 'music' ou 'sfx', aplica na hora e salva. */
+  setVolume(kind, value) {
+    this.volume[kind] = clampVolume(value);
+    this.storage.set(VOLUME_KEYS[kind], this.volume[kind]);
+    const bus = kind === 'music' ? this.musicBus : this.sfxBus;
+    if (bus) bus.gain.setTargetAtTime(this.busGain(kind), this.ctx.currentTime, 0.02);
+    return this.volume[kind];
   }
 
   suspend() {

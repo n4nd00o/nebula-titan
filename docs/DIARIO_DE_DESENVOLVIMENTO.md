@@ -11,6 +11,25 @@
 
 ---
 
+## 28/11/2026: Versão 1.8 (feedback de um jogador)
+
+### Contexto
+Um jogador testou o jogo e mandou um retorno escrito: gostou dos chefes, mas achou as telas cheias de texto pequeno, sentiu falta de um tutorial, esquecia as habilidades novas e achou o dash difícil de alcançar no teclado. O grupo também notou que, parado, dava para passar a 1ª fase da Hidra Glacial sem levar dano.
+
+### Problema da Hidra
+Uma simulação com a nave parada em vários pontos da tela mostrou: no centro ela morria, mas em x≈300 passava a fase em 122 s sem morrer. O tiro mirado das cabeças se divide em leque, e eram **4** agulhas: com número par, não sobra agulha no meio, e o vão cai bem na linha da mira, ou seja, em cima de quem está parado. Com **5**, a do meio segue a mira. O grupo pediu para não mexer na dificuldade, então a correção foi só essa.
+
+### Decisões
+- **Menu da primeira vez com 3 opções**; o resto aparece depois de jogar.
+- **Configurações separadas dos controles**: volume, som, vibração, tela cheia e celular num lugar só, em vez de botões pequenos no topo do menu.
+- **Teclado desenhado** em vez de lista de texto, como no exemplo do jogador.
+- **Treino de Voo** numa cena própria, reaproveitando a nave e os tiros do jogo, em vez de mexer na luta.
+- **Dicas de habilidade** que esperam o jogador apertar a tecla: aprender fazendo.
+- **Dash no Shift**: é a habilidade mais usada e fica ao alcance do mindinho.
+
+### Aprendizado
+Um teste que só verifica se o chefe *pode* ser vencido não pega um chefe que pode ser vencido **sem jogar**. A simulação com a nave parada virou teste de regressão.
+
 ## 24/11/2026: Versão 1.7 (história e entrega da A3)
 
 ### Contexto

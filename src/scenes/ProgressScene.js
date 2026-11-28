@@ -23,6 +23,7 @@ import { iconFor, MapScene } from './MapScene.js';
 import { PlayScene, SAVE_KEY, UNLOCK_KEY } from './PlayScene.js';
 import { TitleScene } from './TitleScene.js';
 import { BuffsScene } from './BuffsScene.js';
+import { wrapText } from '../story/story.js';
 
 /** Posições dos planetas na tela da galáxia (rota em zigue-zague, de baixo para cima). */
 export const PLANETS = Object.freeze([
@@ -299,7 +300,7 @@ export class ProgressScene {
       }
       const bob = Math.sin(this.time * 4) * 3;
       this.game.sprites.draw(ctx, 'player', p.x, p.y + bob, { scale: 0.6 });
-      drawText(ctx, 'VOCÊ', p.x, p.y + 20, { size: 5, align: 'center', color: '#ffcd75' });
+      drawText(ctx, 'VOCÊ', p.x, p.y + 20, { size: 7, align: 'center', color: '#ffcd75' });
     }
 
     this.drawGalaxyInfo(ctx);
@@ -364,11 +365,9 @@ export class ProgressScene {
     const tx = p.x;
     const align = 'center';
     drawText(ctx, world.name, tx, p.y + r + 6, { size: 7, align, color: locked ? '#566c86' : accent });
-    const label = {
-      current: 'VOCÊ ESTÁ AQUI', done: 'CONCLUÍDO', visited: 'JÁ VISITADO', locked: 'BLOQUEADO',
-    }[status];
+    // v1.8: só a contagem, com a cor dizendo o estado (amarelo = você está aqui).
     const color = { current: '#ffcd75', done: '#a7f070', visited: '#73eff7', locked: '#566c86' }[status];
-    drawText(ctx, `${label} · ${info.doneCount}/${info.total}`, tx, p.y + r + 18, { size: 6, align, color });
+    drawText(ctx, `${info.doneCount}/${info.total}`, tx, p.y + r + 18, { size: 8, align, color });
   }
 
   drawProgressBar(ctx, x, y, w, ratio) {
@@ -386,9 +385,9 @@ export class ProgressScene {
     const y = H - 92;
     this.drawPanel(ctx, y, 76, info.world.theme.accent);
     drawText(ctx, `MUNDO ${info.world.number}: ${info.world.name}`, W / 2, y + 12, { size: 9, align: 'center', color: info.world.theme.accent });
-    drawText(ctx, info.world.tagline, W / 2, y + 30, { size: 6, align: 'center' });
-    const hint = info.status === 'locked' ? 'Ainda bloqueado: toque para ver as fases' : 'Toque no planeta (ou ENTER) para ver as fases';
-    drawText(ctx, hint, W / 2, y + 50, { size: 6, align: 'center', color: UI_COLORS.muted });
+    const touch = this.game.input.touchMode;
+    const hint = info.status === 'locked' ? 'BLOQUEADO' : touch ? 'TOQUE PARA VER AS FASES' : 'ENTER: VER AS FASES';
+    drawText(ctx, hint, W / 2, y + 40, { size: 8, align: 'center', color: UI_COLORS.muted });
   }
 
   drawPanel(ctx, y, h, color) {
@@ -468,12 +467,8 @@ export class ProgressScene {
     const name = ENCOUNTERS[enc.id].name;
     // Fundo escuro atrás do nome: as linhas da rota passam por baixo sem atrapalhar a leitura.
     ctx.fillStyle = 'rgba(5, 5, 13, 0.85)';
-    ctx.fillRect(node.x - name.length * 3.5 - 4, node.y + r + 3, name.length * 7 + 8, REWARDS[enc.id] ? 22 : 13);
-    drawText(ctx, name, node.x, node.y + r + 6, { size: 6, align: 'center', color: locked ? '#566c86' : UI_COLORS.text });
-    if (REWARDS[enc.id]) {
-      const buff = BUFFS[REWARDS[enc.id]];
-      drawText(ctx, buff.short, node.x, node.y + r + 16, { size: 5, align: 'center', color: locked ? '#566c86' : buff.color });
-    }
+    ctx.fillRect(node.x - name.length * 4 - 4, node.y + r + 3, name.length * 8 + 8, 14);
+    drawText(ctx, name, node.x, node.y + r + 6, { size: 7, align: 'center', color: locked ? '#566c86' : UI_COLORS.text });
   }
 
   drawWorldInfo(ctx) {
@@ -485,13 +480,16 @@ export class ProgressScene {
     this.drawPanel(ctx, y, 70, color);
     const kind = { stage: 'SETOR', mini: 'MINI-CHEFE', boss: this.worldInfo.world.circles ? 'CHEFE FINAL' : 'CHEFE DO MUNDO', finale: 'CHEFE FINAL' }[enc.kind];
     drawText(ctx, `${kind} · ${def.name}`, W / 2, y + 10, { size: 8, align: 'center', color: UI_COLORS.boss });
-    drawText(ctx, def.description, W / 2, y + 28, { size: 6, align: 'center' });
+    // v1.8: descrição maior (uma linha) e ação curta.
+    const desc = wrapText(def.description, Math.floor((W - 48) / 8))[0];
+    drawText(ctx, desc, W / 2, y + 28, { size: 8, align: 'center' });
+    const verb = this.game.input.touchMode ? 'TOQUE DE NOVO' : 'ENTER';
     const action = {
-      done: 'TOQUE DE NOVO / ENTER: TREINAR (não altera o progresso)',
-      available: this.save ? 'TOQUE DE NOVO / ENTER: JOGAR (campanha)' : 'TOQUE DE NOVO / ENTER: NOVA CAMPANHA',
-      locked: 'BLOQUEADO: vença as fases anteriores',
+      done: `${verb}: TREINAR`,
+      available: this.save ? `${verb}: JOGAR` : `${verb}: NOVA CAMPANHA`,
+      locked: 'BLOQUEADO',
     }[enc.status];
     const blink = enc.status === 'locked' || Math.floor(this.time * 2) % 2 === 0;
-    if (blink) drawText(ctx, action, W / 2, y + 48, { size: 6, align: 'center', color });
+    if (blink) drawText(ctx, action, W / 2, y + 48, { size: 8, align: 'center', color });
   }
 }

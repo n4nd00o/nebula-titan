@@ -12,6 +12,23 @@
 
 ---
 
+## [1.8.0] - 2026-11-28
+
+**Pedido:** "Eu preciso de alguma correções e adições no jogo, primeiro o jogo na fase da Hidra Glacial se ficar parado você passa a fase sem levar dano. Além disso gostaria que o feedback do arquivo PDF fosse levado em consideração para os ajustes"
+
+A **v1.8.0** está pronta e os 362 testes passam. Todas as telas novas e alteradas foram conferidas por captura no Edge.
+
+- **Hidra corrigida:** o tiro mirado da 1ª fase se dividia em 4 agulhas e deixava um vão bem na linha da mira; parada nesse ponto, a nave passava a fase sem morrer. Agora são 5 agulhas. A dificuldade para quem se move ficou praticamente igual, como pedido. Há um teste para o problema não voltar.
+- **Menu enxuto:** na primeira vez só INICIAR JOGO, CONTROLES e CONFIGURAÇÕES; o resto aparece depois de jogar. Saiu o botão HISTÓRIA.
+- **CONFIGURAÇÕES:** volume da música e dos efeitos, som, vibração, tela cheia e opções do celular.
+- **CONTROLES** com teclado desenhado, cada ação numa cor.
+- **Treino de Voo** jogável antes do Setor 1 (mover, destruir alvos, pausar), com a tecla desenhada e opção de pular.
+- **Dica de habilidade nova** (dash, bomba, tempo bala) na primeira luta depois de ganhá-la.
+- **Teclas novas:** dash no Shift, foco no C.
+- **Menos texto e letra maior** em todas as telas.
+
+---
+
 ## [1.7.0] - 2026-11-24
 
 **Pedido:** "Preciso que seguindo o arquivo de instruções .md e as instruções de texto a seguir: Linguagem que usou, ideias, explicando rapidamente, fazer um slide de 4 até 5 slides. Colocar nome dos participantes em todos os documentos, fazer slides, explicar decisões, adicionar uma história pro jogo. Você faça as mudanças no projeto, necessárias para a apresentação, sem afetar o jogo e seu funcionamento em grande escala, apenas adicionando o que foi solicitado"

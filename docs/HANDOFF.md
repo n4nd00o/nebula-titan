@@ -7,7 +7,7 @@
 <!-- integrantes:fim -->
 
 > Para quem vai **editar o código**. O README já explica o jogo; aqui fica só o que falta para mexer nele sem quebrar nada.
-> Versão do código descrita: **1.7.0**. Detalhes mais profundos: [ARQUITETURA.md](ARQUITETURA.md).
+> Versão do código descrita: **1.8.0**. Detalhes mais profundos: [ARQUITETURA.md](ARQUITETURA.md).
 
 ## 1. Visão rápida
 
@@ -35,17 +35,19 @@
 
 | Cena | Arquivo | Papel |
 |---|---|---|
-| Título | `src/scenes/TitleScene.js` | Menu: continuar, nova campanha, mundo, mapa, buffs, controles, duelo; botões do topo (história, som, vibração, tela cheia) |
+| Título | `src/scenes/TitleScene.js` | Menu: na primeira vez só INICIAR JOGO, CONTROLES e CONFIGURAÇÕES; depois também continuar, mundo, mapa, buffs e duelo |
+| Treino de Voo | `src/scenes/TutorialScene.js` | Tutorial jogável antes do Setor 1 (mover, destruir alvos, pausar) |
+| Configurações | `src/scenes/SettingsScene.js` | Volume, som, vibração, tela cheia e opções do celular |
 | História | `src/scenes/StoryScene.js` | Páginas de texto datilografado; recebe `pages` e `next()` (a cena seguinte) |
 | Luta | `src/scenes/PlayScene.js` | Um encontro jogável (setor de ondas ou chefe). Estados internos: `playing`, `paused`, `gameover`, `victory` |
 | Rota de Ataque | `src/scenes/MapScene.js` | Escolha do próximo mini-chefe do mundo atual |
 | Mapa de Progresso | `src/scenes/ProgressScene.js` | Galáxia com os 5 mundos; rejogar fases vencidas (treino) |
 | Meus Buffs | `src/scenes/BuffsScene.js` | Lista de buffs conquistados |
-| Controles | `src/scenes/ControlsScene.js` | Trocar teclas e esquema de toque |
+| Controles | `src/scenes/ControlsScene.js` | Teclado desenhado com as teclas de cada ação; trocar teclas |
 
 ### Fluxo entre cenas
 
-- **Nova campanha:** Título → História (introdução) → Luta (setor 1) → Luta (setor 2) → Rota de Ataque → Luta (mini-chefe) … → Luta (chefe do mundo).
+- **Nova campanha:** Título → História (introdução) → Treino de Voo (só até ser concluído uma vez) → Luta (setor 1) → Luta (setor 2) → Rota de Ataque → Luta (mini-chefe) … → Luta (chefe do mundo).
 - **Mundo vencido:** Luta → História (texto entre mundos) → Mapa de Progresso → Rota de Ataque do próximo mundo.
 - **Vitória final (Ômega):** Luta → História (final + créditos) → Título.
 - **Fim de jogo na campanha:** ENTER = continuar (mesma luta, pontos zerados, buffs mantidos); ESC = desistir → História (final de derrota) → Título.
@@ -77,6 +79,8 @@
 | `entities/` | Jogador (`Player.js`), tiros (`projectiles.js`), alienígenas (`FormationEnemy.js`, `alienTypes.js`, `Minion.js`), ala (`Wingman.js`), power-ups, parede de laser |
 | `systems/Campaign.js` | **Mundos (`WORLDS`), buffs (`BUFFS`), recompensas (`REWARDS`)** e o estado da campanha (save, vidas, pontos) |
 | `systems/Progress.js` | Estado do Mapa de Progresso |
+| `systems/Onboarding.js` | Primeiras vezes: opções do menu, passos do treino e dicas de habilidade nova |
+| `graphics/keyboard.js` | Teclado desenhado e teclas avulsas (controles, treino, dicas) |
 | `systems/Scoring.js` | Rank e bônus de cada luta |
 | `systems/Collision.js` | Colisão círculo × círculo e ponto × segmento |
 | `systems/ParticleSystem.js`, `Starfield.js` | Partículas e fundo de estrelas |
@@ -165,6 +169,7 @@ Sempre envie: este `docs/HANDOFF.md`, `src/config.js` e o arquivo que vai mudar.
 | Mundos | `src/systems/Campaign.js`, `src/story/story.js`, `tests/worlds.test.js` |
 | Buffs | `src/systems/Campaign.js`, `src/scenes/PlayScene.js`, `src/entities/Player.js`, `tests/buffs.test.js` |
 | Telas/menus | a cena em `src/scenes/`, `src/core/Game.js`, `src/graphics/text.js` |
+| Tutorial, dicas e menu da primeira vez | `src/systems/Onboarding.js`, `src/scenes/TutorialScene.js`, `src/graphics/keyboard.js`, `tests/onboarding.test.js` |
 | Controles | `src/core/Input.js`, `src/core/KeyBindings.js`, `src/core/TouchControls.js` |
 | Som | `src/core/AudioEngine.js` |
 | Sprites | o `src/graphics/spriteData*.js` certo, `src/graphics/SpriteBank.js`, `src/graphics/palette.js` |

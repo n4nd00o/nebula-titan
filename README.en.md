@@ -146,7 +146,8 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 - 🛸 **8-phase screen-filling final boss** with section-by-section camera, armor, regeneration and laser walls.
 - ❤️ Lives carry over (max 5), extra life every 50k, **perfect-run bonus**.
 - 📜 **In-game story** *(v1.7)*: intro, texts between worlds, victory and defeat endings and the group credits.
-- 🧪 **353 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
+- 🧭 **Guided first steps** *(v1.8, from player feedback)*: a lean first-time menu, a playable **Flight Training**, a short tip for each new ability, a **CONTROLS** screen with a drawn keyboard, a **SETTINGS** screen (music/effects volume, vibration, fullscreen, mobile) and bigger text everywhere.
+- 🧪 **362 automated tests** (catalogued in [docs/TESTES.md](docs/TESTES.md); delivery reports in [docs/RELATORIOS_DE_ENTREGA.md](docs/RELATORIOS_DE_ENTREGA.md)) + CI (generic tests run automatically for every registered boss), including **"no immortal boss" guarantee tests** that beat every boss using only upward shots and verify hitboxes match the sprites.
 - 🐞 **Debug mode** (`?debug`): hitboxes, FPS, god mode, phase skip.
 
 ## 🕹️ Controls
@@ -154,16 +155,18 @@ The **NEBULA TITAN** is built from **8 independent parts**, each with its own he
 | Action | Keyboard | Touch (MODERN · CLASSIC, the default since v1.6.1) |
 |---|---|---|
 | Move | `Arrows` / `WASD` | **Joystick**: touch and drag anywhere · CLASSIC: drag the ship |
-| Shoot | `Space` / `Z` / `J` (hold) | Always automatic · CLASSIC: while touching |
-| Focus mode (slow + visible hitbox) | `Shift` | Tilt the joystick slightly · CLASSIC: — |
-| Dash *(Reaper buff)* | `C` / `L` | **DASH** button · CLASSIC: also a **second finger** |
+| Shoot | `Space` / `Z` (hold) | Always automatic · CLASSIC: while touching |
+| Dash *(Reaper buff)* | `Shift` *(v1.8)* | **DASH** button · CLASSIC: also a **second finger** |
 | Pulse Bomb *(after all mini-bosses)* | `X` / `K` | **BOMB** button (bottom right) |
+| Focus mode (slow + visible hitbox) | `C` / `L` *(v1.8)* | Tilt the joystick slightly · CLASSIC: — |
 | Progress map (from the route screen) | `Tab` | **MAPA** button |
 | Pause | `P` / `Esc` | ⏸ button (top right) |
 | Quit to menu (paused) | `Q` | **MENU** button |
-| Toggle sound / vibration / fullscreen | `M` / `V` / `F` | Buttons on the title screen |
+| Toggle sound / vibration / fullscreen | `M` / `V` / `F` | Title → **CONFIGURAÇÕES** (also music/effects volume) |
 | My buffs | `I` | **MEUS BUFFS** button (pause) |
-| Remap keys / touch scheme | Title → **CONTROLES** | **CONTROLES** → **TOQUE** page (MODERN/CLASSIC + mobile assist) |
+| See / remap keys | Title → **CONTROLES** (drawn keyboard) | **CONTROLES** → **TOQUE** page; scheme and mobile assist in **CONFIGURAÇÕES** |
+
+*Why is dash on Shift?* Players said dash is used far more than focus mode and `C` was hard to reach mid-fight, so v1.8 moved dash to `Shift` and focus to `C`.
 
 ## ▶️ Running
 

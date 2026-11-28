@@ -19,9 +19,11 @@ const REGROW_TIME = 9;
 const ICE = ['#73eff7', '#41a6f6', '#257179', '#f4f4f4'];
 const SCALE_IDS = ['scaleA', 'scaleB', 'scaleC', 'scaleD'];
 
+// Número ÍMPAR de agulhas (v1.8): a do meio segue na linha da mira. Com 4,
+// sobrava um vão bem no centro e quem ficava parado nunca era atingido.
 const SPLITTER = {
   kind: 'shard', color: '#73eff7', radius: 5,
-  split: { at: 0.8, count: 4, spread: 0.9, speed: 160, style: { kind: 'needle', color: '#73eff7', radius: 3 } },
+  split: { at: 0.8, count: 5, spread: 0.9, speed: 160, style: { kind: 'needle', color: '#73eff7', radius: 3 } },
 };
 const BOMBLET = {
   kind: 'shard', color: '#41a6f6', radius: 7,
