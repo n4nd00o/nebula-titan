@@ -519,6 +519,7 @@ nebula-titan/
 | [docs/PLANEJAMENTO.md](docs/PLANEJAMENTO.md) | Contexto, ideia inicial × final, escopo, requisitos, cronograma e riscos |
 | [docs/GDD.md](docs/GDD.md) | Game Design Document: mecânicas, chefe, fases, pontuação, arte e áudio |
 | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | Arquitetura de software, diagramas e decisões técnicas |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | Handoff técnico para quem vai editar o código: arquivos, fluxo, onde mudar chefes, fases, mundos e buffs |
 | [docs/GUIA_DE_SPRITES.md](docs/GUIA_DE_SPRITES.md) | Como desenhar e substituir os sprites |
 | [docs/DIARIO_DE_DESENVOLVIMENTO.md](docs/DIARIO_DE_DESENVOLVIMENTO.md) | Registro cronológico do desenvolvimento |
 | [docs/TESTES.md](docs/TESTES.md) | Catálogo dos testes: o que cada arquivo garante, bugs que viraram teste e como verificar o jogo |
