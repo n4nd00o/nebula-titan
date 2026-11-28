@@ -29,6 +29,8 @@ Ajustes a partir do retorno escrito de um jogador que testou o jogo.
 - **Menos texto, letra maior:** descrições e dicas pequenas cortadas em todas as telas (menu, pausa, fim de luta, rota de ataque, mapa, buffs, história); o que ficou usa no mínimo 7–8 px. A pausa agora tem só os três botões.
 - HUD: o dash mostra a tecla quando está pronto e a bomba mostra o número de cargas com a tecla embaixo.
 - Página TOQUE dos controles só explica os controles; a escolha de esquema e de ajuda foi para CONFIGURAÇÕES.
+- Treino de Voo: alvos 40 px mais abaixo, para não cobrirem o contador "1/3".
+- **Vídeo da demonstração regravado** (80 s) com o fluxo da v1.8: menu da primeira vez, Treino de Voo, setor, pausa, menu completo, tela CONTROLES e duelo. Slides gerados de novo com o vídeo novo.
 
 ### Testes
 - `onboarding.test.js` (8 testes) e regressão da Hidra parada em `worlds.test.js` (total: **362**).

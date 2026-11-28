@@ -192,7 +192,7 @@ function qr(slide, x, y, size, side) {
     s.addText(head, { x: 1.1, y, w: 3.9, h: 0.3, fontFace: HEAD, fontSize: 14, bold: true, color, margin: 0, isTextBox: true });
     s.addText(body, { x: 1.1, y: y + 0.3, w: 3.9, h: 0.55, fontFace: BODY, fontSize: 12, color: C.text, margin: 0, valign: 'top', isTextBox: true });
   });
-  // Vídeo da demonstração (gravado do jogo, 72 s, sem som): clique para tocar.
+  // Vídeo da demonstração (gravado do jogo na v1.8, 80 s, sem som): clique para tocar.
   const vh = 3.4;
   const vw = vh * 0.75;
   const vx = 5.3;
@@ -204,7 +204,7 @@ function qr(slide, x, y, size, side) {
   });
   s.addText('Demonstração (clique para tocar)', { x: vx - 0.3, y: vy + vh + 0.08, w: vw + 0.6, h: 0.25, fontFace: BODY, fontSize: 10, italic: true, color: C.muted, align: 'center', margin: 0, isTextBox: true });
   qr(s, 8.25, 1.45, 1.1, false);
-  s.addNotes("Agora a história. No ano 2187, a armada do Ômega, liderada pelo Titã, apagou as colônias. A Vega, última piloto da Aliança, foge na nave NT-01 para destruir o Ômega no centro da galáxia.\n\nA história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.\n\nDEMONSTRAÇÃO (1:30): Nova Campanha > introdução (ENTER, depois ESC) > 30 s do primeiro setor > P e I > Q > Duelo com o Titã. Roteiro completo em docs/apresentacao/README.md.\n\nFECHAMENTO: Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e o Nathan e o Luccas cuidaram das músicas e do design das fases. Obrigado! Alguma pergunta?");
+  s.addNotes("Agora a história. No ano 2187, a armada do Ômega, liderada pelo Titã, apagou as colônias. A Vega, última piloto da Aliança, foge na nave NT-01 para destruir o Ômega no centro da galáxia.\n\nA história conversa com o jogo: os buffs são os núcleos de energia que os chefes deixam, e os mundos são o caminho até o Ômega. Ela aparece dentro do jogo, na introdução, entre cada mundo e nos finais de vitória e de derrota, com uma música própria.\n\nDEMONSTRAÇÃO (1:00): Iniciar jogo > introdução (ENTER, depois ESC) > Treino de Voo > 15 s do primeiro setor > P e I > Q > Controles > Duelo com o Titã. Roteiro completo em docs/apresentacao/README.md.\n\nFECHAMENTO: Na divisão de tarefas, o Luiz fez a programação, o game design e a documentação, e o Nathan e o Luccas cuidaram das músicas e do design das fases. Obrigado! Alguma pergunta?");
 }
 
 // Grava sem as entradas de pasta que o pptxgenjs coloca no ZIP (o OneDrive e

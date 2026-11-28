@@ -8,7 +8,7 @@
 
 **Slides:** [`Nebula-Titan-Apresentacao.pptx`](Nebula-Titan-Apresentacao.pptx), 5 slides, abre no PowerPoint e no Google Slides. Cada slide tem **anotações do apresentador** com o que falar.
 
-**Vídeo da demonstração:** [`demonstracao.mp4`](demonstracao.mp4), 72 segundos, sem som. Ele está **dentro do slide 5** (clique no vídeo para tocar no PowerPoint) e também solto nesta pasta, para abrir em qualquer player. Foi gravado do jogo real, seguindo o roteiro da demonstração: tela inicial → introdução da história → primeiro setor → pausa e Meus Buffs → Duelo com o Titã, em que as duas asas do chefe são destruídas. Na gravação a nave estava invencível e o piloto era automático, para o vídeo não depender de ninguém jogar bem.
+**Vídeo da demonstração:** [`demonstracao.mp4`](demonstracao.mp4), 80 segundos, sem som, gravado na **v1.8**. Ele está **dentro do slide 5** (clique no vídeo para tocar no PowerPoint) e também solto nesta pasta, para abrir em qualquer player. Foi gravado do jogo real, como alguém jogando pela primeira vez: menu da primeira vez → introdução da história → Treino de Voo → primeiro setor → pausa e Meus Buffs → menu completo → tela CONTROLES (teclado desenhado) → Duelo com o Titã, em que uma asa do chefe é destruída. Na gravação a nave estava invencível e o piloto era automático, para o vídeo não depender de ninguém jogar bem.
 
 **QR code:** na **capa** e no **slide 5**, abre [nebula-titan.vercel.app](https://nebula-titan.vercel.app) para quem quiser jogar no celular. A imagem também está em [`docs/images/qr-jogo.png`](../images/qr-jogo.png).
 
@@ -80,11 +80,13 @@ O enunciado sugere: história e objetivo, demonstração jogando, o que cada um 
 
 | O que fazer no jogo | O que falar |
 |---|---|
-| Na tela inicial, escolher **NOVA CAMPANHA** | Vou mostrar o jogo funcionando. |
+| Na primeira vez o menu tem só 3 opções: escolher **INICIAR JOGO** | Na primeira vez o menu é simples, para não confundir quem está começando. |
 | Deixar a 1ª página da introdução aparecer, apertar **ENTER** e depois **ESC** | Essa é a introdução. ENTER passa a página e ESC pula. |
-| Jogar o primeiro setor por uns 30 segundos | Os inimigos entram em formação, como no Galaga. Em cima ficam os pontos; embaixo, as vidas. |
+| **Treino de Voo**: mover, destruir os 3 alvos e apertar **P** | Antes da primeira fase tem um treino: ele mostra a tecla e espera você fazer. |
+| Jogar o primeiro setor por uns 15 segundos | Os inimigos entram em formação, como no Galaga. Em cima ficam os pontos; embaixo, as vidas. |
 | Apertar **P** e depois **I** | O P pausa, e o I mostra os buffs. |
-| Voltar ao menu (**Q** na pausa) e escolher **DUELO COM O TITÃ** | Aqui é um chefe. Os colchetes amarelos mostram o ponto fraco, e quando uma asa cai ele muda os ataques. |
+| Voltar ao menu (**Q** na pausa) e abrir **CONTROLES** | Depois de jogar, o menu mostra o resto. Os controles aparecem num teclado, cada ação com uma cor. |
+| Voltar e escolher **DUELO** | Aqui é um chefe. Os colchetes amarelos mostram o ponto fraco, e quando uma asa cai ele muda os ataques. |
 
 **Fechamento (0:15)**
 
@@ -139,7 +141,7 @@ Esta parte **não é para ler na apresentação**. É para vocês entenderem os 
 - Teste o som da sala: a música e os efeitos também contam na nota.
 - Se a internet falhar, rode `npm start` e abra http://localhost:5173.
 
-**Desde a v1.8 (jogando ao vivo):** num navegador que nunca jogou, o menu mostra só **INICIAR JOGO, CONTROLES e CONFIGURAÇÕES**, e depois da introdução aparece o **Treino de Voo** (ENTER pula). O **dash agora é no Shift** e o foco no C. Na primeira luta com uma habilidade nova aparece um cartão pedindo para apertar a tecla. O vídeo `demonstracao.mp4` foi gravado antes dessas mudanças.
+**Desde a v1.8 (jogando ao vivo):** num navegador que nunca jogou, o menu mostra só **INICIAR JOGO, CONTROLES e CONFIGURAÇÕES**, e depois da introdução aparece o **Treino de Voo** (ENTER pula). O **dash agora é no Shift** e o foco no C. Na primeira luta com uma habilidade nova aparece um cartão pedindo para apertar a tecla. O vídeo `demonstracao.mp4` já mostra esse fluxo.
 
 **Dica para a demonstração:** o modo `?debug` (http://localhost:5173/?debug) tem atalhos: `T` destrói o alvo atual (pula fases), `G` liga a invencibilidade. Útil para mostrar o Ômega ou o final da história sem jogar a campanha inteira.
 

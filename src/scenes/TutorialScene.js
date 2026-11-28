@@ -97,7 +97,7 @@ export class TutorialScene {
 
   spawnTargets() {
     for (let i = 0; i < TUTORIAL_TARGETS; i++) {
-      this.targets.push({ x: W / 2 + (i - 1) * 120, y: 200, baseY: 200, phase: i, hp: TARGET_HP, hit: 0 });
+      this.targets.push({ x: W / 2 + (i - 1) * 120, y: 240, baseY: 240, phase: i, hp: TARGET_HP, hit: 0 });
     }
   }
 
